@@ -3,7 +3,8 @@
 --@auther 大猪猪，RedPig
 --@date 2016-10-23
 PrefabFiles = {
-
+"bigpig",
+"redpig",
 }
 local require = GLOBAL.require
 --自定义工具函数（常用的工具函数放这里）
