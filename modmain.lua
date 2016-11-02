@@ -4,8 +4,8 @@
 --@date 2016-10-23
 --test1234
 PrefabFiles = {
-"bigpig",
-"redpig",
+"pkc_bigpig",
+"pkc_redpig",
 }
 
 local require = GLOBAL.require
