@@ -2,7 +2,7 @@
 --@description MOD入口
 --@auther 大猪猪，RedPig
 --@date 2016-10-23
---test123
+--test1
 PrefabFiles = {
 "bigpig",
 "redpig",
