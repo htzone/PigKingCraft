@@ -22,42 +22,63 @@ local function choose_pos()
 	end
 end
 
---生成基地
-function PKC_BASE:ProduceBase(group_num)
-	
+--生成单个设施 
+--@大猪猪 10-31
+local function produceSingleUtil(prefname,pos,offset)
+	SpawnPrefab(prefname).Transform:SetPosition( (pos+offset):Get() )
+end
+
+--位置是否合格
+--@大猪猪 10-31
+local function isValidBasePos(pos,previousPos)
+	for k,v in pairs(previousPos) do
+		if v and pos:Dist(v) < GROUP_DISTANCE then
+			return true	--只要有一个小于允许的最小距离,那么继续选位置
+		end
+	end
+	return false
+end
+
+--生成单个基地
+--@大猪猪 10-31
+local function produceSingleBase(previousPos)
+	local pos=choose_pos()
+	while isValidBasePos(pos,previousPos) do
+		pos = choose_pos()
+	end
+	produceSingleUtil("firepit",pos,Vector3(1.5,0,0))
+	produceSingleUtil("coldfirepit",pos,Vector3(-1.5,0,0))
+	produceSingleUtil("cookpot",pos,Vector3(0,0,-3))
+	produceSingleUtil("cookpot",pos,Vector3(3,0,-3))
+	produceSingleUtil("cookpot",pos,Vector3(0,0,-6))
+	produceSingleUtil("cookpot",pos,Vector3(3,0,-6))
+	produceSingleUtil("icebox",pos,Vector3(1.5,0,-4.5))
+	produceSingleUtil("tent",pos,Vector3(3,0,3))
+	produceSingleUtil("siestahut",pos,Vector3(-3,0,3))
+	return pos
+end
+
+--生成基地并保存基地的位置	
+--@大猪猪 10-31
+function PKC_BASE:ProduceBase(group_num)	--参数是基地的个数
 	if not self.inst.hasProduceBase then
 		local pt = self.inst:GetPosition()
-		local x,y,z = pt:Get()
-		local pos1 = choose_pos()
-		while pos1:Dist(pt) < 200 do
-			pos1 = choose_pos()
-		end
-		local x1,y1,z1 = pos1:Get()
-		SpawnPrefab("firepit").Transform:SetPosition(x1+1.5,y,z1)
-		SpawnPrefab("coldfirepit").Transform:SetPosition(x1-1.5,y,z1)
-		SpawnPrefab("cookpot").Transform:SetPosition(x1,y,z1-3)
-		SpawnPrefab("cookpot").Transform:SetPosition(x1+3,y,z1-3)
-		SpawnPrefab("cookpot").Transform:SetPosition(x1,y,z1-6)
-		SpawnPrefab("cookpot").Transform:SetPosition(x1+3,y,z1-6)
-		SpawnPrefab("icebox").Transform:SetPosition(x1+1.5,y,z1-4.5)
-		SpawnPrefab("tent").Transform:SetPosition(x1+3,y,z1+3)
-		SpawnPrefab("siestahut").Transform:SetPosition(x1-3,y,z1+3)
-		--生成海贼基地
-		local pos2 = choose_pos()
-		while pos2:Dist(pt) < 200 or pos2:Dist(pos1) < 200 do
-			pos2 = choose_pos()
-		end
-		local x2,y2,z2 = pos2:Get()
-		SpawnPrefab("firepit").Transform:SetPosition(x2+1.5,y,z2)
-		SpawnPrefab("coldfirepit").Transform:SetPosition(x2-1.5,y,z2)
-		SpawnPrefab("cookpot").Transform:SetPosition(x2,y,z2-3)
-		SpawnPrefab("cookpot").Transform:SetPosition(x2+3,y,z2-3)
-		SpawnPrefab("cookpot").Transform:SetPosition(x2,y,z2-6)
-		SpawnPrefab("cookpot").Transform:SetPosition(x2+3,y,z2-6)
-		SpawnPrefab("icebox").Transform:SetPosition(x2+1.5,y,z2-4.5)
-		SpawnPrefab("tent").Transform:SetPosition(x2+3,y,z2+3)
-		SpawnPrefab("siestahut").Transform:SetPosition(x2-3,y,z2+3)
+		local pos1=produceSingleBase({pt})	--产生基地,且和已经存在的位置做距离的比较
+		TheWorld.components.pkc_baseinfo:SetBasePos("BIG",pos1)
 		
+		local pos2=produceSingleBase({pt,pos1})
+		TheWorld.components.pkc_baseinfo:SetBasePos("RED",pos2)
+		
+		local pos3
+		if group_num>=3 then
+			pos3=produceSingleBase({pt,pos1,pos2})
+			TheWorld.components.pkc_baseinfo:SetBasePos("LONG",pos3)
+		end
+		local pos4
+		if group_num>=4 then
+			pos4=produceSingleBase({pt,pos1,pos2,pos3})
+			TheWorld.components.pkc_baseinfo:SetBasePos("CUI",pos4)
+		end
 		self.inst.hasProduceBase = true
 	end
 end
