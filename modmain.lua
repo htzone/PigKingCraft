@@ -2,7 +2,7 @@
 --@description MOD入口
 --@auther 大猪猪，RedPig
 --@date 2016-10-23
---test1234
+
 PrefabFiles = {
 "pkc_bigpig",
 "pkc_redpig",
@@ -21,4 +21,5 @@ modimport("scripts/init/pkc_playerinit")
 modimport("scripts/init/pkc_choosegroup") 
 --基地生成
 modimport("scripts/init/pkc_produecebase")
+
 

@@ -26,3 +26,5 @@
 		BIGPIG = "大猪猪势力",
 		REDPIG = "红猪猪势力",
 	}
+	--猪王的生命值
+	GLOBAL.PIGKING_HEALTH = 500

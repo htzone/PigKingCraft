@@ -108,3 +108,46 @@ function pkc_trySpawn(target, prefab_name, min_dist, max_dist, max_trying_times,
 	end
 	return b
 end
+
+--根据tag来找到最近的prefab
+--@param tag Tag名
+function pkc_findFirstPrefabByTag(tag)
+	return TheSim:FindFirstEntityWithTag(tag)
+end
+
+--根据权值大小随机获取物品
+--@param weight_table 传入的table 如：--设置掉落权值 local loot = {preab1 = 1, prefab2 = 2,}
+--@return 返回随机获取后的物品字符串
+function pkc_getRandomStrByWeight(weight_table)
+    local function weighted_total(weight_table)
+        local total = 0
+        for choice, weight in pairs(weight_table) do
+            total = total + weight
+        end
+        return total
+    end
+    local threshold = math.random() * weighted_total(weight_table)
+    local last_choice
+    for choice, weight in pairs(weight_table) do
+        threshold = threshold - weight
+        if threshold <= 0 then return choice end
+        last_choice = choice
+    end
+    return last_choice
+end
+
+function pkc_HexToRGB(hex)
+    hex = hex:gsub("#","")
+    return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+end
+
+function pkc_RGBToPercentColor(r, g, b)
+    return r/255, g/255, b/255
+end
+
+--根据颜色字符串转换成rgb的值
+--@param 颜色字符串
+--@return rgb值
+function pkc_HexToPercentColor(hex)
+    return pkc_RGBToPercentColor(pkc_HexToRGB(hex))
+end

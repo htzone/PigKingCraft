@@ -1,3 +1,5 @@
+--[[红猪猪]]--
+
 local assets =
 {
     Asset("ANIM", "anim/pig_king.zip"),
@@ -72,6 +74,41 @@ local function OnIsNight(inst, isnight)
     end
 end
 
+--被攻击时播放动画
+local function healthdelta_fn(inst, data)
+	if inst and data then
+		if data.newpercent > 0 and data.newpercent < data.oldpercent then
+			inst.AnimState:PlayAnimation("happy")
+			inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingReject")
+		end
+		if data.newpercent == 0 then
+			inst.AnimState:PlayAnimation("sleep_pre")
+			inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingHappy")
+		end
+	end
+end
+
+--被攻击时让猪人群殴之
+local function attacked_fn(inst, data)
+	local attacker = data and data.attacker
+	if attacker then
+		if inst.components.combat:CanTarget(attacker) and not attacker:HasTag("pig") then
+			inst.components.combat:ShareTarget(attacker, 100, function(dude)
+				return dude:HasTag("pig")	
+			end, 40)
+		end
+	end
+end
+
+--死亡
+local function death_fn(inst)
+	if inst then
+	end
+end
+
+--掉落
+local pigking_loot_table = {"meat","meat","meat","meat","meat","meat","meat","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget",}
+
 local function fn()
     local inst = CreateEntity()
 
@@ -90,9 +127,11 @@ local function fn()
 
     inst.DynamicShadow:SetSize(10, 5)
 
-    --inst.Transform:SetScale(1.5, 1.5, 1.5)
+    inst.Transform:SetScale(1.2, 1.2, 1.2)
 
     inst:AddTag("king")
+	inst:AddTag("redpig")
+	inst:AddTag("pig")
     inst.AnimState:SetBank("Pig_King")
     inst.AnimState:SetBuild("Pig_King")
     inst.AnimState:PlayAnimation("idle", true)
@@ -109,7 +148,19 @@ local function fn()
     inst:AddComponent("inspectable")
 
     inst:AddComponent("trader")
-
+	
+	--设置颜色
+	local r, g, b = pkc_HexToPercentColor("#E50000")
+	inst.AnimState:SetMultColour(r, g, b, 1)
+	
+	--让猪王具备生命
+	inst:AddComponent("pkc_addhealth")
+	inst.components.pkc_addhealth:setMaxHealth(PIGKING_HEALTH) --设置最大生命值
+	inst.components.pkc_addhealth:setOnHealthDelta(healthdelta_fn) --监听生命变化
+	inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
+	inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
+	inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
+	
     inst.components.trader:SetAcceptTest(AcceptTest)
     inst.components.trader.onaccept = OnGetItemFromPlayer
     inst.components.trader.onrefuse = OnRefuseItem
@@ -130,4 +181,4 @@ local function fn()
     return inst
 end
 
-return Prefab("pigking", fn, assets, prefabs)
+return Prefab("pkc_redpig", fn, assets, prefabs)
