@@ -23,8 +23,9 @@ end
 local function showStartWindow(inst, player)
 	print("name:"..player.name)
 	if player 
-	and player.components.pkc_group 
-	and player.components.pkc_group:getChoosen() ~= true 
+	--and player.components.pkc_group 
+	--and player.components.pkc_group:getChoosen() == 0		
+	and player.hasChoosen:value() == 0		--这个变量初值为0 
 	then --未选择过阵营时执行
 		makePlayerInvincible(player)
 		local pkc_introduction_screen = require "screens/pkc_introduction_screen"
@@ -34,6 +35,8 @@ end
 
 --监听玩家加入游戏
 AddPrefabPostInit("world", function(inst)
+	--if GLOBAL.TheWorld.ismastersim then
 	inst:ListenForEvent("playeractivated", showStartWindow, TheWorld)
+	--end
 end)
 

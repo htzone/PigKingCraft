@@ -100,23 +100,32 @@ local function cnancleInvincible(player, delay_time)
 	end)
 end
 
+--把请求发送给主机,这样就省去网络变量的定义了
+--@param player 玩家
+--@param group_id 玩家选择的营地ID
+--@大猪猪 10-31
+local function teleportToBase(player, group_id)
+	local Namespace="pkc_teleport"
+	local Action="TeleportToBase"
+	if TheWorld.ismastersim then
+		MOD_RPC_HANDLERS[Namespace][MOD_RPC[Namespace][Action].id](player, group_id)
+	else
+		SendModRPCToServer( MOD_RPC[Namespace][Action], group_id)
+	end
+end
+
 --选择阵营势力
+--选择后进入基地
+--@大猪猪 10-31
 function PauseScreen:chooseGroup(group_id)
-	if ThePlayer  then 
+	if ThePlayer then
+		--[[
 		if not ThePlayer.components.pkc_group then
 			ThePlayer:AddComponent("pkc_group")
 		end
-		--标记已选择阵营
-		ThePlayer.components.pkc_group:setChoosen(true)
-		cnancleInvincible(ThePlayer, 5)
-	end
-	if GROUP_BIGPIG_ID == group_id then
-		--TODO 选择阵营之后的操作，记录选择的阵营并传送至对应基地
-
-		self:unpause()
-	elseif GROUP_REDPIG_ID == group_id then
-		--TODO 选择阵营之后的操作，记录选择的阵营并传送至对应基地
+		ThePlayer.components.pkc_group:setChoosen(group_id)]]
 		
+		teleportToBase(ThePlayer, group_id)
 		self:unpause()
 	end
 end

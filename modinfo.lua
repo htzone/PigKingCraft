@@ -5,7 +5,7 @@ PigKingCraft(PVP)
 ]]
 
 author = "大猪猪, RedPig"
-version = "1.0.0"
+version = "1.0.6"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -64,5 +64,16 @@ configuration_options =
 			{description = "4组", data = 4, hover = "4组" },
         },
         default = 2,
+    },
+	{
+        name = "group_distance",
+        label = "各个阵营最小距离",
+        options =
+        {
+            {description = "200", data = 200, hover = "200"},
+            {description = "300", data = 300, hover = "300" },
+			{description = "400", data = 400, hover = "400" },
+        },
+        default = 200,
     },
 }

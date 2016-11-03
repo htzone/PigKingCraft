@@ -151,3 +151,32 @@ end
 function pkc_HexToPercentColor(hex)
     return pkc_RGBToPercentColor(pkc_HexToRGB(hex))
 end
+
+--定义网络变量
+--@大猪猪 10-31
+--@param inst 要添加网络变量的对象
+--@param nettab 要添加网络变量的列表,例如{ GROUP_BIGPIG_POS_x = {"net_float", 0}, }
+function pkc_setNetvar(inst,nettab)
+	local t = {
+		net_shortint = net_shortint,
+		net_tinybyte = net_tinybyte,
+		net_smallbyte = net_smallbyte,
+		net_byte = net_byte,
+		net_shortint = net_shortint,
+		net_ushortint = net_ushortint,
+		net_int = net_int,
+		net_uint = net_uint,
+		net_float = net_float,
+		net_hash = net_hash,
+		net_string = net_string,
+		net_entity = net_entity,
+		net_bytearray = net_bytearray,
+		net_smallbytearray = net_smallbytearray,
+	}
+	for k,v in pairs(nettab) do
+		if type(v) == "table" then
+			inst[k] = t[v[1]](inst.GUID, k, k.."dirty")
+			inst[k]:set(v[2])
+		end
+	end
+end
