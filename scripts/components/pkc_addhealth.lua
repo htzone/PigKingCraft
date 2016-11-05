@@ -1,4 +1,4 @@
---@name pkc_hashealth
+--@name pkc_addhealth
 --@description 让prefab具有生命且可被杀死组件
 --@auther redpig
 --@date 2016-11-02

@@ -11,10 +11,9 @@ end
 --@param fn_name 组件函数名
 --@param fn 要注入的函数实现
 function pkc_inject(comp, fn_name, fn)
-	local old = comp[fn_name]
+	comp["Old"..fn_name] = comp[fn_name]
 	comp[fn_name] = function(self,...)
-		old(self,...)
-		fn(self.inst)
+		return fn(self,...)
 	end
 end
 

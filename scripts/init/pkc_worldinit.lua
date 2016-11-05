@@ -6,6 +6,18 @@
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()
 
+--检查是不是同盟关系。
+local function checkFn(attacker, target)
+	if attacker and target then
+		if attacker.components.pkc_group 
+		and target.components.pkc_group 
+		and attacker.components.pkc_group.hasChoosen == target.components.pkc_group.hasChoosen then
+			return true
+		end
+	end
+	return false
+end
+
 --世界初始化
 --@大猪猪 10-31
 AddPrefabPostInit("world", function(inst)
@@ -21,6 +33,11 @@ AddPrefabPostInit("world", function(inst)
 			GROUP_CUIPIG_POS_x = {"net_float", 0},
 			GROUP_CUIPIG_POS_z = {"net_float", 0},
 		})]]
+		
+		--添加防止队友相互攻击组件
+		inst:AddComponent("pkc_checkattack")
+		inst.components.pkc_checkattack:isGroupMember(checkFn)
+		
 		if IsServer then
 			inst:AddComponent("pkc_baseinfo")	--记录阵营的位置
 		end
