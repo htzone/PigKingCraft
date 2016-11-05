@@ -22,17 +22,6 @@ end
 --@大猪猪 10-31
 AddPrefabPostInit("world", function(inst)
 	if inst then
-		--[[
-		GLOBAL.pkc_setNetvar(inst,{
-			GROUP_BIGPIG_POS_x = {"net_float", 0},
-			GROUP_BIGPIG_POS_z = {"net_float", 0},
-			GROUP_REDPIG_POS_x = {"net_float", 0},
-			GROUP_REDPIG_POS_z = {"net_float", 0},
-			GROUP_LONGPIG_POS_x = {"net_float", 0},
-			GROUP_LONGPIG_POS_z = {"net_float", 0},
-			GROUP_CUIPIG_POS_x = {"net_float", 0},
-			GROUP_CUIPIG_POS_z = {"net_float", 0},
-		})]]
 		
 		--添加防止队友相互攻击组件
 		inst:AddComponent("pkc_checkattack")
@@ -73,10 +62,10 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 	
 	local t=
 	{
-		GROUP_BIGPIG_POS = { id=GLOBAL.GROUP_BIGPIG_ID, info="大猪猪营地" },
-		GROUP_REDPIG_POS = { id=GLOBAL.GROUP_REDPIG_ID, info="红猪猪营地" },
-		GROUP_LONGPIG_POS = { id=GLOBAL.GROUP_LONGPIG_ID, info="龙猪猪营地" },
-		GROUP_CUIPIG_POS = { id=GLOBAL.GROUP_CUIPIG_ID, info="崔猪猪营地" },
+		GROUP_BIGPIG_POS = { id=GLOBAL.GROUP_BIGPIG_ID, info="大猪猪营地", color={0,1,0}, },
+		GROUP_REDPIG_POS = { id=GLOBAL.GROUP_REDPIG_ID, info="红猪猪营地", color={1,0,0}, },
+		GROUP_LONGPIG_POS = { id=GLOBAL.GROUP_LONGPIG_ID, info="龙猪猪营地", color={0,0,1}, },
+		GROUP_CUIPIG_POS = { id=GLOBAL.GROUP_CUIPIG_ID, info="崔猪猪营地", color={1,0,1}, },
 	}
 	for k,v in pairs(t) do
 		if group_id == t[k].id then
@@ -86,11 +75,20 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			if player.components.talker then
 				player.components.talker:Say("我来到了 "..t[k].info.." 坐标位置是 { "..x..", ".."0, "..z.." }")
 			end
+			
+			GLOBAL.pkc_spawnat(player,"pkc_title",{0,3,0},1,function(guy,player)
+				guy.Label:SetColour(GLOBAL.unpack(v.color))
+				guy.Label:SetText( string.sub(player:GetDisplayName(),1,20) )
+				if player.pkc_title~=nil then
+					player.pkc_title:Remove()
+					player.pkc_title=guy
+				end
+			end)
+			
 			break
 		end
 	end
 end)
-
 
 
 

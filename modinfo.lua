@@ -5,7 +5,7 @@ PigKingCraft(PVP)
 ]]
 
 author = "大猪猪, RedPig"
-version = "1.0.6"
+version = "1.0.7"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:

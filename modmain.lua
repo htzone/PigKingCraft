@@ -6,6 +6,7 @@
 PrefabFiles = {
 "pkc_bigpig",
 "pkc_redpig",
+"pkc_title",
 }
 
 local require = GLOBAL.require

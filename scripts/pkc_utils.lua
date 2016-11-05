@@ -179,3 +179,78 @@ function pkc_setNetvar(inst,nettab)
 		end
 	end
 end
+
+--生成物体
+--@大猪猪 11-05
+--@param inst 生成新物体的参照物
+--@param prefname 如果是string则是单一的新物体,如果是table，则为按照权重的单一物体,例如{bat=1,butterfly=2}那么蝙蝠概率1/3，蝴蝶概率2/3
+--@param offset	新物体相对于参照物inst的位置比如{0,3,0}就是在上方3单位高度(看具体模式mode决定)
+--@param mode 新物体相对于参照物的模式,如果mode为1,新物体则是inst的child,如果是sring类型,则这个是symbol,如果为空则是普通的位置关系
+function pkc_spawnat(inst,prefname,offset,mode,fn)
+	if not inst then return end
+	local tar
+	if type(prefname) == "string" then
+		tar = SpawnPrefab(prefname)
+	elseif type(prefname) == "table" then
+		--获取权重
+		local weight = 0
+		for k,v in pairs(prefname) do
+			weight = weight + v
+		end
+		--选取物体
+		local t = 0
+		local ran = math.random()
+		for k,v in pairs(prefname) do
+			t = t + v
+			if ran <= t/weight then
+				tar = SpawnPrefab(k)
+				break
+			end
+		end
+	else
+		return
+	end
+	if not tar then return end
+		
+	--物体的parent位置关系
+	if mode == 1 then
+		tar.entity:SetParent(inst.entity)
+		if type(offset) == "table" then
+			tar.Transform:SetPosition(offset[1],offset[2],offset[3])
+		else
+			tar.Transform:SetPosition(0,0,0)
+		end
+	--Follow Symbol的关系
+	elseif type(mode) == "string" then
+		
+		tar.entity:SetParent(inst.entity)
+		tar.entity:AddFollower()
+		if type(offset) == "table" then
+			tar.Follower:FollowSymbol(inst.GUID, mode, offset[1],offset[2],offset[3])
+		else
+			tar.Follower:FollowSymbol(inst.GUID, mode, 0,0,0)
+		end
+	--普通生成模式
+	else
+		local x,y,z = inst.Transform:GetWorldPosition()
+		local x1,y1,z1 = x,y,z
+		if type(offset) == "table" then
+			x1,y1,z1 = x+offset[1], y+offset[2], z+offset[3]
+		end
+		tar.Transform:SetPosition(x1,y1,z1)
+	end
+	
+	if fn then
+		fn(tar,inst)
+	end
+end
+
+
+
+
+
+
+
+
+
+
