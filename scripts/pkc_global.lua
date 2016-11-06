@@ -36,3 +36,5 @@
 	GLOBAL.PIGKING_HEALTH = 500
 	--基地间的距离
 	GLOBAL.GROUP_DISTANCE=GetModConfigData("group_distance")
+	--下线掉落所有物品
+	GLOBAL.LEVAE_DROP_EVERYTHING = GetModConfigData("levae_drop_everything")

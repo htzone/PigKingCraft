@@ -76,4 +76,14 @@ configuration_options =
         },
         default = 200,
     },
+	{
+        name = "levae_drop_everything",
+        label = "下线掉落身上所有物品",
+        options =
+        {
+            {description = "是", data = true, hover = "是"},
+            {description = "否", data = false, hover = "否" },
+        },
+        default = true,
+    },
 }

@@ -17,6 +17,12 @@ function pkc_inject(comp, fn_name, fn)
 	end
 end
 
+--属性注入
+function pkc_propinject(comp, prop_name, prop)
+	comp["Old"..prop_name] = comp[prop_name]
+	comp[prop_name] = prop
+end
+
 --强制触发网络变量更新函数
 --@param netvar 网络变量名称
 --@param val 网络变量的值

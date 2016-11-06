@@ -13,7 +13,7 @@ local require = GLOBAL.require
 --自定义工具函数（常用的工具函数放这里）
 require "pkc_utils" 
 --全局变量（全局变量放这里）
-modimport("scripts/pkc_global") 
+modimport("scripts/pkc_global")
 --世界初始化
 modimport("scripts/init/pkc_worldinit") 
 --玩家初始化
@@ -22,3 +22,5 @@ modimport("scripts/init/pkc_playerinit")
 modimport("scripts/init/pkc_choosegroup") 
 --基地生成
 modimport("scripts/init/pkc_produecebase")
+--设置约束条件
+modimport("scripts/init/pkc_rulesinit")

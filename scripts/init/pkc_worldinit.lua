@@ -35,7 +35,7 @@ end)
 
 
 --取消无敌状态
-local function cnancleInvincible(player, delay_time)
+local function cancelInvincible(player, delay_time)
 	player:DoTaskInTime(delay_time, function()
 		if player then
 			if player.components.health then
@@ -58,7 +58,7 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 	end
 	player.components.pkc_group:setChoosen(group_id)
 	
-	cnancleInvincible(player, 5)
+	cancelInvincible(player, 5)
 	
 	local t=
 	{
