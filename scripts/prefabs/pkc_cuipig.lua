@@ -1,5 +1,5 @@
---@name pkc_bigpig
---@description 大猪猪首领
+--@name pkc_redpig
+--@description 红猪首领
 --@auther RedPig
 --@date 2016-11-01
 
@@ -117,7 +117,7 @@ local function fn()
 
 	--设置阵营
 	inst:AddComponent("pkc_group")
-	inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
+	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
 	
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
@@ -135,8 +135,9 @@ local function fn()
     inst.DynamicShadow:SetSize(10, 5)
 
     inst.Transform:SetScale(1, 1, 1)
-	inst:AddTag("king")
-	inst:AddTag("pkc_bigpig")
+
+    inst:AddTag("king")
+	inst:AddTag("pkc_cuipig")
 	inst:AddTag("pig")
     inst.AnimState:SetBank("Pig_King")
     inst.AnimState:SetBuild("Pig_King")
@@ -156,7 +157,7 @@ local function fn()
     inst:AddComponent("trader")
 	
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.BIGPIG.color)
+	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	
 	--让猪王具备生命
@@ -166,7 +167,7 @@ local function fn()
 	inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
 	inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
 	inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
-
+	
     inst.components.trader:SetAcceptTest(AcceptTest)
     inst.components.trader.onaccept = OnGetItemFromPlayer
     inst.components.trader.onrefuse = OnRefuseItem
@@ -183,11 +184,10 @@ local function fn()
         end
         return false
     end)
-
 	inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription("大猪猪爱吃肉！")
-	
+	inst.components.inspectable:SetDescription("基佬崔猪猪！")
+
     return inst
 end
 
-return Prefab("pkc_bigpig", fn, assets, prefabs)
+return Prefab("pkc_cuipig", fn, assets, prefabs)

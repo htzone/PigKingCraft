@@ -137,7 +137,7 @@ local function fn()
     inst.Transform:SetScale(1, 1, 1)
 
     inst:AddTag("king")
-	inst:AddTag("redpig")
+	inst:AddTag("pkc_redpig")
 	inst:AddTag("pig")
     inst.AnimState:SetBank("Pig_King")
     inst.AnimState:SetBuild("Pig_King")
@@ -157,7 +157,7 @@ local function fn()
     inst:AddComponent("trader")
 	
 	--设置颜色
-	local r, g, b = HexToPercentColor("#E50000")
+	local r, g, b = HexToPercentColor(GROUP_INFOS.REDPIG.color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	
 	--让猪王具备生命
@@ -185,7 +185,7 @@ local function fn()
         return false
     end)
 	inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription("它是小红猪！")
+	inst.components.inspectable:SetDescription("万恶的小红猪！")
 
     return inst
 end

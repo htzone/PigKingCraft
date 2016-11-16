@@ -88,9 +88,9 @@ local function produceSingleBase(previousPos, groupId)
 	elseif groupId == GROUP_REDPIG_ID then
 		produceSingleUtil("pkc_redpig", pos, Vector3(-3, 0, -3))
 	elseif groupId == GROUP_LONGPIG_ID then
-	
+		produceSingleUtil("pkc_longpig", pos, Vector3(-3, 0, -3))
 	elseif groupId == GROUP_CUIPIG_ID then
-	
+		produceSingleUtil("pkc_cuipig", pos, Vector3(-3, 0, -3))
 	end
 	return pos
 end

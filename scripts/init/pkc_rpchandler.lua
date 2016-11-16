@@ -42,7 +42,7 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			player.Transform:SetPosition(x, 0, z)
 			player:DoTaskInTime(2, function()
 				if player and player.components.talker then
-					player.components.talker:Say("我来到了 "..v.name.."阵营！")
+					player.components.talker:Say("我要保护我们的"..v.name.."！")
 				end
 			end)
 			--根据选择的阵营进行相应的头部显示

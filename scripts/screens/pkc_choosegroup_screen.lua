@@ -81,7 +81,12 @@ local PauseScreen = Class(Screen, function(self)
 	end
 	
     self.menu = self.proot:AddChild(Menu(buttons, -button_h, false))
-    self.menu:SetPosition(0, 50, 0)
+	if _G.GROUP_NUM < 3 then
+		self.menu:SetPosition(0, 20, 0)
+	else
+		self.menu:SetPosition(0, 50, 0)
+	end
+    
     for i,v in pairs(self.menu.items) do
         v:SetScale(.8)
     end

@@ -7,6 +7,8 @@
 PrefabFiles = {
 "pkc_bigpig",
 "pkc_redpig",
+"pkc_longpig",
+"pkc_cuipig",
 "pkc_title",
 }
 

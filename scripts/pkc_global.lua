@@ -4,6 +4,8 @@
 	GLOBAL.GAME_LANGUAGE = GetModConfigData("language")
 	--分组数
 	GLOBAL.GROUP_NUM = GetModConfigData("group_num")
+	--基地间的距离
+	GLOBAL.GROUP_DISTANCE = 200
 	
 	--大猪猪势力
 	GLOBAL.GROUP_BIGPIG_ID= 1	--0x10
@@ -34,15 +36,13 @@
 	}
 	--阵营信息
 	GLOBAL.GROUP_INFOS = {
-		BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "大猪猪", color = "#0055CC", },
+		BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "大猪猪", color = "#0C6CEC", },
 		REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "红猪猪", color= "#FF0000", },
 		LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "龙猪猪", color = "#33B80F", },
-		CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#F77B01", },
+		CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#FADE07", },
 	}
 	--猪王的生命值
 	GLOBAL.PIGKING_HEALTH = 500
-	--基地间的距离
-	GLOBAL.GROUP_DISTANCE = GetModConfigData("group_distance")
 	--下线掉落所有物品
 	GLOBAL.LEVAE_DROP_EVERYTHING = GetModConfigData("levae_drop_everything")
 	--开始无敌时间（秒）

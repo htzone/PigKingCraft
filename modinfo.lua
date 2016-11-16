@@ -56,34 +56,13 @@ configuration_options =
     },
 	{
         name = "group_num",
-        label = "分组数",
+        label = "分组数(GroupNum)",
         options =
         {
-            {description = "2组", data = 2, hover = "2组"},
-            {description = "3组", data = 3, hover = "3组" },
-			{description = "4组", data = 4, hover = "4组" },
+            {description = "2组", data = 2, hover = "2"},
+            {description = "3组", data = 3, hover = "3" },
+			{description = "4组", data = 4, hover = "4" },
         },
         default = 4,
-    },
-	{
-        name = "group_distance",
-        label = "各个阵营最小距离",
-        options =
-        {
-            {description = "200", data = 200, hover = "200"},
-            {description = "300", data = 300, hover = "300" },
-			{description = "400", data = 400, hover = "400" },
-        },
-        default = 200,
-    },
-	{
-        name = "levae_drop_everything",
-        label = "下线掉落身上所有物品",
-        options =
-        {
-            {description = "是", data = true, hover = "是"},
-            {description = "否", data = false, hover = "否" },
-        },
-        default = true,
     },
 }
