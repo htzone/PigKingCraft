@@ -5,70 +5,136 @@
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()
 
+--让玩家在一段时间内无敌
+local function makePlayerInvincible(player, timeDelay)
+	if player and player.components.health then
+		player.components.health:SetInvincible(true)
+		player._fx = SpawnPrefab("forcefieldfx")
+		if player._fx then
+			player._fx.entity:SetParent(player.entity)
+			player._fx.Transform:SetPosition(0, 0.2, 0)	
+		end
+		player:DoTaskInTime(timeDelay, function()
+			if player then
+				if player.components.health then
+					player.components.health:SetInvincible(false)
+				end
+				if player._fx then
+					player._fx:kill_fx()
+					player._fx:Remove()
+					player._fx = nil
+				end
+			end
+		end)
+	end
+end
+
+--复活计时任务
+local function reviveTask(inst)
+	inst:DoTaskInTime(1, function()
+		if inst then
+			if inst.revive_time > 1 then
+				inst.revive_time = inst.revive_time - 1
+				if inst.components.talker then
+					inst.components.talker:Say("还有"..inst.revive_time.."秒复活")
+				end
+				reviveTask(inst)
+			else
+				if not GLOBAL.TheWorld:HasTag("cave") then
+					if inst.components.pkc_group then
+						local x, y, z = GLOBAL.unpack(inst.components.pkc_group:getBasePos()) 
+						inst.Transform:SetPosition(x, 0, z)
+					end
+					if inst.components.talker then
+						inst.components.talker:Say("啊，我要复活啦！")
+					end
+					inst:DoTaskInTime(3, function()
+						if inst then
+							inst:PushEvent("respawnfromghost")
+						end							
+					end)
+				else
+					inst:PushEvent("respawnfromghost")
+				end
+			end
+		end
+	end)
+end
+
 --玩家初始化
 --@大猪猪 10-31
 AddPlayerPostInit(function(inst)
 	if inst then
-		GLOBAL.pkc_setNetvar(inst,{
-			hasChoosen = {"net_shortint", 0},
-		})
-		if IsServer then	--必须主机加载,否则无法保存
-			--添加玩家阵营组件
-			inst:AddComponent("pkc_group")
-			local t=
-			{
-				GROUP_BIGPIG_POS = { id=GLOBAL.GROUP_BIGPIG_ID, info="大猪猪营地", color={0,1,0}, },
-				GROUP_REDPIG_POS = { id=GLOBAL.GROUP_REDPIG_ID, info="红猪猪营地", color={1,0,0}, },
-				GROUP_LONGPIG_POS = { id=GLOBAL.GROUP_LONGPIG_ID, info="龙猪猪营地", color={0,0,1}, },
-				GROUP_CUIPIG_POS = { id=GLOBAL.GROUP_CUIPIG_ID, info="崔猪猪营地", color={1,0,1}, },
-			}
-			inst:DoTaskInTime(0,function()
-				for k,v in pairs(t) do
-					if inst.components.pkc_group.hasChoosen==v.id then
+		--添加分组组件
+		inst:AddComponent("pkc_group")
+		--添加头部显示组件
+		inst:AddComponent("pkc_headshow")
+		
+		--显示头部名字
+		inst:DoTaskInTime(0, function()
+			if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() ~= 0 then
+				inst.components.pkc_headshow:addHeadView()
+			end
+		end)
+	
+		
+		if IsServer then
+			--出生提示属于哪个阵营（前提是已选择了阵营）
+			inst:DoTaskInTime(2, function()
+				for _,v in pairs(GLOBAL.GROUP_INFOS) do
+					if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() == v.id then
 						if inst.components.talker then
-							inst.components.talker:Say("我属于 "..v.info)
+							inst.components.talker:Say("我属于 "..v.name.."阵营！")
 						end
-						
-						GLOBAL.pkc_spawnat(inst,"pkc_title",{0,3,0},1,function(guy,inst)
-							guy.Label:SetColour(GLOBAL.unpack(v.color))
-							guy.Label:SetText( inst:GetDisplayName() )
-							if inst.pkc_title~=nil then
-								inst.pkc_title:Remove()
-								inst.pkc_title=guy
-							end
-						end)
-						
 						break
 					end
 				end
+			end)
+			--死亡复活机制
+			inst:ListenForEvent("death", function(inst)
+				inst.revive_time = GLOBAL.PLAYER_REVIVE_TIME 
+				reviveTask(inst)
+			end)
+			inst:ListenForEvent("respawnfromghost", function(inst, data)
+				inst.revive_time = -1
+				--makePlayerInvincible(inst, 10)
 			end)
 		end
 	end
 end)
 
-
+--[[
 --给蜘蛛加阵营组件 测试
-AddPrefabPostInit("spider",function(inst)
-	GLOBAL.pkc_setNetvar(inst,{
-		hasChoosen = {"net_shortint", 0},
-	})
-	if GLOBAL.TheWorld.ismastersim then
-		inst:AddComponent("pkc_group")
-		inst.components.pkc_group:setChoosen(GLOBAL.GROUP_BIGPIG_ID)
-		
-		if inst.components.combat then
-			local o_CanTarget = inst.components.combat.CanTarget
-			function inst.components.combat:CanTarget(target)
-				if target and target.components.pkc_group.hasChoosen==inst.components.pkc_group.hasChoosen then
-					return false
-				end
-				return o_CanTarget(self,target)
-			end
-		end
-	end
+AddPrefabPostInit("tallbird",function(inst)
+	inst:AddComponent("pkc_group")
+	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_REDPIG_ID)
+	--if inst.components.combat then
+	--	local o_CanTarget = inst.components.combat.CanTarget
+	--	function inst.components.combat:CanTarget(target)
+	--	if target and target.components.pkc_group.hasChoosen==inst.components.pkc_group.hasChoosen then
+	--			return false
+	--		end
+	--		return o_CanTarget(self,target)
+	--	end
+	--end
+--end
 end)
 
-
+AddPrefabPostInit("spider",function(inst)
+	inst:AddComponent("pkc_group")
+	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
+	--if inst.components.combat then
+	--	local o_CanTarget = inst.components.combat.CanTarget
+	--	function inst.components.combat:CanTarget(target)
+	--	if target and target.components.pkc_group.hasChoosen==inst.components.pkc_group.hasChoosen then
+	--			return false
+	--		end
+	--		return o_CanTarget(self,target)
+	--	end
+	--end
+--end
+end)
+]]--
 
 
 

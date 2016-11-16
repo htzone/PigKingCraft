@@ -2,8 +2,12 @@
 
 --系统公告
 --@param content 公告内容
-function pkc_announce(content)
-	TheNet:Announce(content)
+function pkc_announce(content, showTime)
+	if showTime ~= nil then
+		TheNet:Announce(content, showTime)
+	else
+		TheNet:Announce(content)
+	end
 end
 
 --函数注入
@@ -139,22 +143,6 @@ function pkc_getRandomStrByWeight(weight_table)
         last_choice = choice
     end
     return last_choice
-end
-
-function pkc_HexToRGB(hex)
-    hex = hex:gsub("#","")
-    return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
-end
-
-function pkc_RGBToPercentColor(r, g, b)
-    return r/255, g/255, b/255
-end
-
---根据颜色字符串转换成rgb的值
---@param 颜色字符串
---@return rgb值
-function pkc_HexToPercentColor(hex)
-    return pkc_RGBToPercentColor(pkc_HexToRGB(hex))
 end
 
 --定义网络变量

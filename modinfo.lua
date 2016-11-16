@@ -63,7 +63,7 @@ configuration_options =
             {description = "3组", data = 3, hover = "3组" },
 			{description = "4组", data = 4, hover = "4组" },
         },
-        default = 2,
+        default = 4,
     },
 	{
         name = "group_distance",

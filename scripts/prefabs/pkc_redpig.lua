@@ -1,4 +1,7 @@
---[[红猪猪]]--
+--@name pkc_redpig
+--@description 红猪首领
+--@auther RedPig
+--@date 2016-11-01
 
 local assets =
 {
@@ -112,6 +115,10 @@ local pigking_loot_table = {"meat","meat","meat","meat","meat","meat","meat","go
 local function fn()
     local inst = CreateEntity()
 
+	--设置阵营
+	inst:AddComponent("pkc_group")
+	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
+	
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -127,7 +134,7 @@ local function fn()
 
     inst.DynamicShadow:SetSize(10, 5)
 
-    inst.Transform:SetScale(1.2, 1.2, 1.2)
+    inst.Transform:SetScale(1, 1, 1)
 
     inst:AddTag("king")
 	inst:AddTag("redpig")
@@ -150,7 +157,7 @@ local function fn()
     inst:AddComponent("trader")
 	
 	--设置颜色
-	local r, g, b = pkc_HexToPercentColor("#E50000")
+	local r, g, b = HexToPercentColor("#E50000")
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	
 	--让猪王具备生命
@@ -177,6 +184,8 @@ local function fn()
         end
         return false
     end)
+	inst:AddComponent("inspectable")
+	inst.components.inspectable:SetDescription("它是小红猪！")
 
     return inst
 end

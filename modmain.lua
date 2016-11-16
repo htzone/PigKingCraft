@@ -3,6 +3,7 @@
 --@auther 大猪猪，RedPig
 --@date 2016-10-23
 
+--自定义Prefab
 PrefabFiles = {
 "pkc_bigpig",
 "pkc_redpig",
@@ -18,9 +19,11 @@ modimport("scripts/pkc_global")
 modimport("scripts/init/pkc_worldinit") 
 --玩家初始化
 modimport("scripts/init/pkc_playerinit") 
+--RPC调用处理
+modimport("scripts/init/pkc_rpchandler")
 --阵营选择
 modimport("scripts/init/pkc_choosegroup") 
 --基地生成
-modimport("scripts/init/pkc_produecebase")
+modimport("scripts/init/pkc_producebase")
 --设置约束条件
 modimport("scripts/init/pkc_rulesinit")

@@ -8,7 +8,6 @@ local SpawnPrefab = GLOBAL.SpawnPrefab
 
 --让玩家无敌
 local function makePlayerInvincible(player)
-	print("name:"..player.name)
 	if player and player.components.health then
 		player.components.health:SetInvincible(true)
 		player._fx = SpawnPrefab("forcefieldfx")
@@ -21,15 +20,24 @@ end
 
 --显示开始弹框
 local function showStartWindow(inst, player)
-	print("name:"..player.name)
 	if player 	
-	and player.hasChoosen:value() == 0		--这个变量初值为0 
+	and player.components.pkc_group:getChooseGroup() == 0 --这个变量初值为0 
 	then --未选择过阵营时执行
-		makePlayerInvincible(player)
 		local pkc_introduction_screen = require "screens/pkc_introduction_screen"
 		GLOBAL.TheFrontEnd:PushScreen(pkc_introduction_screen())
 	end
 end
+
+AddComponentPostInit("playerspawner", function(OnPlayerSpawn, inst)
+    inst:ListenForEvent("ms_playerjoined", function(inst, player)
+		if player 
+		and player.components.pkc_group
+		and player.components.pkc_group:getChooseGroup() == 0 
+		then
+			makePlayerInvincible(player)
+		end
+	end)
+end)
 
 --监听玩家加入游戏
 AddPrefabPostInit("world", function(inst)
