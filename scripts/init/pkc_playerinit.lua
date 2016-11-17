@@ -119,7 +119,7 @@ AddPrefabPostInit("tallbird",function(inst)
 	--end
 --end
 end)
-
+]]--
 AddPrefabPostInit("spider",function(inst)
 	inst:AddComponent("pkc_group")
 	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
@@ -134,7 +134,7 @@ AddPrefabPostInit("spider",function(inst)
 	--end
 --end
 end)
-]]--
+
 
 
 

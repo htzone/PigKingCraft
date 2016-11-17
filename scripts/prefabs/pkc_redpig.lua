@@ -186,6 +186,8 @@ local function fn()
     end)
 	inst:AddComponent("inspectable")
 	inst.components.inspectable:SetDescription("万恶的小红猪！")
+	inst:AddComponent("named")
+	inst.components.named:SetName("小红猪")
 
     return inst
 end

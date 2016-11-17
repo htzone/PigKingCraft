@@ -1,5 +1,5 @@
 --@name pkc_rulesinit
---@description è§„åˆ™çº¦æŸ
+--@description ¹æÔòÔ¼Êø
 --@auther RedPig
 --@date 2016-11-05
 
@@ -16,12 +16,12 @@ local function removeBurnable(inst)
 	end
 end
 
---è®¾ç½®æ‰€æœ‰å»ºç­‘ä¸å¯çƒ§
+--ÉèÖÃËùÓĞ½¨Öş²»¿ÉÉÕ
 for _,recipes in pairs(GLOBAL.AllRecipes) do
 	AddPrefabPostInit(recipes.name, removeBurnable)
 end
 
---è®¾ç½®ç«ç„°è”“å»¶åŠå¾„ä¸ºä¸€åŠåŠå¾„
+--ÉèÖÃ»ğÑæÂûÑÓ°ë¾¶ÎªÒ»°ë°ë¾¶
 local CurrentMakeSmallPropagator = GLOBAL.MakeSmallPropagator
 GLOBAL.MakeSmallPropagator = function(inst)
 	CurrentMakeSmallPropagator(inst)
@@ -44,8 +44,8 @@ GLOBAL.MakeLargePropagator = function(inst)
 	end
 end
 
---å½“æœ‰æ•Œäººåœ¨é™„è¿‘æ—¶ä¸‹çº¿ä¼šæ‰è½èº«ä¸Šæ‰€æœ‰ç‰©å“(å®¢æœºæˆ–æœåŠ¡å™¨æ‰æœ‰æ•ˆ)
-if GetModConfigData("levae_drop_everything") then
+--µ±ÓĞµĞÈËÔÚ¸½½üÊ±ÏÂÏß»áµôÂäÉíÉÏËùÓĞÎïÆ·(¿Í»ú»ò·şÎñÆ÷²ÅÓĞĞ§)
+if GLOBAL.LEVAE_DROP_EVERYTHING then
 	AddComponentPostInit("playerspawner", function(PlayerSpawner, inst)
 		inst:ListenForEvent("ms_playerdespawn", function (inst, player)
 			local x, y, z = player.Transform:GetWorldPosition()
@@ -68,7 +68,7 @@ if GetModConfigData("levae_drop_everything") then
 	end)
 end
 
---æ­»äº¡ä¸å‡è¡€é‡ä¸Šé™
+--ËÀÍö²»¼õÑªÁ¿ÉÏÏŞ
 AddComponentPostInit("health", function(self, inst)
     self.oldDeltaPenalty = self.DeltaPenalty
 	if GLOBAL.TheWorld.ismastersim then
@@ -78,7 +78,7 @@ AddComponentPostInit("health", function(self, inst)
 	end
 end)
 
---ä¸å­˜åœ¨çš„ç‰©å“
+--²»´æÔÚµÄÎïÆ·
 local cantExistPrefabs = {
 "pigking",
 "mandrake_planted",
@@ -95,9 +95,9 @@ for _, prefab_name in pairs(cantExistPrefabs) do
 	AddPrefabPostInit(prefab_name, removePrefab)
 end
 
---å»ºé€ æ–°çš„ç‰©å“ï¼Œä¸ºæ¯ä¸ªå»ºé€ çš„æ–°ç‰©å“æ·»åŠ Tag
+--½¨ÔìĞÂµÄÎïÆ·£¬ÎªÃ¿¸ö½¨ÔìµÄĞÂÎïÆ·Ìí¼ÓTag
 local function OnBuildNew(doer, prod) 
-	if prod and (not prod.components.inventoryitem or prod.components.container) then --ä»“åº“ç‰©å“é™¤äº†èƒŒåŒ…ä»¥å¤–éƒ½ä¸éœ€è¦åŠ Tag
+	if prod and (not prod.components.inventoryitem or prod.components.container) then --²Ö¿âÎïÆ·³ıÁË±³°üÒÔÍâ¶¼²»ĞèÒª¼ÓTag
 		if doer and doer.components.pkc_group then
 			prod.saveTags = {}
 			prod:AddTag("pkc_group_"..doer.components.pkc_group:getChooseGroup())
@@ -121,7 +121,7 @@ AddPlayerPostInit(function(inst)
     end
 end)
 
---å®‰ç½®ç‰©å“ï¼Œä¸ºæ¯ä¸ªå®‰ç½®çš„æ–°ç‰©å“æ·»åŠ Tag
+--°²ÖÃÎïÆ·£¬ÎªÃ¿¸ö°²ÖÃµÄĞÂÎïÆ·Ìí¼ÓTag
 local old_DEPLOY = GLOBAL.ACTIONS.DEPLOY.fn 
 GLOBAL.ACTIONS.DEPLOY.fn = function(act)
     if GLOBAL.TheWorld.ismastersim then 
@@ -143,7 +143,7 @@ GLOBAL.ACTIONS.DEPLOY.fn = function(act)
     return old_DEPLOY(act)
 end
 
------å»ºé€ ç‰©å“çš„Tagå’Œæ ‡è®°ä¿å­˜ä¸åŠ è½½----
+-----½¨ÔìÎïÆ·µÄTagºÍ±ê¼Ç±£´æÓë¼ÓÔØ----
 local function OnSave(inst, data)
 	if inst.OldOnSave ~= nil then
 		inst.OldOnSave(inst, data)
@@ -182,21 +182,21 @@ for _, v in pairs(GLOBAL.AllRecipes) do
 	end)
 end
 
---çŒªç‹é™„è¿‘å»ºç­‘å—é˜²ç ¸
+--ÖíÍõ¸½½ü½¨ÖşÊÜ·ÀÔÒ
 local old_HAMMER = GLOBAL.ACTIONS.HAMMER.fn
 GLOBAL.ACTIONS.HAMMER.fn = function(act)
-	--æœ¬é˜Ÿçš„äººæ— é™åˆ¶
+	--±¾¶ÓµÄÈËÎŞÏŞÖÆ
 	if (act.doer.components.pkc_group and act.target.pkc_group_id 
 	and act.doer.components.pkc_group:getChooseGroup() == act.target.pkc_group_id) 
 	or act.target.prefab == "pighouse"
 	then
 		return old_HAMMER(act)
 	end
-	--ç‰©å“æ— é˜Ÿä¼æ ‡è®°å¯ç ¸
+	--ÎïÆ·ÎŞ¶ÓÎé±ê¼Ç¿ÉÔÒ
 	if act.target.pkc_group_id == nil then
 		return old_HAMMER(act)
 	end
-	--çŒªç‹é™„è¿‘å»ºç­‘è¢«ä¿æŠ¤
+	--ÖíÍõ¸½½ü½¨Öş±»±£»¤
 	if not act.doer.components.pkc_group then
 		return old_HAMMER(act)
 	else
@@ -214,27 +214,27 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("å¯æƒœï¼Œå—æ•Œæ–¹çŒªç‹ä¿æŠ¤ï¼")
+					act.doer.components.talker:Say("¿ÉÏ§£¬ÊÜµĞ·½ÖíÍõ±£»¤£¡")
 				end
             end)
 		end
 	end
 end
 
---çŒªç‹é™„è¿‘å†œä½œç‰©é˜²æŒ–
+--ÖíÍõ¸½½üÅ©×÷Îï·ÀÍÚ
 local old_DIG = GLOBAL.ACTIONS.DIG.fn 
 GLOBAL.ACTIONS.DIG.fn = function(act)
-	--æœ¬é˜Ÿçš„äººæ— é™åˆ¶
+	--±¾¶ÓµÄÈËÎŞÏŞÖÆ
 	if act.doer.components.pkc_group and act.target.pkc_group_id 
 	and act.doer.components.pkc_group:getChooseGroup() == act.target.pkc_group_id
 	then
 		return old_DIG(act)
 	end
-	--ç‰©å“æ— é˜Ÿä¼æ ‡è®°å¯ç ¸
+	--ÎïÆ·ÎŞ¶ÓÎé±ê¼Ç¿ÉÔÒ
 	if act.target.pkc_group_id == nil then
 		return old_DIG(act)
 	end
-	--çŒªç‹é™„è¿‘å†œä½œç‰©å—ä¿æŠ¤
+	--ÖíÍõ¸½½üÅ©×÷ÎïÊÜ±£»¤
 	if not act.doer.components.pkc_group then
 		return old_DIG(act)
 	else
@@ -252,27 +252,27 @@ GLOBAL.ACTIONS.DIG.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("å¯æƒœï¼Œå—æ•Œæ–¹çŒªç‹ä¿æŠ¤ï¼")
+					act.doer.components.talker:Say("¿ÉÏ§£¬ÊÜµĞ·½ÖíÍõ±£»¤£¡")
 				end
             end)
 		end
 	end
 end
 
---çŒªç‹é™„è¿‘ç‰©å“é˜²çƒ§
+--ÖíÍõ¸½½üÎïÆ··ÀÉÕ
 local old_LIGHT = GLOBAL.ACTIONS.LIGHT.fn 
 GLOBAL.ACTIONS.LIGHT.fn = function(act)
-	--æœ¬é˜Ÿçš„äººæ— é™åˆ¶
+	--±¾¶ÓµÄÈËÎŞÏŞÖÆ
     if act.doer.components.pkc_group and act.target.pkc_group_id 
 	and act.doer.components.pkc_group:getChooseGroup() == act.target.pkc_group_id
 	then
 		return old_LIGHT(act)
 	end
-	--ç‰©å“æ— é˜Ÿä¼æ ‡è®°å¯ç ¸
+	--ÎïÆ·ÎŞ¶ÓÎé±ê¼Ç¿ÉÔÒ
 	if act.target.pkc_group_id == nil then
 		return old_LIGHT(act)
 	end
-	--çŒªç‹é™„è¿‘å†œä½œç‰©å—ä¿æŠ¤
+	--ÖíÍõ¸½½üÅ©×÷ÎïÊÜ±£»¤
 	if not act.doer.components.pkc_group then
 		return old_LIGHT(act)
 	else
@@ -290,21 +290,21 @@ GLOBAL.ACTIONS.LIGHT.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("å¯æƒœï¼Œå—æ•Œæ–¹çŒªç‹ä¿æŠ¤ï¼")
+					act.doer.components.talker:Say("¿ÉÏ§£¬ÊÜµĞ·½ÖíÍõ±£»¤£¡")
 				end
             end)
 		end
 	end
 end
 
---æ”»å‡»é™åˆ¶
+--¹¥»÷ÏŞÖÆ
 local old_ATTACK = GLOBAL.ACTIONS.ATTACK.fn 
 GLOBAL.ACTIONS.ATTACK.fn = function(act)
-	--æ²¡æœ‰åŠ å…¥é˜µè¥çš„ä¸é™åˆ¶
+	--Ã»ÓĞ¼ÓÈëÕóÓªµÄ²»ÏŞÖÆ
 	if not act.doer.components.pkc_group or not act.target.components.pkc_group then
 		return old_ATTACK(act)
 	end
-	--åŒç»„é˜Ÿå‹ä¹‹é—´ä¸èƒ½ä¼¤å®³
+	--Í¬×é¶ÓÓÑÖ®¼ä²»ÄÜÉËº¦
 	if act.doer.components.pkc_group and act.target.components.pkc_group
 	and act.doer.components.pkc_group:getChooseGroup() == act.target.components.pkc_group:getChooseGroup() then
 		return false

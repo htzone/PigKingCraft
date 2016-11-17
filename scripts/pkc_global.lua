@@ -38,13 +38,13 @@
 	GLOBAL.GROUP_INFOS = {
 		BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "大猪猪", color = "#0055CC", },
 		REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "红猪猪", color= "#FF0000", },
-		LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "龙猪猪", color = "#33B80F", },
-		CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#FADE07", },
+		LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "龙猪猪", color = "#0E8004", },
+		CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#C906C8", },
 	}
 	--猪王的生命值
 	GLOBAL.PIGKING_HEALTH = 500
-	--下线掉落所有物品
-	GLOBAL.LEVAE_DROP_EVERYTHING = GetModConfigData("levae_drop_everything")
+	--下线掉落所有物品(附近有敌人时)
+	GLOBAL.LEVAE_DROP_EVERYTHING = true
 	--开始无敌时间（秒）
 	GLOBAL.INVINCIBLE_TIME = 20
 	--玩家死亡自动复活时间（秒）
