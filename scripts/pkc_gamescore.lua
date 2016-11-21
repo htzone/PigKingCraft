@@ -34,6 +34,7 @@ GLOBAL.GAME_SCORE = {
 		greengem = 10,
 		orangegem = 10,
 		yellowgem = 10,
+		--TODO
 	},
 }
 

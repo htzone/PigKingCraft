@@ -162,6 +162,13 @@ local  function dissolvePlayers(killedId)
 	end
 end
 
+--移除阵营
+local function removeGroup(inst, group_id)
+	--GLOBAL.GROUP_NUM = 3
+	--未实现
+	inst.components.pkc_existgroup:setExistGroupNum(GLOBAL.GROUP_NUM - 1)
+end
+
 --监听国王被杀
 local function onKingbekilled(data, inst)
 	if data then
@@ -181,6 +188,7 @@ local function onKingbekilled(data, inst)
 		end
 		
 		dissolvePlayers(data.killed_group_id) --解散成员
+		removeGroup(inst, data.killed_group_id) --移除阵营
 		
 		inst:DoTaskInTime(10, function()
 			GLOBAL.SpawnPrefab("lightning")
@@ -190,6 +198,9 @@ local function onKingbekilled(data, inst)
 end
 
 local function updateWorld(inst)
+	inst:DoTaskInTime(8, function()
+
+	end)
 	if GLOBAL.TheWorld.state.cycles % 4 == 1 then
 		local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_BIGPIG_POS_x"]
 		local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_BIGPIG_POS_z"]
@@ -219,6 +230,7 @@ end
 --@大猪猪 10-31
 AddPrefabPostInit("world", function(inst)
 	if inst then
+		
 		--添加防止队友相互攻击组件
 		inst:AddComponent("pkc_checkattack")
 		inst.components.pkc_checkattack:isGroupMember(checkIsGroupMemberFn)
@@ -233,6 +245,7 @@ end)
 local function network(inst)
 	--添加队伍得分机制
     inst:AddComponent("pkc_groupscore")
+	inst:AddComponent("pkc_existgroup")
 	--添加监听事件
 	if IsServer then
 		--物体死亡
@@ -249,7 +262,7 @@ end
 AddPrefabPostInit("forest_network", network)
 AddPrefabPostInit("cave_network", network)
 
-
+--得分显示
 AddClassPostConstruct("widgets/controls", function(wdt)
 	wdt.inst:DoTaskInTime(0, function()
 	
