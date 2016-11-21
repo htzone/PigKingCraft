@@ -17,15 +17,19 @@ local require = GLOBAL.require
 require "pkc_utils" 
 --全局变量（全局变量放这里）
 modimport("scripts/pkc_global")
+--对话设定
+modimport("scripts/pkc_speech")
+--分数设定
+modimport("scripts/pkc_gamescore")
 --世界初始化
 modimport("scripts/init/pkc_worldinit") 
 --玩家初始化
 modimport("scripts/init/pkc_playerinit") 
---RPC调用处理
+--RPC处理
 modimport("scripts/init/pkc_rpchandler")
 --阵营选择
 modimport("scripts/init/pkc_choosegroup") 
 --基地生成
 modimport("scripts/init/pkc_producebase")
 --设置约束条件
-modimport("scripts/init/pkc_rulesinit")
+modimport("scripts/init/pkc_rules")

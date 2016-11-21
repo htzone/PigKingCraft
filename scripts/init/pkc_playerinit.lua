@@ -84,7 +84,7 @@ AddPlayerPostInit(function(inst)
 				for _,v in pairs(GLOBAL.GROUP_INFOS) do
 					if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() == v.id then
 						if inst.components.talker then
-							inst.components.talker:Say("我属于 "..v.name.."阵营！")
+							inst.components.talker:Say("我属于 "..v.name.." 阵营！")
 						end
 						break
 					end
@@ -133,6 +133,12 @@ AddPrefabPostInit("spider",function(inst)
 	--	end
 	--end
 --end
+end)
+
+AddPrefabPostInit("merm",function(inst)
+	inst:AddComponent("pkc_group")
+	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
+
 end)
 
 

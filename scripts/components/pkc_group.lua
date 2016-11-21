@@ -12,7 +12,7 @@ local PKC_GROUP = Class(function(self, inst)
 	self.inst = inst
 	self._chooseGroup = net_shortint(self.inst.GUID, "pkc_group._chooseGroup", "_chooseGroupDirty")
 	self.chooseGroup = 0
-	self.basePos = {0, 0, 0}
+	self.basePos = {0, 0, 0} --队伍所在基地的位置
 end,
 nil,
 {

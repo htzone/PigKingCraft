@@ -1,10 +1,34 @@
 ----[[常用的工具函数]]----
 
+function getNamebyGroupId(groupId)
+	for _,v in pairs(GROUP_INFOS) do
+		if groupId == v.id then
+			return v.name
+		end
+	end
+	return nil
+end
+	
+	
+--检查table里是否包含指定key
+--@param checkTable 检查table
+--@param key 指定key
+function containsKey(checkTable, key)
+	for k,v in pairs(checkTable) do
+		print("key:"..k)
+		print("value:"..v)
+		if k == key then
+			return true
+		end
+	end
+	return false
+end
+
 --系统公告
 --@param content 公告内容
-function pkc_announce(content, showTime)
-	if showTime ~= nil then
-		TheNet:Announce(content, showTime)
+function pkc_announce(content, lifetime)
+	if lifetime ~= nil then
+		TheNet:Announce(content, nil, nil, lifetime)
 	else
 		TheNet:Announce(content)
 	end

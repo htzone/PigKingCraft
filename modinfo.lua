@@ -1,11 +1,13 @@
 -- This information tells other players more about the mod
-name = " AAA猪王争霸（PVP）"
+name = " (beta)猪王争霸(PVP)"
 description = [[
 PigKingCraft(PVP)
+
+"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
 ]]
 
 author = "大猪猪, RedPig, TRICIA"
-version = "1.0.7"
+version = "1.0.0"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -33,7 +35,7 @@ client_only_mod = false
 dst_compatible = true
 
 --These tags allow the server running this mod to be found with filters from the server listing screen
-server_filter_tags = {"pvp","hard","challenge","group"}
+server_filter_tags = {"redpig","pvp","hard","challenge","group"}
 
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"

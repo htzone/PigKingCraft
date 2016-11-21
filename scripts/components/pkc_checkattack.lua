@@ -7,7 +7,7 @@ local PKC_CHECK_ATTACK = Class(function(self, inst)
 	self.inst = inst 
 end)
 
---设置防止队友互相攻击函数
+--防止队友攻击（限制攻击动作）
 function PKC_CHECK_ATTACK:isGroupMember(checkFn)
 	local combat_replica = require "components/combat_replica"
 	pkc_inject(combat_replica, "IsAlly", function(compn, target)

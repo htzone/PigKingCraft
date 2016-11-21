@@ -47,7 +47,7 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			end)
 			--根据选择的阵营进行相应的头部显示
 			player.components.pkc_headshow:setHeadText(player:GetDisplayName())
-			player.components.pkc_headshow:setHeadColor(v.color)
+			player.components.pkc_headshow:setHeadColor(v.head_color)
 			player.components.pkc_headshow:setChoose(true)
 			break
 		end

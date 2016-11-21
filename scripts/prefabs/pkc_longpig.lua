@@ -39,19 +39,22 @@ local function onendhappytask(inst)
     inst.endhappytask = nil
 end
 
+--从玩家那里获得物品
 local function OnGetItemFromPlayer(inst, giver, item)
-    if item.components.tradable.goldvalue > 0 then
-        inst.AnimState:PlayAnimation("cointoss")
+	if item and containsKey(GAME_SCORE.GIVE, item.prefab) then
+		local addScore = GAME_SCORE.GIVE[item.prefab]
+		TheWorld:PushEvent("pkc_giveScoreItem", { getter = inst, giver = giver, item = item,  addScore = addScore})
+		inst.AnimState:PlayAnimation("cointoss")
         inst.AnimState:PushAnimation("happy")
         inst.AnimState:PushAnimation("idle", true)
-        inst:DoTaskInTime(20/30, ontradeforgold, item)
+		--inst:DoTaskInTime(20/30, ontradeforgold, item)
         inst:DoTaskInTime(1.5, onplayhappysound)
         inst.happy = true
         if inst.endhappytask ~= nil then
             inst.endhappytask:Cancel()
         end
         inst.endhappytask = inst:DoTaskInTime(5, onendhappytask)
-    end
+	end
 end
 
 local function OnRefuseItem(inst, giver, item)
@@ -62,7 +65,7 @@ local function OnRefuseItem(inst, giver, item)
 end
 
 local function AcceptTest(inst, item)
-    return item.components.tradable.goldvalue > 0
+	return containsKey(GAME_SCORE.GIVE, item.prefab)
 end
 
 local function OnIsNight(inst, isnight)
@@ -117,7 +120,7 @@ local function fn()
 
 	--设置阵营
 	inst:AddComponent("pkc_group")
-	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
+	inst.components.pkc_group:setChooseGroup(GROUP_LONGPIG_ID)
 	
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
@@ -137,8 +140,10 @@ local function fn()
     inst.Transform:SetScale(1, 1, 1)
 
     inst:AddTag("king")
-	inst:AddTag("pkc_longpig")
+	inst:AddTag("longpig")
+	inst:AddTag("pkc_group3")
 	inst:AddTag("pig")
+	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")
     inst.AnimState:SetBuild("Pig_King")
     inst.AnimState:PlayAnimation("idle", true)
