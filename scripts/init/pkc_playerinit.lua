@@ -36,7 +36,7 @@ local function reviveTask(inst)
 			if inst.revive_time > 1 then
 				inst.revive_time = inst.revive_time - 1
 				if inst.components.talker then
-					inst.components.talker:Say("还有"..inst.revive_time.."秒复活")
+					inst.components.talker:Say(GLOBAL.PKC_SPEECH.REVIVE_TIPS1.SPEECH1..inst.revive_time..GLOBAL.PKC_SPEECH.REVIVE_TIPS1.SPEECH2)
 				end
 				reviveTask(inst)
 			else
@@ -46,7 +46,7 @@ local function reviveTask(inst)
 						inst.Transform:SetPosition(x, 0, z)
 					end
 					if inst.components.talker then
-						inst.components.talker:Say("啊，我要复活啦！")
+						inst.components.talker:Say(GLOBAL.PKC_SPEECH.REVIVE_TIPS2)
 					end
 					inst:DoTaskInTime(3, function()
 						if inst then
@@ -76,7 +76,6 @@ AddPlayerPostInit(function(inst)
 				inst.components.pkc_headshow:addHeadView()
 			end
 		end)
-	
 		
 		if IsServer then
 			--出生提示属于哪个阵营（前提是已选择了阵营）
@@ -84,7 +83,7 @@ AddPlayerPostInit(function(inst)
 				for _,v in pairs(GLOBAL.GROUP_INFOS) do
 					if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() == v.id then
 						if inst.components.talker then
-							inst.components.talker:Say("我属于 "..v.name.." 阵营！")
+							inst.components.talker:Say(GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH1..v.name..GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH2)
 						end
 						break
 					end
@@ -97,7 +96,6 @@ AddPlayerPostInit(function(inst)
 			end)
 			inst:ListenForEvent("respawnfromghost", function(inst, data)
 				inst.revive_time = -1
-				--makePlayerInvincible(inst, 10)
 			end)
 		end
 	end
@@ -119,28 +117,17 @@ AddPrefabPostInit("tallbird",function(inst)
 	--end
 --end
 end)
-]]--
+
 AddPrefabPostInit("spider",function(inst)
 	inst:AddComponent("pkc_group")
 	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
-	--if inst.components.combat then
-	--	local o_CanTarget = inst.components.combat.CanTarget
-	--	function inst.components.combat:CanTarget(target)
-	--	if target and target.components.pkc_group.hasChoosen==inst.components.pkc_group.hasChoosen then
-	--			return false
-	--		end
-	--		return o_CanTarget(self,target)
-	--	end
-	--end
---end
 end)
 
 AddPrefabPostInit("merm",function(inst)
 	inst:AddComponent("pkc_group")
 	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
-
 end)
-
+]]--
 
 
 

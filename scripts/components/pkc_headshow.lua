@@ -76,7 +76,7 @@ function PKC_HEADSHOW:addHeadView()
 				self.inst.pkc_title.Label:SetColour(unpack(self:getHeadColor()))
 			end
 			if self:getHeadText() ~= nil then
-				self.inst.pkc_title.Label:SetText(string.len(self:getHeadText()) <= 20 and self:getHeadText() or string.sub(self:getHeadText(), 1, 20).."...") --只取前20个字符
+				self.inst.pkc_title.Label:SetText(string.len(self:getHeadText()) <= 10 and self:getHeadText() or string.sub(self:getHeadText(), 1, 10).."...") --只取前10个字符
 			end
 		end
 	end)

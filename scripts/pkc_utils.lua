@@ -1,5 +1,13 @@
 ----[[常用的工具函数]]----
 
+function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
+--根据groupId来获取对应的name
+--@param groupId 阵营Id
 function getNamebyGroupId(groupId)
 	for _,v in pairs(GROUP_INFOS) do
 		if groupId == v.id then
@@ -8,7 +16,6 @@ function getNamebyGroupId(groupId)
 	end
 	return nil
 end
-	
 	
 --检查table里是否包含指定key
 --@param checkTable 检查table

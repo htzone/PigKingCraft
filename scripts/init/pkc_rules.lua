@@ -8,6 +8,8 @@ local function removeBurnable(inst)
 		if inst 
 		and inst:HasTag("structure")
 		and inst.components.burnable
+		and not inst.prefab == "pighouse"
+		and not inst.prefab == "rabbithouse"
 		then
 			inst:RemoveTag("canlight")
 			inst:AddTag("nolight")
@@ -222,7 +224,7 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("可惜，受敌方猪王保护！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 				end
             end)
 		end
@@ -263,7 +265,7 @@ GLOBAL.ACTIONS.DIG.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("可惜，受敌方猪王保护！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 				end
             end)
 		end
@@ -304,7 +306,7 @@ GLOBAL.ACTIONS.LIGHT.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("可惜，受敌方猪王保护！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 				end
             end)
 		end
@@ -345,7 +347,7 @@ GLOBAL.ACTIONS.HAUNT.fn = function(act)
 		else
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("可惜，受敌方猪王保护！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 				end
             end)
 		end
@@ -369,7 +371,7 @@ GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
 		if act.target:HasTag("king") then
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("可惜，不能这么做！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH2)
 				end
 			end)
 			return false
@@ -404,7 +406,7 @@ GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
 			else
 				act.doer:DoTaskInTime(0, function ()	
 					if act.doer and act.doer.components.talker then
-						act.doer.components.talker:Say("可惜，受敌方猪王保护！")
+						act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 					end
 				end)
 				return false
@@ -449,7 +451,7 @@ AddComponentPostInit("container", function(Container, target)
 				else
 					doer:DoTaskInTime(0, function ()	
 						if doer and doer.components.talker then
-							doer.components.talker:Say("可惜，受敌方猪王保护！")
+							doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
 						end
 					end)
 				end

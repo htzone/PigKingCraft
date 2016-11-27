@@ -44,16 +44,18 @@ local function OnGetItemFromPlayer(inst, giver, item)
 	if item and containsKey(GAME_SCORE.GIVE, item.prefab) then
 		local addScore = GAME_SCORE.GIVE[item.prefab]
 		TheWorld:PushEvent("pkc_giveScoreItem", { getter = inst, giver = giver, item = item,  addScore = addScore})
-		inst.AnimState:PlayAnimation("cointoss")
+		--inst.AnimState:PlayAnimation("cointoss")
+		inst.happy = false
+		inst.endhappytask = nil
         inst.AnimState:PushAnimation("happy")
-        inst.AnimState:PushAnimation("idle", true)
+		inst.AnimState:PushAnimation("idle", true)
 		--inst:DoTaskInTime(20/30, ontradeforgold, item)
-        inst:DoTaskInTime(1.5, onplayhappysound)
+        --inst:DoTaskInTime(.1, onplayhappysound)
         inst.happy = true
         if inst.endhappytask ~= nil then
             inst.endhappytask:Cancel()
         end
-        inst.endhappytask = inst:DoTaskInTime(5, onendhappytask)
+        inst.endhappytask = inst:DoTaskInTime(1, onendhappytask)
 	end
 end
 
@@ -139,6 +141,7 @@ local function fn()
     inst.DynamicShadow:SetSize(10, 5)
 
     inst.Transform:SetScale(1, 1, 1)
+	--加Tag
 	inst:AddTag("king")
 	inst:AddTag("bigpig")
 	inst:AddTag("pkc_group1")
@@ -172,7 +175,10 @@ local function fn()
 	inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
 	inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
 	inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
-
+	if inst.components.health then
+		inst.components.health:StartRegen(100, 100)
+	end
+	
     inst.components.trader:SetAcceptTest(AcceptTest)
     inst.components.trader.onaccept = OnGetItemFromPlayer
     inst.components.trader.onrefuse = OnRefuseItem

@@ -1,7 +1,7 @@
 --@name 猪王争霸（PigKingCraft）
 --@description MOD入口
---@auther 大猪猪，RedPig
---@date 2016-10-23
+
+--扩展和完善PVP玩法，欢迎加入<猪人联盟>，QQ群--575726583
 
 --自定义Prefab
 PrefabFiles = {
@@ -24,12 +24,14 @@ modimport("scripts/pkc_gamescore")
 --世界初始化
 modimport("scripts/init/pkc_worldinit") 
 --玩家初始化
-modimport("scripts/init/pkc_playerinit") 
+modimport("scripts/init/pkc_playerinit")
+--Prefab初始化
+modimport("scripts/init/pkc_prefabinit") 
 --RPC处理
 modimport("scripts/init/pkc_rpchandler")
 --阵营选择
 modimport("scripts/init/pkc_choosegroup") 
 --基地生成
 modimport("scripts/init/pkc_producebase")
---设置约束条件
+--约束条件设定
 modimport("scripts/init/pkc_rules")

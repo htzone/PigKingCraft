@@ -16,6 +16,16 @@ local Widget = require "widgets/widget"
 local PopupDialogScreen = require "screens/popupdialog"
 local TEMPLATES = require "widgets/templates"
 
+local function getExistGroups(groupNum)
+	local exist_groups = {}
+	for i = 1, groupNum do
+		if EXIST_GROUPS[i] ~= nil and next(EXIST_GROUPS[i]) ~= nil then
+			exist_groups[i] = EXIST_GROUPS[i]
+		end
+	end
+	return exist_groups
+end
+
 local PauseScreen = Class(Screen, function(self)
     Screen._ctor(self, "PauseScreen")
 
@@ -69,19 +79,24 @@ local PauseScreen = Class(Screen, function(self)
 
 	--添加选择阵营按钮
     local buttons = {}
-	table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.BIGPIG, cb=function() self:chooseGroup(GROUP_BIGPIG_ID) end })
-	table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.REDPIG, cb=function() self:chooseGroup(GROUP_REDPIG_ID) end })
-	if _G.GROUP_NUM >= 3 then
-		button_h = 70
-		table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.LONGPIG, cb=function() self:chooseGroup(GROUP_LONGPIG_ID) end })
+	
+	--根据设置的阵营数和存在的阵营数来设置button
+	local exist_groups = CURRENT_EXIST_GROUPS
+	
+	for k, v in pairs(exist_groups) do
+		table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.BUTTON_NAME[k], cb=function() self:chooseGroup(v) end })
 	end
-	if _G.GROUP_NUM >= 4 then
+	
+	if GROUP_NUM >= 3 then
+		button_h = 70
+	end
+	
+	if GROUP_NUM >= 4 then
 		button_h = 50
-		table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.CUIPIG, cb=function() self:chooseGroup(GROUP_CUIPIG_ID) end })
 	end
 	
     self.menu = self.proot:AddChild(Menu(buttons, -button_h, false))
-	if _G.GROUP_NUM < 3 then
+	if GROUP_NUM < 3 then
 		self.menu:SetPosition(0, 20, 0)
 	else
 		self.menu:SetPosition(0, 50, 0)

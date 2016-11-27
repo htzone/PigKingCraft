@@ -49,19 +49,19 @@ local PauseScreen = Class(Screen, function(self)
 
     --title
     self.title = self.proot:AddChild(Text(BUTTONFONT, 50))
-    self.title:SetPosition(0, 165, 0)
+    self.title:SetPosition(0, 170, 0)
     self.title:SetString(STRINGS.UI.INTRO.TITLE)
     self.title:SetColour(0,0,0,1)
 
     --subtitle
     self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 30))
-    self.subtitle:SetPosition(0, 130, 0)
+    self.subtitle:SetPosition(0, 135, 0)
     self.subtitle:SetString(STRINGS.UI.INTRO.SUBTITLE)
     self.subtitle:SetColour(0,0,0,1)
 	
 	--description
 	self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 25))
-    self.subtitle:SetPosition(-220, 100, 0)
+    self.subtitle:SetPosition(-43, 0, 0)
     self.subtitle:SetString(STRINGS.UI.INTRO.DESC)
     self.subtitle:SetColour(0,0,0,1)
 
@@ -75,7 +75,7 @@ local PauseScreen = Class(Screen, function(self)
     local buttons = {}
     table.insert(buttons, {text=STRINGS.UI.INTRO.NEXT, cb=function() self:nextStep() end }) 
     self.menu = self.proot:AddChild(Menu(buttons, -button_h, false))
-    self.menu:SetPosition(0, -135, 0)
+    self.menu:SetPosition(0, -140, 0)
     for i,v in pairs(self.menu.items) do
         v:SetScale(.8)
     end

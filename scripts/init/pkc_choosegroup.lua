@@ -28,13 +28,39 @@ local function showStartWindow(inst, player)
 	end
 end
 
+--检查队伍是否还存在
+local function isMyGroupExist(groupId)
+	for k, v in pairs(GLOBAL.CURRENT_EXIST_GROUPS) do 
+		if v == groupId then
+			return true
+		end
+	end
+	return false
+end
+
 AddComponentPostInit("playerspawner", function(OnPlayerSpawn, inst)
     inst:ListenForEvent("ms_playerjoined", function(inst, player)
-		if player 
-		and player.components.pkc_group
-		and player.components.pkc_group:getChooseGroup() == 0 
-		then
-			makePlayerInvincible(player)
+		if player and player.components.pkc_group then
+			--第一次进入游戏
+			if player.components.pkc_group:getChooseGroup() == 0 then
+				makePlayerInvincible(player)
+			else
+				--如果队伍已被消灭，重新选人
+				if not isMyGroupExist(player.components.pkc_group:getChooseGroup()) then
+					player:DoTaskInTime(1, function()
+						if player and player.components.talker then
+							player.components.talker:Say(GLOBAL.PKC_SPEECH.GROUP_HASBE_KILLED)
+						end
+					end)
+					player:DoTaskInTime(5, function()
+						if player ~= nil and player:IsValid() then
+						  if GLOBAL.TheWorld.ismastersim then
+							GLOBAL.TheWorld:PushEvent("ms_playerdespawnanddelete", player)
+						  end
+						end
+					end)
+				end
+			end
 		end
 	end)
 end)

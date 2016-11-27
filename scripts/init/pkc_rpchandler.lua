@@ -35,14 +35,14 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 	--传送至对应的基地
 	for k, v in pairs(GLOBAL.GROUP_INFOS) do
 		if group_id == GLOBAL.GROUP_INFOS[k].id then
-			GLOBAL.pkc_announce(player.name.." 选择加入了 "..v.name.." 阵营！")
+			GLOBAL.pkc_announce(player.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH1..v.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH2)
 			local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_x"]
 			local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_z"]
 			player.components.pkc_group:setBasePos({x, 0 , z}) --记住自己的基地位置
 			player.Transform:SetPosition(x, 0, z)
 			player:DoTaskInTime(2, function()
 				if player and player.components.talker then
-					player.components.talker:Say("我要保护我们的"..v.name.."！")
+					player.components.talker:Say(GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH3..v.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH4)
 				end
 			end)
 			--根据选择的阵营进行相应的头部显示

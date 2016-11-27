@@ -7,6 +7,17 @@ local PKC_BASE = Class(function(self, inst)
 	self.inst = inst
 end)
 
+--是否为安全位置
+local function isSavePos(pos)
+	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 10)
+	for _, obj in ipairs(ents) do
+		 if obj and (obj:HasTag("houndmound") or obj:HasTag("dragonfly") or obj:HasTag("beehive") or obj:HasTag("tallbird")) then
+			return false
+		end
+	end
+	return true
+end
+
 --随机地点中心
 local function choosePos()
 	local ground = TheWorld
@@ -22,7 +33,7 @@ local function choosePos()
 	end
 end
 
---构造地毯
+--构造地皮
 local function rebuildTile(tile, pt, offset)
 	local map = TheWorld.Map
     local original_tile_type = map:GetTileAtPoint((pt + offset):Get())
@@ -40,7 +51,12 @@ end
 --生成单个设施 
 --@大猪猪 10-31
 local function produceSingleUtil(prefname, pos, offset)
-	SpawnPrefab(prefname).Transform:SetPosition((pos + offset):Get())
+	local prefab = SpawnPrefab(prefname)
+	if prefab then
+		prefab.Transform:SetPosition((pos + offset):Get())
+	end
+	--SpawnPrefab(prefname).Transform:SetPosition((pos + offset):Get())
+	return prefab
 end
 
 --位置是否合格
@@ -51,6 +67,9 @@ local function isValidBasePos(pos, previousPos)
 			return false	--只要有一个小于允许的最小距离,那么继续选位置
 		end
 	end
+	if not isSavePos(pos) then --不是安全的位置
+		return false
+	end
 	return true
 end
 
@@ -60,37 +79,39 @@ local function commenBuild(previousPos)
 	while not isValidBasePos(pos, previousPos) do
 		pos = choosePos()
 	end
-	--produceSingleUtil("firepit", pos, Vector3(1.5,0,0))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(-3, 0, -3))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(0, 0, 0))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(-3, 0, 0))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(0, 0, -3))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(1, 0, 0))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(-3, 0, 3))
-	--rebuildTile(GROUND.CARPET, pos, Vector3(2, 0, 2))
-	--produceSingleUtil("coldfirepit", pos, Vector3(-1.5,0,0))
-	--produceSingleUtil("cookpot",pos,Vector3(0,0,-3))
-	--produceSingleUtil("cookpot",pos,Vector3(3,0,-3))
-	--produceSingleUtil("cookpot",pos,Vector3(0,0,-6))
-	--produceSingleUtil("cookpot",pos,Vector3(3,0,-6))
-	--produceSingleUtil("icebox",pos,Vector3(1.5,0,-4.5))
-	--produceSingleUtil("tent",pos,Vector3(3,0,3))
-	--produceSingleUtil("siestahut",pos,Vector3(-3,0,3))
 	return pos
+end
+
+--清理猪王附近的东西
+local function clearPigkingNear(pigking)
+	if pigking and pigking.Transform then
+		local x, y, z = pigking.Transform:GetWorldPosition()
+		local ents = TheSim:FindEntities(x, y, z, 4)
+		for _, obj in ipairs(ents) do
+			if obj and obj ~= pigking and not obj:HasTag("burnt") then
+				obj:Remove()
+			end
+		end
+	end
 end
 
 --生成单个基地
 --@大猪猪 10-31
 local function produceSingleBase(previousPos, groupId)
 	local pos = commenBuild(previousPos)
+	local pigking = nil
 	if groupId == GROUP_BIGPIG_ID then
-		produceSingleUtil("pkc_bigpig", pos, Vector3(-3, 0, -3))
+		pigking = produceSingleUtil("pkc_bigpig", pos, Vector3(-3, 0, -3))
 	elseif groupId == GROUP_REDPIG_ID then
-		produceSingleUtil("pkc_redpig", pos, Vector3(-3, 0, -3))
+		pigking = produceSingleUtil("pkc_redpig", pos, Vector3(-3, 0, -3))
 	elseif groupId == GROUP_LONGPIG_ID then
-		produceSingleUtil("pkc_longpig", pos, Vector3(-3, 0, -3))
+		pigking = produceSingleUtil("pkc_longpig", pos, Vector3(-3, 0, -3))
 	elseif groupId == GROUP_CUIPIG_ID then
-		produceSingleUtil("pkc_cuipig", pos, Vector3(-3, 0, -3))
+		pigking = produceSingleUtil("pkc_cuipig", pos, Vector3(-3, 0, -3))
+	end
+	clearPigkingNear(pigking)
+	for i=1, 4 do
+		pkc_trySpawn(pigking, "pighouse", 5, 12, 30) --生成周围的猪人房
 	end
 	return pos
 end

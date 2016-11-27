@@ -35,16 +35,19 @@ end
 local PKC_GROUP_SCORE = Class(function(self, inst)
 	self.inst = inst
 	
+	--队伍分数网络变量
 	self.group1Score = net_int(self.inst.GUID, "pkc_group.group1Score", "group1ScoreDirty")
 	self.group2Score = net_int(self.inst.GUID, "pkc_group.group2Score", "group2ScoreDirty")
 	self.group3Score = net_int(self.inst.GUID, "pkc_group.group3Score", "group3ScoreDirty")
 	self.group4Score = net_int(self.inst.GUID, "pkc_group.group4Score", "group4ScoreDirty")
 	
+	--监听分数改变，客机处理
 	inst:ListenForEvent("group1ScoreDirty", onGroup1ScoreDirty)
 	inst:ListenForEvent("group2ScoreDirty", onGroup2ScoreDirty)
 	inst:ListenForEvent("group3ScoreDirty", onGroup3ScoreDirty)
 	inst:ListenForEvent("group4ScoreDirty", onGroup4ScoreDirty)
 	
+	--保存胜利者
 	self.winner = 0
 	
 	self:init()
@@ -60,28 +63,7 @@ function PKC_GROUP_SCORE:init()
 	self.group4Score:set(0)
 end
 
-function PKC_GROUP_SCORE:OnEntityDied(data)
-	if data 
-	--and data.inst:HasTag("player") 
-	and data.afflicter:HasTag("player") then
-		if data.inst.components.pkc_group and data.afflicter.components.pkc_group then
-			if data.inst.components.pkc_group:getChooseGroup() ~= data.afflicter.components.pkc_group:getChooseGroup() then
-				if data.afflicter.components.pkc_group:getChooseGroup() == GROUP_BIGPIG_ID then
-					self:addGroup1Score(10)
-				elseif data.afflicter.components.pkc_group:getChooseGroup() == GROUP_REDPIG_ID then
-					self:addGroup2Score(10)
-					--pkc_announce("sb22!!!!!!!!!!!!!!!!!!!!"..(_GROUP_SCORE.GROUP2_SCORE or 0))
-				elseif data.afflicter.components.pkc_group:getChooseGroup() == GROUP_LONGPIG_ID then
-					self:addGroup3Score(10)
-				elseif data.afflicter.components.pkc_group:getChooseGroup() == GROUP_CUIPIG_ID then
-					self:addGroup4Score(10)
-				end
-			end
-			
-		end
-	end
-end
-
+--设置分数
 function PKC_GROUP_SCORE:setGroup1Score(score)
 	_GROUP_SCORE.GROUP1_SCORE = score
 	if TheNet:GetIsServer() then
@@ -114,6 +96,7 @@ function PKC_GROUP_SCORE:setGroup4Score(score)
 	self:checkWin(score, GROUP_CUIPIG_ID)
 end
 
+--获取分数
 function PKC_GROUP_SCORE:getGroup1Score()
 	return self.group1Score:value()
 end
@@ -130,11 +113,24 @@ function PKC_GROUP_SCORE:getGroup4Score()
 	return self.group4Score:value()
 end
 
+--设置分数
+function PKC_GROUP_SCORE:setGroupScore(groupId, score)
+	if groupId == GROUP_BIGPIG_ID then
+		self:setGroup1Score(score)
+	elseif groupId == GROUP_REDPIG_ID then
+		self:setGroup2Score(score)
+	elseif groupId == GROUP_LONGPIG_ID then
+		self:setGroup3Score(score)
+	elseif groupId == GROUP_CUIPIG_ID then
+		self:setGroup4Score(score)
+	end
+end
+
+--加分
 function PKC_GROUP_SCORE:addGroupScore(groupId, addScore)
 	if addScore == nil then
 		addScore = 1
 	end
-	
 	if groupId == GROUP_BIGPIG_ID then
 		self:setGroup1Score(self:getGroup1Score() + addScore)
 	elseif groupId == GROUP_REDPIG_ID then
@@ -174,8 +170,9 @@ function PKC_GROUP_SCORE:addGroup4Score(addScore)
 	self:setGroup4Score(self:getGroup4Score() + addScore)
 end
 
+--检查是否胜利
 function PKC_GROUP_SCORE:checkWin(score, groupId)
-	if score >= WIN_SCORE then --赢了
+	if score and score >= WIN_SCORE then --赢了
 		self.winner = groupId
 		TheWorld:PushEvent("pkc_win", { winner = self.winner, score = score})
 	end
