@@ -77,6 +77,11 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH4 = " 消灭啦！！！",
 		},
 		GROUP_BEKILLED = "灭",
+		AUTO_CLEAR = {
+		SPEECH1 = "注意，扔地上超过",
+		SPEECH2 = "天的东西将被清理掉！！！",
+		},
+		CLEANING = "清理中...",
 	}
 else
 	GLOBAL.BOSS_NAME = {
@@ -96,8 +101,8 @@ else
 		QUEST = "?",
 		GROUP_HASBE_KILLED = "No!  My  group  has  been  wiped  out !",
 		REVIVE_TIPS1 = {
-			SPEECH1 = "",
-			SPEECH2 = "s  To  Revive",
+			SPEECH1 = "Revive in",
+			SPEECH2 = "s ",
 		},
 		REVIVE_TIPS2 = "well,  Im  coming  back !",
 		BELONG_TIPS = {
@@ -105,14 +110,14 @@ else
 			SPEECH2 = " Group !",
 		},
 		GROUP_JOIN = {
-			SPEECH1 = "  has  chosen  the  ",
+			SPEECH1 = "  has  joined  the  ",
 			SPEECH2 = " Group！",
-			SPEECH3 = "We  should  protect  our ",
+			SPEECH3 = "We  need to protect  our ",
 			SPEECH4 = " !",
 		},
 		PIGKING_PROTECT = {
-			SPEECH1 = "This  is  protected  by  Enemy  PigKing !",
-			SPEECH2 = "I  cant  do  that!",
+			SPEECH1 = "It's  protected  by  Enemy  PigKing !",
+			SPEECH2 = "Sorry, I  cant  do  that!",
 		},
 		GRAVESTONE_TIPS = {
 			SPEECH1 = "He's  already  asleep!",
@@ -125,8 +130,8 @@ else
 		},
 		WINDIALOG_TITLE = "PigKingCraft",
 		WINDIALOG_CONTENT = {
-			SPEECH1 = "Congratulations ",
-			SPEECH2 = " Group  for winning the final Victory!!!",
+			SPEECH1 = "Victory !!!  The Winner is 【",
+			SPEECH2 = " 】Group !!!",
 		},
 		WINDIALOG_BUTTON = "CLOSE",
 		WORLDRESET_TIPS = {
@@ -144,7 +149,12 @@ else
 			SPEECH3 = " Group !!!",
 			SPEECH4 = "",
 		},
-		GROUP_BEKILLED = "KO",
+		GROUP_BEKILLED = " KO",
+		AUTO_CLEAR = {
+		SPEECH1 = "Tips:the item dropped on the ground for more than ",
+		SPEECH2 = " days will be cleared!",
+		},
+		CLEANING = "Cleaning...",
 	}
 end
 

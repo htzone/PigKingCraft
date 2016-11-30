@@ -12,10 +12,25 @@
 	GLOBAL.PIGKING_HEALTH = GetModConfigData("pigking_health")
 	--给初始物品
 	GLOBAL.GIVE_START_ITEM = GetModConfigData("give_start_item")
+	--随机队伍
+	GLOBAL.RANDOM_GROUP = GetModConfigData("random_group")
 	--基地间的距离
-	GLOBAL.GROUP_DISTANCE = 300
-	--物品自动清理时间(秒)
+	GLOBAL.GROUP_DISTANCE = 350
+	--物品自动清理超过时间(秒)
 	GLOBAL.AUTO_DELETE_TIME = 60
+	--世界自动清理间隔时间(天)
+	GLOBAL.WORLD_DELETE_INTERVAL = 10
+	--世界自动清理超过时间(天)
+	GLOBAL.WORLD_DELETE_TIME = 9
+	--下线掉落所有物品(附近有敌人时)
+	GLOBAL.LEVAE_DROP_EVERYTHING = true
+	--开始无敌时间（秒）
+	GLOBAL.INVINCIBLE_TIME = 30
+	--玩家死亡自动复活时间（秒）
+	GLOBAL.PLAYER_REVIVE_TIME = 30
+	--猪王财产保护范围
+	GLOBAL.PIGKING_RANGE = 50
+	
 	--大猪猪势力
 	GLOBAL.GROUP_BIGPIG_ID= 1	
 	--红猪猪势力
@@ -24,12 +39,12 @@
 	GLOBAL.GROUP_LONGPIG_ID= 3	
 	--崔猪猪势力
 	GLOBAL.GROUP_CUIPIG_ID = 4	
-	
+
 	--介绍弹框STRING
 	if GLOBAL.GAME_LANGUAGE == "chinese" then
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "猪王争霸",
-			SUBTITLE = "玩法介绍",
+			SUBTITLE = "总分:"..GLOBAL.WIN_SCORE,
 			DESC = [[
 				胜利条件
 				★获取到足够高的分数★
@@ -41,7 +56,8 @@
 				★猪王附近的建筑和农作物会被保护★
 				★自己阵营的猪王被杀时阵营会被解散，财产将被击杀势力占有★
 			]],
-			NEXT = "开始游戏",
+			NEXT = "选择队伍",
+			RANDOM_NEXT = "随机队伍",
 		}
 		--阵营弹框STRING
 		GLOBAL.STRINGS.UI.CHOOSEGROUP = {
@@ -71,24 +87,26 @@
 	else
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "PigKingCraft",
-			SUBTITLE = "Play Introduction",
+			SUBTITLE = "TotalScore:"..GLOBAL.WIN_SCORE,
 			DESC = [[
-				How Can Win
-				★Get  enough  score  to  win★
-				★Kill  all  other  group's  pigking  to  win★
-				The final Victory can be reached by any one above !
+				How To Win
+				★Get enough scores.★
+				★Or Kill pigking of all other teams.★
+				The Victory can be reached by any one above !
 				Tips
-				★Give  some  valuable  prefabs  to  your  pigking  to  get  score★
-				★Kill  other  group's  player  or  some  monster  boss  to  get  score★
-				★The  structure  and  crops  near  pigking  will  be  protected★
-				★If  your  pigking  was  killed,  your  group  will  be  disbanded★
+				★Giving some valuable items to your pigking to get scores.★
+				★Killing other team members or monster boss to get scores.★
+				★The buildings or crops near pigking will be protected.★
+				★If your pigking die, your team will be disbanded.★
+				★In order to win the game, you need to protect your pigking first.★
 			]],
-			NEXT = "START",
+			NEXT = "ChoosePigKing",
+			RANDOM_NEXT = "RandomPigKing",
 		}
 		--阵营弹框STRING
 		GLOBAL.STRINGS.UI.CHOOSEGROUP = {
-			TITLE = "ChooseGroup",
-			SUBTITLE = "choose group you fight for",
+			TITLE = "ChoosePigKing",
+			SUBTITLE = "choose pigking you fight for",
 			BUTTON_NAME = {
 				BIGPIG = "BIGPIG",
 				REDPIG = "REDPIG",
@@ -107,7 +125,7 @@
 		GLOBAL.SHORT_NAME = {
 			BIGPIG = "Big",
 			REDPIG = "Red",
-			LONGPIG = "Long",
+			LONGPIG = "Lon",
 			CUIPIG = "Cui",
 		}
 	end
@@ -118,17 +136,13 @@
 		"LONGPIG",
 		"CUIPIG",
 	}
+	
 	--保存当前存在的队伍
 	GLOBAL.CURRENT_EXIST_GROUPS = {
 	}
 	
-	--下线掉落所有物品(附近有敌人时)
-	GLOBAL.LEVAE_DROP_EVERYTHING = true
-	--开始无敌时间（秒）
-	GLOBAL.INVINCIBLE_TIME = 30
-	--玩家死亡自动复活时间（秒）
-	GLOBAL.PLAYER_REVIVE_TIME = 30
-	--猪王财产保护范围
-	GLOBAL.PIGKING_RANGE = 50
 	--保存队伍分数
 	GLOBAL.GROUP_SCORE = {}
+	
+	--保存玩家的全局变量
+	GLOBAL.PLAYERS = {}

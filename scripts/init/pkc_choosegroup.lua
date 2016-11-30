@@ -38,11 +38,12 @@ local function isMyGroupExist(groupId)
 	return false
 end
 
+--监听玩家加入游戏
 AddComponentPostInit("playerspawner", function(OnPlayerSpawn, inst)
     inst:ListenForEvent("ms_playerjoined", function(inst, player)
 		if player and player.components.pkc_group then
-			--第一次进入游戏
 			if player.components.pkc_group:getChooseGroup() == 0 then
+				--第一次进入游戏
 				makePlayerInvincible(player)
 			else
 				--如果队伍已被消灭，重新选人

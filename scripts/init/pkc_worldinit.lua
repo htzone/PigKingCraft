@@ -16,11 +16,11 @@ local autoDeleteTable = {
 --执行自动删除
 local function autodeletefn(inst)
 	if GLOBAL.TheWorld.ismastersim then
-		if not inst.components.exautodelete then
-			inst:AddComponent("exautodelete")
+		if not inst.components.pkc_autodelete then
+			inst:AddComponent("pkc_autodelete")
 		end
-		inst.components.exautodelete:SetPerishTime(GLOBAL.AUTO_DELETE_TIME)
-		inst.components.exautodelete:StartPerishing()
+		inst.components.pkc_autodelete:SetPerishTime(GLOBAL.AUTO_DELETE_TIME)
+		inst.components.pkc_autodelete:StartPerishing()
 	end
 end
 
@@ -52,17 +52,6 @@ local function startingInventory(inst, player)
 	if GLOBAL.TheWorld:HasTag("cave") then
 		giveItemToPlayer(startInventory, 1, "minerhat") --矿工帽
 	end
-	
-	--if player.prefab ~= "wathgrithr" then
-	--print("----wathgrithr------"..player.name)
-	--end
-	--如果是PVP模式
-	--if GLOBAL.TheNet:GetPVPEnabled() then
-	--	if player.prefab ~= "wathgrithr" then
-	--		giveItemToPlayer(startInventory, 1, "spear") --长矛
-	--		giveItemToPlayer(startInventory, 1, "footballhat") --皮帽
-	--	end
-	--end
 
 	--玩家第一次进入时获取初始物品
 	player.CurrentOnNewSpawn = player.OnNewSpawn or function() return true end
@@ -339,12 +328,25 @@ AddPrefabPostInit("world", function(inst)
 	end
 end)
 
+local function onPlayerJoin(inst, player)
+	inst:DoTaskInTime(0, function()
+		--print("------------Join player!!!!!----------")
+		
+	end)
+end
+
+local function onPlayerLeft(inst, player)
+	inst:DoTaskInTime(0, function()
+		--print("------------Left player!!!!!----------")
+	end)
+end
+
 local function network(inst)
 	--添加队伍得分机制
     inst:AddComponent("pkc_groupscore")
 	--初始化存在队伍
 	inst:AddComponent("pkc_existgroup")
-	
+	--简单弹框
 	inst:AddComponent("pkc_popdialog")
 	
 	inst:DoTaskInTime(0, function()
@@ -360,6 +362,10 @@ local function network(inst)
 		inst:ListenForEvent("pkc_kingbekilled", function(world, data) onKingbekilled(data, inst) end, GLOBAL.TheWorld)
 		--胜利
 		inst:ListenForEvent("pkc_win", function(world, data) onWin(data, inst) end, GLOBAL.TheWorld)
+		--玩家加入
+		--inst:ListenForEvent("ms_playerjoined", function (world, player) onPlayerJoin(inst, player) end, GLOBAL.TheWorld)
+		--玩家离开
+		--inst:ListenForEvent("ms_playerleft", function (world, player) onPlayerLeft(inst, player) end, GLOBAL.TheWorld)
 	end
 end
 

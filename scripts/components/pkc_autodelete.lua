@@ -13,7 +13,7 @@ end)
 ----更新函数，功能的主体部分
 local function Update(inst, dt)
 
-    if inst.components.exautodelete then
+    if inst.components.pkc_autodelete then
 		local owner = nil 
 			----判断物品的拥有者或占有方
 		owner = inst.components.inventoryitem 
@@ -22,26 +22,23 @@ local function Update(inst, dt)
 		if not owner and inst.components.occupier then
 			owner = inst.components.occupier:GetOwner()
 		end
-		
-			----拥有者或占有者为空的时候,开始动用定时删除
+			--拥有者或占有者为空的时候,开始动用定时删除
 			if not owner then
 			
-				----对距离删除时间的计算,核心部分 
-				if inst.components.exautodelete.perishremainingtime then
+				----对距离删除时间的计算
+				if inst.components.pkc_autodelete.perishremainingtime then
 						
-						inst.components.exautodelete.perishremainingtime = inst.components.exautodelete.perishremainingtime - 1
-						if inst.components.exautodelete.perishremainingtime <= 0 then
-							inst.components.exautodelete:Perish()
+						inst.components.pkc_autodelete.perishremainingtime = inst.components.pkc_autodelete.perishremainingtime - 1
+						if inst.components.pkc_autodelete.perishremainingtime <= 0 then
+							inst.components.pkc_autodelete:Perish()
 						end
 					
 				end
 			----拥有者或占有方存在的时候，剩余离删除时间清零，即重置为设定的perishtime
 			else 
-				inst.components.exautodelete.perishremainingtime = inst.components.exautodelete.perishtime
+				inst.components.pkc_autodelete.perishremainingtime = inst.components.pkc_autodelete.perishtime
 			end	
-		
     end
-	
 end
 
 ----物体移除后
@@ -55,7 +52,7 @@ function PKC_AUTO_DELETE:Perish()
         self.updatetask:Cancel()
         self.updatetask = nil
     end
-	if self.inst then
+	if self.inst and not self.inst:HasTag("burnt") then
 		self.inst:Remove()
 	end
 end
@@ -75,7 +72,6 @@ function PKC_AUTO_DELETE:StartPerishing()
         self.updatetask:Cancel()
         self.updatetask = nil
     end
-    --local dt = .1
     self.updatetask = self.inst:DoPeriodicTask(1, Update)
 end
 ----停止计算

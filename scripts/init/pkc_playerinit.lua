@@ -70,6 +70,25 @@ AddPlayerPostInit(function(inst)
 		--添加头部显示组件
 		inst:AddComponent("pkc_headshow")
 		
+		--人物分组测试
+		--[[
+		if inst.prefab == "wilson" then
+			inst:DoTaskInTime(0, function()
+				if inst.components.talker then
+					inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
+				end
+			end)
+		end
+		
+		if inst.prefab == "willow" then
+			inst:DoTaskInTime(0, function()
+				if inst.components.talker then
+					inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_REDPIG_ID)
+				end
+			end)
+		end
+		]]--
+		
 		--显示头部名字
 		inst:DoTaskInTime(0, function()
 			if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() ~= 0 then

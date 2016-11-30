@@ -516,3 +516,65 @@ GLOBAL.ACTIONS.ATTACK.fn = function(act)
 	end
 	return old_ATTACK(act)
 end
+
+--------简单的垃圾清理功能，提升服务器性能-------
+--仓库物品的掉落和捡起添加Tag
+AddComponentPostInit("inventoryitem", function(self, inst)
+	self.OriginalOnDropped = self.OnDropped
+	self.OriginalOnPickup = self.OnPickup
+	function self:OnDropped(randomdir)
+		if inst then
+			inst:AddTag("pkc_dropitem")
+			inst.droptime = GLOBAL.os.time()
+		end
+		return self:OriginalOnDropped(randomdir)
+	end
+	function self:OnPickup(pickupguy)
+		if inst and inst:HasTag("pkc_dropitem") then
+			inst:RemoveTag("pkc_dropitem")
+			inst.droptime = nil
+		end
+		return self:OriginalOnPickup(pickupguy)
+	end
+end)
+
+--物品掉落添加Tag
+AddComponentPostInit("lootdropper", function(self, inst)
+	self.OriginalFlingItem = self.FlingItem
+	function self:FlingItem(loot, pt, bouncedcb)
+		if loot ~= nil then
+			loot:AddTag("pkc_dropitem")
+			loot.droptime = GLOBAL.os.time()
+		end
+		return self:OriginalFlingItem(loot, pt, bouncedcb)
+	end
+end)	
+
+local function updateWorld(inst)
+	if GLOBAL.TheWorld.state.cycles ~= 0 and (GLOBAL.TheWorld.state.cycles + 2) % GLOBAL.WORLD_DELETE_INTERVAL == 0 then
+		inst:DoTaskInTime(0, function()
+			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH1..(GLOBAL.WORLD_DELETE_TIME+1)..GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH2)
+		end)
+		inst:DoTaskInTime(60, function()
+			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.CLEANING)
+			if inst then
+				for _, v in pairs(GLOBAL.Ents) do
+					if v and v:HasTag("pkc_dropitem") and v.components.inventoryitem and not v.components.container and v.prefab ~= "chester_eyebone" then 
+						if not v:HasTag("burnt") and not v.components.inventoryitem:IsHeld() and v.droptime ~= nil then
+							if GLOBAL.os.time() - v.droptime > (GLOBAL.WORLD_DELETE_TIME * GLOBAL.TUNING.TOTAL_DAY_TIME) then
+								v:Remove()
+							end
+						end 
+					end 
+				end 
+			end
+		end)
+	end
+end 
+
+--监听天数变换执行清理
+AddPrefabPostInit("world", function(inst)
+	if inst.ismastersim then
+		inst:ListenForEvent("ms_cyclecomplete", function() updateWorld(inst) end)
+	end 		
+end)

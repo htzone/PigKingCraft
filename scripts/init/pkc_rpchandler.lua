@@ -22,9 +22,57 @@ local function cancelInvincible(player, delay_time)
 	end)
 end
 
---添加按钮的RPC
+--获取每个队伍的人数
+local function getGroupPlayerNum()
+	--保存队伍名和队伍人数的键值对
+	local groupPlayerNum = {}
+	for group_name, group_id in pairs(GLOBAL.CURRENT_EXIST_GROUPS) do
+		groupPlayerNum[group_name] = 0
+		for _, player in pairs(GLOBAL.AllPlayers) do 
+			if player and player.components.pkc_group 
+			and player.components.pkc_group:getChooseGroup() == group_id
+			then
+				groupPlayerNum[group_name] = groupPlayerNum[group_name] + 1
+			end
+		end
+	end
+	return groupPlayerNum
+end
+
+--比较每个队伍的人数，选出最小人数的队伍，相同人数则从中随机
+local function compareGroupPlayerNum(groupPlayerNum)
+	local min_num = 0
+	local i = 1
+	for _, num in pairs(groupPlayerNum) do 
+		if i == 1 then
+			min_num = num
+		else
+			if num < min_num then
+				min_num = num
+			end
+		end
+		i = i + 1
+	end
+	local minNumGroup = {} --保存拥有最小玩家数的队伍名
+	for group_name, num in pairs(groupPlayerNum) do
+		if min_num == num then
+			table.insert(minNumGroup, group_name)
+		end	
+	end
+	--多个则随机选择其中一个
+	return GLOBAL.GROUP_INFOS[minNumGroup[math.random(#minNumGroup)]].id
+end
+
+--添加队伍选择RPC处理
 --@大猪猪 11-02
 AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
+	
+	if group_id == -1 then
+		--如果为随机选队
+		--新加入的玩家只会选择人数最少的队伍，人数相同则选择其中一个
+		 group_id = compareGroupPlayerNum(getGroupPlayerNum())
+	end
+	
 	--设置选择的阵营
 	if not player.components.pkc_group then
 		player:AddComponent("pkc_group")
@@ -39,7 +87,8 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_x"]
 			local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_z"]
 			player.components.pkc_group:setBasePos({x, 0 , z}) --记住自己的基地位置
-			player.Transform:SetPosition(x, 0, z)
+			--player.Transform:SetPosition(x, 0, z)
+			player.Physics:Teleport(x, 0, z)
 			player:DoTaskInTime(2, function()
 				if player and player.components.talker then
 					player.components.talker:Say(GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH3..v.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH4)

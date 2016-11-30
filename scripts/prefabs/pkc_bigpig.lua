@@ -41,16 +41,20 @@ end
 
 --从玩家那里获得物品
 local function OnGetItemFromPlayer(inst, giver, item)
-	if item and containsKey(GAME_SCORE.GIVE, item.prefab) then
+	if item and (containsKey(GAME_SCORE.GIVE, item.prefab) or item.components.tradable.goldvalue > 0) then
 		local addScore = GAME_SCORE.GIVE[item.prefab]
 		TheWorld:PushEvent("pkc_giveScoreItem", { getter = inst, giver = giver, item = item,  addScore = addScore})
-		--inst.AnimState:PlayAnimation("cointoss")
+		if item.components.tradable.goldvalue > 0 then
+			inst.AnimState:PlayAnimation("cointoss")
+		end
 		inst.happy = false
 		inst.endhappytask = nil
         inst.AnimState:PushAnimation("happy")
 		inst.AnimState:PushAnimation("idle", true)
-		--inst:DoTaskInTime(20/30, ontradeforgold, item)
-        --inst:DoTaskInTime(.1, onplayhappysound)
+		if item.components.tradable.goldvalue > 0 then
+			inst:DoTaskInTime(20/30, ontradeforgold, item)
+			inst:DoTaskInTime(1.5, onplayhappysound)
+		end
         inst.happy = true
         if inst.endhappytask ~= nil then
             inst.endhappytask:Cancel()
@@ -67,7 +71,7 @@ local function OnRefuseItem(inst, giver, item)
 end
 
 local function AcceptTest(inst, item)
-	return containsKey(GAME_SCORE.GIVE, item.prefab)
+	return containsKey(GAME_SCORE.GIVE, item.prefab) or item.components.tradable.goldvalue > 0
 end
 
 local function OnIsNight(inst, isnight)
@@ -195,8 +199,6 @@ local function fn()
         end
         return false
     end)
-
-	inst:AddComponent("inspectable")
 	inst.components.inspectable:SetDescription("大猪猪爱吃肉！")
 	inst:AddComponent("named")
 	inst.components.named:SetName("大猪猪")

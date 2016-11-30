@@ -1,15 +1,17 @@
 -- This information tells other players more about the mod
 name = " 猪王争霸(PVP)"
 description = [[
-PigKingCraft
-
-猪王之间的战争正式拉开帷幕...
+<PigKingCraft>
 
 "在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
+
+这只是一切的开始
+猪王之间的战争才正式拉开帷幕...
+
 ]]
 
 author = "大猪猪, RedPig, TRICIA"
-version = "1.0.0"
+version = "1.0.3"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -59,6 +61,16 @@ configuration_options =
         default = "chinese",
     },
 	{
+        name = "random_group",
+        label = "队伍选择(ChooseGroup)",
+        options =
+        {
+			{description = "随机队伍(RandomGroup)", data = true, hover = "随机队伍(RandomGroup)" },
+            {description = "指定队伍(SpecifyGroup)", data = false, hover = "指定队伍(SpecifyGroup)"},
+        },
+        default = false,
+    },
+	{
         name = "group_num",
         label = "分组数(GroupNum)",
         options =
@@ -85,10 +97,12 @@ configuration_options =
         options =
         {
             {description = "1000分", data = 1000, hover = "闪电战"},
+			{description = "3000分", data = 3000, hover = "3000"},
+			{description = "5000分", data = 5000, hover = "5000"},
             {description = "10000分", data = 10000, hover = "竞赛" },
 			{description = "100000分", data = 100000, hover = "持久战" },
         },
-        default = 10000,
+        default = 5000,
     },
 	{
         name = "pigking_health",
@@ -96,11 +110,12 @@ configuration_options =
         options =
         {
             {description = "500", data = 500, hover = "500血"},
-            {description = "1000", data = 10000, hover = "1000血" },
+            {description = "1000", data = 1000, hover = "1000血" },
 			{description = "2000", data = 2000, hover = "2000血" },
 			{description = "3000", data = 3000, hover = "3000血" },
 			{description = "4000", data = 4000, hover = "4000血" },
 			{description = "5000", data = 5000, hover = "5000血" },
+			{description = "10000", data = 10000, hover = "10000血" },
         },
         default = 2000,
     },
