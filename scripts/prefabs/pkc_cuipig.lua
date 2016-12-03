@@ -7,6 +7,7 @@ local assets =
 {
     Asset("ANIM", "anim/pig_king.zip"),
     Asset("SOUND", "sound/pig.fsb"),
+	Asset("ANIM", "anim/pigkingcui.zip"),
 }
 
 local prefabs =
@@ -151,7 +152,7 @@ local function fn()
 	inst:AddTag("pig")
 	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")
-    inst.AnimState:SetBuild("Pig_King")
+    inst.AnimState:SetBuild("pigkingcui")
     inst.AnimState:PlayAnimation("idle", true)
 
     --trader (from trader component) added to pristine state for optimization
@@ -168,8 +169,8 @@ local function fn()
     inst:AddComponent("trader")
 	
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
-	inst.AnimState:SetMultColour(r, g, b, 1)
+--	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
+--	inst.AnimState:SetMultColour(r, g, b, 1)
 	
 	--让猪王具备生命
 	inst:AddComponent("pkc_addhealth")
