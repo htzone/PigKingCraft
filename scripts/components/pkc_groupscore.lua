@@ -34,7 +34,7 @@ end
 
 local PKC_GROUP_SCORE = Class(function(self, inst)
 	self.inst = inst
-	
+	self.isWin = false
 	--队伍分数网络变量
 	self.group1Score = net_int(self.inst.GUID, "pkc_group.group1Score", "group1ScoreDirty")
 	self.group2Score = net_int(self.inst.GUID, "pkc_group.group2Score", "group2ScoreDirty")
@@ -172,7 +172,8 @@ end
 
 --检查是否胜利
 function PKC_GROUP_SCORE:checkWin(score, groupId)
-	if score and score >= WIN_SCORE then --赢了
+	if score and score >= WIN_SCORE and not self.isWin then --赢了
+		self.isWin = true
 		self.winner = groupId
 		TheWorld:PushEvent("pkc_win", { winner = self.winner, score = score})
 	end

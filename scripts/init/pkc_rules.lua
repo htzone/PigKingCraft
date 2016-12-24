@@ -3,15 +3,48 @@
 --@auther redpig
 --@date 2016-11-05
 
+--根据id获取各队伍的猪王保护半径, 暂时这样，哎呀，真TM懒 _(:3 」∠)_
+--TODO 应该把各猪王的等级信息放在一个全局变量中的
+local function getPigkingRange(pigkingId)
+	local needLevelUpScore = GLOBAL.WIN_SCORE / 10
+	if pigkingId ==  GLOBAL.GROUP_BIGPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP1_SCORE
+		local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+		if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
+			return GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+		end
+	elseif pigkingId ==  GLOBAL.GROUP_REDPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP2_SCORE
+		local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+		if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
+			return GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+		end
+	elseif pigkingId ==  GLOBAL.GROUP_LONGPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP3_SCORE
+		local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+		if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
+			return GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+		end
+	elseif pigkingId ==  GLOBAL.GROUP_CUIPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP4_SCORE
+		local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+		if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
+			return GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+		end
+	end
+	return nil
+end
+
+--移除燃烧属性
 local function removeBurnable(inst)
 	if GLOBAL.TheWorld.ismastersim then
 		if inst 
-		and inst:HasTag("structure")
+		and inst:HasTag("structure") 
 		and inst.components.burnable
-		and not inst.prefab == "pighouse"
-		and not inst.prefab == "rabbithouse"
 		then
-			inst:RemoveTag("canlight")
+			if inst:HasTag("canlight") then
+				inst:RemoveTag("canlight")
+			end	
 			inst:AddTag("nolight")
 			inst:AddTag("fireimmune")
 		end
@@ -19,8 +52,19 @@ local function removeBurnable(inst)
 end
 
 --设置所有建筑不可烧
-for _,recipes in pairs(GLOBAL.AllRecipes) do
+for _, recipes in pairs(GLOBAL.AllRecipes) do
 	AddPrefabPostInit(recipes.name, removeBurnable)
+end
+
+--新加入的建筑放这里
+local newStructureTable = {
+"pkc_pighouse_big",
+"pkc_pighouse_red",
+"pkc_pighouse_long",
+"pkc_pighouse_cui",
+}
+for _, name in pairs(newStructureTable) do
+	AddPrefabPostInit(name, removeBurnable)
 end
 
 --设置游戏火焰蔓延半径
@@ -46,7 +90,7 @@ GLOBAL.MakeLargePropagator = function(inst)
 	end
 end
 
---当有敌人在附近下线会掉落身上所有物品(客机或服务器才有效)
+--当有敌人在附近下线会掉落身上所有物品(客机才有效)
 if GLOBAL.LEVAE_DROP_EVERYTHING then
 	AddComponentPostInit("playerspawner", function(PlayerSpawner, inst)
 		inst:ListenForEvent("ms_playerdespawn", function (inst, player)
@@ -131,6 +175,8 @@ GLOBAL.ACTIONS.DEPLOY.fn = function(act)
 		local y = act.pos.y
 		local z = act.pos.z
 		act.doer:DoTaskInTime(0, function ()
+			--if act and act.invobject and string.find(act.invobject.prefab, "wall_") then --判断安置的是否为墙	
+			--end
 			if act.doer and act.doer.components.pkc_group then
 				local ents = GLOBAL.TheSim:FindEntities(x, y, z, 0)
 				for _, obj in pairs(ents) do
@@ -193,14 +239,16 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 	if act.target == nil or act.doer == nil then
 		return old_HAMMER(act)
 	end
+	
 	--本队的人无限制
+	--[[
 	if (act.doer.components.pkc_group and act.target.pkc_group_id 
 	and act.doer.components.pkc_group:getChooseGroup() == act.target.pkc_group_id) 
-	or act.target.prefab == "pighouse" or act.target.prefab == "rabbithouse"
+	--or act.target.prefab == "pighouse" or act.target.prefab == "rabbithouse"
 	then
 		return old_HAMMER(act)
 	end
-
+	]]--
 	--物品无队伍标记可砸
 	if act.target.pkc_group_id == nil then
 		return old_HAMMER(act)
@@ -215,13 +263,28 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 		for _,obj in pairs(ents) do
 			--if obj and obj:HasTag("king") and obj.components.pkc_group and obj.components.pkc_group:getChooseGroup() ~= act.doer.components.pkc_group:getChooseGroup() then
 			if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
-				hasEnemyPigKingNear = true
-				break
+				if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
+					hasEnemyPigKingNear = true
+					break
+				end
 			end
 		end	
 		if not hasEnemyPigKingNear then
 			return old_HAMMER(act)
 		else
+			--和平时期在地方猪王附近砸的不是自己的猪人房
+			if string.find(act.target.prefab, "pkc_pighouse")  and act.doer.components.pkc_group:getChooseGroup() ~= act.target.pkc_group_id then
+				if (GLOBAL.TheWorld.state.cycles + 2) <=  GLOBAL.PEACE_TIME then --和平时期不能砸
+					act.doer:DoTaskInTime(0, function ()	
+						if act.doer and act.doer.components.talker then
+							act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH3)
+						end
+					end)
+					return false
+				else
+					return old_HAMMER(act)
+				end
+			end
 			act.doer:DoTaskInTime(0, function ()	
 				if act.doer and act.doer.components.talker then
 					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
@@ -256,8 +319,10 @@ GLOBAL.ACTIONS.DIG.fn = function(act)
 		local hasEnemyPigKingNear = false
 		for _,obj in pairs(ents) do
 			if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
-				hasEnemyPigKingNear = true
-				break
+				if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
+					hasEnemyPigKingNear = true
+					break
+				end
 			end
 		end	
 		if not hasEnemyPigKingNear then
@@ -285,7 +350,7 @@ GLOBAL.ACTIONS.LIGHT.fn = function(act)
 		return old_LIGHT(act)
 	end
 	--物品无队伍标记
-	if act.target.pkc_group_id == nil then
+	if act.target.pkc_group_id == nil and not act.target:HasTag("tree") then --树长大后没有标记了
 		return old_LIGHT(act)
 	end
 	--猪王附近受保护
@@ -297,8 +362,10 @@ GLOBAL.ACTIONS.LIGHT.fn = function(act)
 		local hasEnemyPigKingNear = false
 		for _,obj in pairs(ents) do
 			if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
-				hasEnemyPigKingNear = true
-				break
+				if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
+					hasEnemyPigKingNear = true
+					break
+				end
 			end
 		end	
 		if not hasEnemyPigKingNear then
@@ -338,8 +405,10 @@ GLOBAL.ACTIONS.HAUNT.fn = function(act)
 		local hasEnemyPigKingNear = false
 		for _,obj in pairs(ents) do
 			if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
-				hasEnemyPigKingNear = true
-				break
+				if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
+					hasEnemyPigKingNear = true
+					break
+				end
 			end
 		end	
 		if not hasEnemyPigKingNear then
@@ -385,7 +454,7 @@ GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
 			staff.components.spellcaster:CastSpell(act.target, act.pos)
 			return true
 		end
-
+		
 		--猪王附近受保护
 		if not act.doer.components.pkc_group then
 			staff.components.spellcaster:CastSpell(act.target, act.pos)
@@ -396,8 +465,10 @@ GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
 			local hasEnemyPigKingNear = false
 			for _,obj in pairs(ents) do
 				if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
-					hasEnemyPigKingNear = true
-					break
+					if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
+						hasEnemyPigKingNear = true
+						break
+					end
 				end
 			end	
 			if not hasEnemyPigKingNear then
@@ -413,6 +484,30 @@ GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
 			end
 		end
     end
+end
+
+--敌人建筑附近不能建造
+local old_BUILD = GLOBAL.ACTIONS.BUILD.fn
+GLOBAL.ACTIONS.BUILD.fn = function(act)
+	if act.doer == nil then
+		return old_BUILD(act)
+	end
+	if not act.doer.components.pkc_group then
+		return old_BUILD(act)
+	end
+	local x, y, z = act.doer.Transform:GetWorldPosition()
+	local ents = GLOBAL.TheSim:FindEntities(x, y, z, 10)
+	for _, obj in ipairs(ents) do
+		if obj and obj:IsValid() and obj:HasTag("structure") and obj.pkc_group_id and obj.pkc_group_id ~= act.doer.components.pkc_group:getChooseGroup() then
+			act.doer:DoTaskInTime(0, function ()
+				if act.doer and act.doer.components.talker then
+					act.doer.components.talker:Say("离敌人建筑太近了，我不能建造！")
+				end
+			end)
+			return false
+		end
+	end
+	return old_BUILD(act)
 end
 
 --防开
@@ -442,8 +537,10 @@ AddComponentPostInit("container", function(Container, target)
 				local hasEnemyPigKingNear = false
 				for _,obj in pairs(ents) do
 					if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..doer.components.pkc_group:getChooseGroup()) then
-						hasEnemyPigKingNear = true
-						break
+						if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > target:GetPosition():Dist(obj:GetPosition()) then
+							hasEnemyPigKingNear = true
+							break
+						end
 					end
 				end	
 				if not hasEnemyPigKingNear then
@@ -509,10 +606,20 @@ GLOBAL.ACTIONS.ATTACK.fn = function(act)
 	if not act.doer.components.pkc_group or not act.target.components.pkc_group then
 		return old_ATTACK(act)
 	end
+	
 	--同组队友之间不能伤害
-	if act.doer.components.pkc_group and act.target.components.pkc_group
-	and act.doer.components.pkc_group:getChooseGroup() == act.target.components.pkc_group:getChooseGroup() then
-		return false
+	if act.doer.components.pkc_group and act.target.components.pkc_group and act.target.components.pkc_group:getChooseGroup() ~= 0 then
+		
+		if act.doer.components.pkc_group:getChooseGroup() == act.target.components.pkc_group:getChooseGroup() then
+			return false
+		end
+		if act.target:HasTag("pig") and act.target.components.follower and act.target.components.follower.leader ~= nil then
+			return old_ATTACK(act)
+		end
+		--和平时期
+		if (GLOBAL.TheWorld.state.cycles + 2) <=  GLOBAL.PEACE_TIME then 
+			return false
+		end
 	end
 	return old_ATTACK(act)
 end
@@ -550,12 +657,28 @@ AddComponentPostInit("lootdropper", function(self, inst)
 	end
 end)	
 
+--执行清理
 local function updateWorld(inst)
+	
+	if (GLOBAL.TheWorld.state.cycles + 2) <  GLOBAL.PEACE_TIME and (GLOBAL.TheWorld.state.cycles + 2) >= 0 then
+		inst:DoTaskInTime(1, function()
+			GLOBAL.pkc_makeAllPlayersSpeak("离和平期结束还有"..((GLOBAL.PEACE_TIME + 1) - (GLOBAL.TheWorld.state.cycles + 2)).."天！")
+		end)
+	end
+	
+	if (GLOBAL.TheWorld.state.cycles + 2) ==  GLOBAL.PEACE_TIME then --和平时期结束
+		inst:DoTaskInTime(1, function()
+			GLOBAL.SpawnPrefab("lightning")
+			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS)
+			GLOBAL.pkc_makeAllPlayersSpeak("啊，和平时期结束啦，战争开始了！！！")
+		end)
+	end
+	
 	if GLOBAL.TheWorld.state.cycles ~= 0 and (GLOBAL.TheWorld.state.cycles + 2) % GLOBAL.WORLD_DELETE_INTERVAL == 0 then
-		inst:DoTaskInTime(0, function()
+		inst:DoTaskInTime(30, function()
 			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH1..(GLOBAL.WORLD_DELETE_TIME+1)..GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH2)
 		end)
-		inst:DoTaskInTime(60, function()
+		inst:DoTaskInTime(90, function()
 			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.CLEANING)
 			if inst then
 				for _, v in pairs(GLOBAL.Ents) do
@@ -572,9 +695,253 @@ local function updateWorld(inst)
 	end
 end 
 
---监听天数变换执行清理
+--监听天数变换
 AddPrefabPostInit("world", function(inst)
 	if inst.ismastersim then
 		inst:ListenForEvent("ms_cyclecomplete", function() updateWorld(inst) end)
 	end 		
+end)
+
+local function buildPigHouse(self, recname, pt, rotation, skin)
+	local recipe = GLOBAL.GetValidRecipe(recname)
+    if recipe ~= nil and (self:IsBuildBuffered(recname) or self:CanBuild(recname)) then
+        if recipe.placer ~= nil and
+            self.inst.components.rider ~= nil and
+            self.inst.components.rider:IsRiding() then
+            return false, "MOUNTED"
+        elseif recipe.level.ORPHANAGE > 0 and (
+                self.inst.components.petleash == nil or
+                self.inst.components.petleash:IsFull() or
+                self.inst.components.petleash:HasPetWithTag("critter")
+            ) then
+            return false, "HASPET"
+        end
+
+        local wetlevel = self.buffered_builds[recname]
+        if wetlevel ~= nil then
+            self.buffered_builds[recname] = nil
+            self.inst.replica.builder:SetIsBuildBuffered(recname, false)
+        else
+            local materials = self:GetIngredients(recname)
+            wetlevel = self:GetIngredientWetness(materials)
+            self:RemoveIngredients(materials, recname)
+        end
+        self.inst:PushEvent("refreshcrafting")
+		local prod = nil
+		if recname == "pighouse" then
+			if self.inst.components.pkc_group then
+				if self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_BIGPIG_ID then
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_big", skin, nil, self.inst.userid)
+				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_REDPIG_ID then
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_red", skin, nil, self.inst.userid)
+				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_LONGPIG_ID then
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_long", skin, nil, self.inst.userid)
+				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_CUIPIG_ID then
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_cui", skin, nil, self.inst.userid)
+				end
+			end
+		else
+			prod = GLOBAL.SpawnPrefab(recipe.product, skin, nil, self.inst.userid)
+		end
+        --local prod = SpawnPrefab(recipe.product, skin, nil, self.inst.userid)
+        if prod ~= nil then
+            
+            pt = pt or self.inst:GetPosition()
+
+            if wetlevel > 0 and prod.components.inventoryitem ~= nil then
+                prod.components.inventoryitem:InheritMoisture(wetlevel, self.inst:GetIsWet())
+            end
+
+            if prod.components.inventoryitem ~= nil then
+                if self.inst.components.inventory ~= nil then
+                    --self.inst.components.inventory:GiveItem(prod)
+                    self.inst:PushEvent("builditem", { item = prod, recipe = recipe, skin = skin })
+                    GLOBAL.ProfileStatsAdd("build_"..prod.prefab)
+
+                    if prod.components.equippable ~= nil and self.inst.components.inventory:GetEquippedItem(prod.components.equippable.equipslot) == nil then
+                        if recipe.numtogive <= 1 then
+                            --The item is equippable. Equip it.
+                            self.inst.components.inventory:Equip(prod)
+                        elseif prod.components.stackable ~= nil then
+                            --The item is stackable. Just increase the stack size of the original item.
+                            prod.components.stackable:SetStackSize(recipe.numtogive)
+                            self.inst.components.inventory:Equip(prod)
+                        else
+                            --We still need to equip the original product that was spawned, so do that.
+                            self.inst.components.inventory:Equip(prod)
+                            --Now spawn in the rest of the items and give them to the player.
+                            for i = 2, recipe.numtogive do
+                                local addt_prod = GLOBAL.SpawnPrefab(recipe.product)
+                                self.inst.components.inventory:GiveItem(addt_prod, nil, pt)
+                            end
+                        end
+                    elseif recipe.numtogive <= 1 then
+                        --Only the original item is being received.
+                        self.inst.components.inventory:GiveItem(prod, nil, pt)
+                    elseif prod.components.stackable ~= nil then
+                        --The item is stackable. Just increase the stack size of the original item.
+                        prod.components.stackable:SetStackSize(recipe.numtogive)
+                        self.inst.components.inventory:GiveItem(prod, nil, pt)
+                    else
+                        --We still need to give the player the original product that was spawned, so do that.
+                        self.inst.components.inventory:GiveItem(prod, nil, pt)
+                        --Now spawn in the rest of the items and give them to the player.
+                        for i = 2, recipe.numtogive do
+                            local addt_prod = GLOBAL.SpawnPrefab(recipe.product)
+                            self.inst.components.inventory:GiveItem(addt_prod, nil, pt)
+                        end
+                    end
+
+                    if self.onBuild ~= nil then
+                        self.onBuild(self.inst, prod)
+                    end
+                    prod:OnBuilt(self.inst)
+
+                    return true
+                end
+            else
+                prod.Transform:SetPosition(pt:Get())
+                --V2C: or 0 check added for backward compatibility with mods that
+                --     have not been updated to support placement rotation yet
+                prod.Transform:SetRotation(rotation or 0)
+                self.inst:PushEvent("buildstructure", { item = prod, recipe = recipe, skin = skin })
+                prod:PushEvent("onbuilt", { builder = self.inst })
+                GLOBAL.ProfileStatsAdd("build_"..prod.prefab)
+
+                if self.onBuild ~= nil then
+                    self.onBuild(self.inst, prod)
+                end
+
+                prod:OnBuilt(self.inst)
+
+                return true
+            end
+        end
+    end
+end
+
+--重写建造方法
+AddComponentPostInit("builder", function(self, inst)
+	self.OriginalDoBuild = self.DoBuild
+	function self:DoBuild(recname, pt, rotation, skin)
+		if recname == "pighouse" then
+			return buildPigHouse(self, recname, pt, rotation, skin)
+		end
+		return self:OriginalDoBuild(recname, pt, rotation, skin)
+	end
+end)	
+
+--重写读触手书
+local function readBookTenttaclesFn(inst, reader)
+	local pt = reader:GetPosition()
+	local numtentacles = 3
+	
+	reader:StartThread(function()
+		for k = 1, numtentacles do
+			local theta = math.random() * 2 * GLOBAL.PI
+			local radius = math.random(3, 8)
+
+			-- we have to special case this one because birds can't land on creep
+			local result_offset = GLOBAL.FindValidPositionByFan(theta, radius, 12, function(offset)
+				local pos = pt + offset
+				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, 1)
+				return GLOBAL.next(ents) == nil
+			end)
+
+			if result_offset ~= nil then
+				local pos = pt + result_offset
+				
+				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, GLOBAL.PIGKING_RANGE)
+				local hasPigKingNear = false
+				for _,obj in pairs(ents) do
+					if obj and obj:HasTag("king") then
+						hasPigKingNear = true
+						break
+					end
+				end	
+				if hasPigKingNear then
+					reader:DoTaskInTime(0, function ()
+						if reader and reader.components.talker then
+							reader.components.talker:Say("离猪王太近了，我不能这么做！")
+						end
+					end)
+					return false
+				end
+				
+				reader.components.sanity:DoDelta(-(GLOBAL.READ_BOOK_TENTACLES_SANITY))
+				local tentacle = GLOBAL.SpawnPrefab("tentacle")
+				tentacle.Transform:SetPosition(pos:Get())
+
+				GLOBAL.ShakeAllCameras(GLOBAL.CAMERASHAKE.FULL, .2, .02, .25, reader, 40)
+
+				--need a better effect
+				GLOBAL.SpawnPrefab("splash_ocean").Transform:SetPosition(pos:Get())
+				--PlayFX((pt + result_offset), "splash", "splash_ocean", "idle")
+				tentacle.sg:GoToState("attack_pre")
+			end
+
+			GLOBAL.Sleep(.33)
+		end
+	end)
+	return true
+end
+
+--重写读催眠书
+local function readBookSleepFn(inst, reader)
+	reader.components.sanity:DoDelta(-(GLOBAL.READ_BOOK_SLEEP_SANITY))
+
+	local x, y, z = reader.Transform:GetWorldPosition()
+	local range = 20
+	local ents = GLOBAL.TheNet:GetPVPEnabled() and
+				GLOBAL.TheSim:FindEntities(x, y, z, range, nil, { "playerghost" }, { "sleeper", "player" }) or
+				GLOBAL.TheSim:FindEntities(x, y, z, range, { "sleeper" }, { "player" })
+	for i, v in ipairs(ents) do
+		if v ~= reader and
+			not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
+			not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) 
+			--and (not v.components.pkc_group or (v.components.pkc_group and reader.components.pkc_group and v.components.pkc_group:getChooseGroup() ~= reader.components.pkc_group:getChooseGroup()))
+			then
+			if not v.components.pkc_group then
+				if v.components.sleeper ~= nil then
+					v.components.sleeper:AddSleepiness(2, 10)
+				elseif v.components.grogginess ~= nil then
+					v.components.grogginess:AddGrogginess(8, 16)
+				else
+					v:PushEvent("knockedout")
+				end
+			else
+				if reader.components.pkc_group and v.components.pkc_group:getChooseGroup() ~= reader.components.pkc_group:getChooseGroup() then
+					if v:HasTag("player") then --只虚弱敌方玩家
+						if v.components.grogginess ~= nil then
+							v.components.grogginess:AddGrogginess(8, 16)
+						end
+					else
+						if v.components.sleeper ~= nil then
+							v.components.sleeper:AddSleepiness(2, 5)
+						elseif v.components.grogginess ~= nil then
+							v.components.grogginess:AddGrogginess(8, 16)
+						else
+							v:PushEvent("knockedout")
+						end
+					end
+				end
+			end
+			
+		end
+	end
+	return true
+end
+
+--老奶奶读书限制（触手书）
+AddPrefabPostInit("book_tentacles", function(inst)
+	if inst and inst.components.book then
+		inst.components.book.onread = readBookTenttaclesFn
+	end
+end)
+
+--老奶奶读书限制（睡眠书）
+AddPrefabPostInit("book_sleep", function(inst)
+	if inst and inst.components.book then
+		inst.components.book.onread = readBookSleepFn
+	end
 end)

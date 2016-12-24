@@ -3,66 +3,86 @@
 --@auther redpig
 --@date 2016-11-20
 
+local json = require "json"
 local PopupDialogScreen = require("screens/popupdialog")
 local Text = require "widgets/text"
 
 return Class(function(self, inst)
 	self.inst = inst
-	self.message = nil
-	self.title = nil
-	self.buttonText = nil
-	self._message = net_string(self.inst.GUID, "message._message", "messagedirty")
-	self._title = net_string(self.inst.GUID, "message._title", "titledirty")
-	self._buttonText = net_string(self.inst.GUID, "message._buttonText", "buttonTextdirty")
+	self.data = nil
 	self._show = net_bool(self.inst.GUID, "message._show", "showdirty")
+	self._data = net_string(self.inst.GUID, "message._data", "datadirty")
 
-	local function OnMessageDirty(inst)
-		self.message = self._message:value()
-	end
-
-	local function OnTitleDirty(inst)
-		self.title = self._title:value()
+	--客机获取数据
+	local function OnDataDirty(inst)
+		self.data = json.decode(self._data:value())
 	end
 	
-	local function OnButtonTextdirty(inst)
-		self.buttonText = self._buttonText:value()
-	end
-
+	--客机显示
 	local function OnShowDirty(inst)
-		--客机显示
-		local screen = PopupDialogScreen(self._title:value(), self._message:value(), { { text = self._buttonText:value(), cb = function() TheFrontEnd:PopScreen() end } })
-		TheFrontEnd:PushScreen( screen )
+		local data = json.decode(self._data:value())
+		if data.type then
+			if data.type == WIN_POPDIALOG then --胜利弹窗
+				if data.winPlayers and next(data.winPlayers) ~= nil then
+					local winPlayers = data.winPlayers
+					local isWinner = false
+					for userid, _ in pairs(winPlayers) do
+						if ThePlayer.userid == userid then
+							isWinner = true
+							break
+						end
+					end
+					local title = ""
+					if isWinner then
+						title = "胜利"
+					else
+						title = "失败"
+					end
+					local screen = PopupDialogScreen(title, data.message, { { text = data.buttonText, cb = function() TheFrontEnd:PopScreen() end } })
+					TheFrontEnd:PushScreen( screen )
+
+					local Namespace = "pkc_popDialog"
+					local Action = "showWinDialog"
+					inst:DoTaskInTime(0, function()
+						SendModRPCToServer( MOD_RPC[Namespace][Action], self._data:value())
+					end)
+				end
+			--elseif data.type == WIN_POPDIALOG then
+			end 
+		end
 	end
 	
+	--设置客机回调的监听
 	if not TheWorld.ismastersim then
-		self.inst:ListenForEvent("messagedirty", OnMessageDirty)
-		self.inst:ListenForEvent("titledirty", OnTitleDirty)
-		self.inst:ListenForEvent("buttonTextdirty", OnButtonTextdirty)
+		self.inst:ListenForEvent("datadirty", OnDataDirty)
 		self.inst:ListenForEvent("showdirty", OnShowDirty)
 	end
 	
-	--设置标题
-	function self:setTitle(title)
-		self.title = title
-		self._title:set(title)
-	end
-
-	--设置内容
-	function self:setMessage(message)
-		self.message = message
-		self._message:set(message)
+	--设置弹窗数据
+	function self:setData(data)
+		self.data = json.encode(data)
+		self._data:set(json.encode(data))
 	end
 	
-	--设置按钮文字
-	function self:setButtonText(text)
-		self.buttonText = text
-		self._buttonText:set(text)
+	--显示弹窗
+	function self:show()		
+		local data = json.decode(self.data)
+		if data.type then
+			if data.type == WIN_POPDIALOG then
+				self:makeWinDialog()
+			--elseif data.type == WIN_POPDIALOG then
+			end
+		end
 	end
 	
-	function self:show()
-		local screen = PopupDialogScreen(self.title, self.message, { { text = self.buttonText, cb = function() TheFrontEnd:PopScreen() end } })
-		TheFrontEnd:PushScreen( screen )
-		self._show:set(true)
+	--胜利弹窗
+	function self:makeWinDialog()
+		self._show:set(true) --触发客机调用
+		local Namespace = "pkc_popDialog"
+		local Action = "showWinDialog"
+		if TheWorld.ismastersim and ThePlayer then
+			MOD_RPC_HANDLERS[Namespace][MOD_RPC[Namespace][Action].id](ThePlayer, self.data)
+		end
 	end
 
 end)

@@ -19,18 +19,9 @@ local function isSavePos(pos)
 end
 
 --随机地点中心
-local function choosePos()
-	local ground = TheWorld
-	local centers = {}
-	for _, node in ipairs(ground.topology.nodes) do
-		if ground.Map:IsPassableAtPoint(node.x, 0, node.y) then
-			table.insert(centers, {x = node.x, z = node.y})
-		end
-	end
-	if #centers > 0 then
-		local pos = centers[math.random(#centers)]
-		return Point(pos.x, 0, pos.z)
-	end
+local function choosePos(centers)
+	local pos = centers[math.random(#centers)]
+	return Point(pos.x, 0, pos.z)
 end
 
 --构造地皮
@@ -75,9 +66,19 @@ end
 
 --相同的构造部分
 local function commenBuild(previousPos)
-	local pos = choosePos()
-	while not isValidBasePos(pos, previousPos) do
-		pos = choosePos()
+	local centers = {}
+	local ground = TheWorld
+	for _, node in ipairs(ground.topology.nodes) do
+		if ground.Map:IsPassableAtPoint(node.x, 0, node.y) then
+			table.insert(centers, {x = node.x, z = node.y})
+		end
+	end
+	local pos = nil
+	if #centers > 0 then
+		pos = choosePos(centers)
+		while not isValidBasePos(pos, previousPos) do
+			pos = choosePos(centers)
+		end
 	end
 	return pos
 end
@@ -100,19 +101,35 @@ end
 local function produceSingleBase(previousPos, groupId)
 	local pos = commenBuild(previousPos)
 	local pigking = nil
+	local pighousePrefab = nil
+	local pighouse = nil
+	local eyetuuretPrefab = nil
+	local eyetuuret = nil
 	if groupId == GROUP_BIGPIG_ID then
 		pigking = produceSingleUtil("pkc_bigpig", pos, Vector3(-3, 0, -3))
+		pighousePrefab = "pkc_pighouse_big"
+		eyetuuretPrefab = "pkc_eyeturret_big"
 	elseif groupId == GROUP_REDPIG_ID then
 		pigking = produceSingleUtil("pkc_redpig", pos, Vector3(-3, 0, -3))
+		pighousePrefab = "pkc_pighouse_red"
+		eyetuuretPrefab = "pkc_eyeturret_red"
 	elseif groupId == GROUP_LONGPIG_ID then
 		pigking = produceSingleUtil("pkc_longpig", pos, Vector3(-3, 0, -3))
+		pighousePrefab = "pkc_pighouse_long"
+		eyetuuretPrefab = "pkc_eyeturret_long"
 	elseif groupId == GROUP_CUIPIG_ID then
 		pigking = produceSingleUtil("pkc_cuipig", pos, Vector3(-3, 0, -3))
+		pighousePrefab = "pkc_pighouse_cui"
+		eyetuuretPrefab = "pkc_eyeturret_cui"
 	end
+	
+	--清理
 	clearPigkingNear(pigking)
-	for i=1, 4 do
-		pkc_trySpawn(pigking, "pighouse", 5, 12, 30) --生成周围的猪人房
-	end
+	
+	--安置建筑
+	pkc_roundSpawn(pigking, pighousePrefab, 10, 4) --猪人房
+	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, 4) --眼球塔
+	
 	return pos
 end
 

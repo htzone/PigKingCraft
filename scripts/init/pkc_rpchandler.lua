@@ -5,6 +5,7 @@
 
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()
+local require = GLOBAL.require
 
 --取消无敌状态
 local function cancelInvincible(player, delay_time)
@@ -100,5 +101,32 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			player.components.pkc_headshow:setChoose(true)
 			break
 		end
+	end
+end)
+
+local json = require "json"
+
+--处理游戏胜利
+AddModRPCHandler("pkc_popDialog", "showWinDialog", function(player, json_data)
+	if player and json_data then
+		local data = json.decode(json_data)
+		local winPlayers = data.winPlayers
+		local isWinner = false
+		for userid, _ in pairs(winPlayers) do
+			if player.userid == userid then
+				isWinner = true
+				break
+			end
+		end
+		local title = ""
+		if isWinner then
+			title = "胜利，然并卵"
+		else
+			title = "失败，好气啊"
+		end
+		local Text = require "widgets/text"
+		local PopupDialogScreen = require("screens/popupdialog")
+		local screen = PopupDialogScreen(title, data.message, { { text = data.buttonText, cb = function() GLOBAL.TheFrontEnd:PopScreen() end } })
+		GLOBAL.TheFrontEnd:PushScreen( screen )
 	end
 end)

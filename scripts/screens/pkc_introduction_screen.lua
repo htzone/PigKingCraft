@@ -55,13 +55,13 @@ local PauseScreen = Class(Screen, function(self)
 
     --subtitle
     self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 30))
-    self.subtitle:SetPosition(0, 135, 0)
+    self.subtitle:SetPosition(0, 130, 0)
     self.subtitle:SetString(STRINGS.UI.INTRO.SUBTITLE)
     self.subtitle:SetColour(0,0,0,1)
 	
 	--description
 	self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 25))
-    self.subtitle:SetPosition(-43, 0, 0)
+    self.subtitle:SetPosition(-43, -5, 0)
     self.subtitle:SetString(STRINGS.UI.INTRO.DESC)
     self.subtitle:SetColour(0,0,0,1)
 

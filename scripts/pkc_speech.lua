@@ -45,6 +45,7 @@ if GetModConfigData("language") == "chinese" then
 		PIGKING_PROTECT = {
 			SPEECH1 = "可惜，受敌方猪王保护！",
 			SPEECH2 = "可惜，不能这么做！",
+			SPEECH3 = "可惜，和平时期不能这么做！",
 		},
 		GRAVESTONE_TIPS = {
 			SPEECH1 = "沉睡的地方",
@@ -78,10 +79,11 @@ if GetModConfigData("language") == "chinese" then
 		},
 		GROUP_BEKILLED = "灭",
 		AUTO_CLEAR = {
-		SPEECH1 = "注意，扔地上超过",
-		SPEECH2 = "天的东西将被清理掉！！！",
+		SPEECH1 = "注意，注意，扔地上超过",
+		SPEECH2 = "天的东西将被清理掉哦！！！",
 		},
-		CLEANING = "清理中...",
+		CLEANING = "垃圾自动清理中...",
+		PEACE_TIME_TIPS = "注意！和平时期结束啦， 战争即将开始！",
 	}
 else
 	GLOBAL.BOSS_NAME = {
@@ -99,15 +101,15 @@ else
 		COMMA = ",",
 		EXCLA = "!",
 		QUEST = "?",
-		GROUP_HASBE_KILLED = "No!  My  group  has  been  wiped  out !",
+		GROUP_HASBE_KILLED = "No!  My team  has  been  wiped  out !",
 		REVIVE_TIPS1 = {
-			SPEECH1 = "Revive in",
-			SPEECH2 = "s ",
+			SPEECH1 = "I will revive in ",
+			SPEECH2 = " sec.",
 		},
 		REVIVE_TIPS2 = "well,  Im  coming  back !",
 		BELONG_TIPS = {
-			SPEECH1 = "Im  belong  to  ",
-			SPEECH2 = " Group !",
+			SPEECH1 = "I  belong  to  ",
+			SPEECH2 = " Team Group !",
 		},
 		GROUP_JOIN = {
 			SPEECH1 = "  has  joined  the  ",
@@ -118,11 +120,12 @@ else
 		PIGKING_PROTECT = {
 			SPEECH1 = "It's  protected  by  Enemy  PigKing !",
 			SPEECH2 = "Sorry, I  cant  do  that!",
+			SPEECH3 = "Sorry, I  cant  do  that in peaceful days!",
 		},
 		GRAVESTONE_TIPS = {
 			SPEECH1 = "He's  already  asleep!",
-			SPEECH2 = "The  pity  is  that ",
-			SPEECH3 = "  is  a  history  of  glory!",
+			SPEECH2 = "It  is  sad  that ",
+			SPEECH3 = "  is  now  a  history  of  glory!",
 		},
 		KILLED_ANNOUNCE = {
 			SPEECH1 = "  was  killed  by ",
@@ -132,11 +135,13 @@ else
 		WINDIALOG_CONTENT = {
 			SPEECH1 = "Victory !!!  The Winner is 【",
 			SPEECH2 = " 】Group !!!",
+			SPEECH3 = "Failure  !!!  The Winner is 【",
+			SPEECH4 = " 】Group !!!",
 		},
 		WINDIALOG_BUTTON = "CLOSE",
 		WORLDRESET_TIPS = {
 			SPEECH1 = "The  world  will  be  regenerated  in  30s!!!",
-			SPEECH2 = "World  Regenerate  Start !!!",
+			SPEECH2 = "World  Regeneration  is  progress !!!",
 		},
 		PLAYER_LOSE_TIPS = "No,  We  have  lost  the  game！！！",
 		KINGBEKILLED_ANNOUNCE = {
@@ -149,12 +154,13 @@ else
 			SPEECH3 = " Group !!!",
 			SPEECH4 = "",
 		},
-		GROUP_BEKILLED = " KO",
+		GROUP_BEKILLED = " K.O.",
 		AUTO_CLEAR = {
-		SPEECH1 = "Tips:the item dropped on the ground for more than ",
+		SPEECH1 = "Warning:the items dropped on the ground for more than ",
 		SPEECH2 = " days will be cleared!",
 		},
-		CLEANING = "Cleaning...",
+		CLEANING = "Commencing item cleanup now...",
+		PEACE_TIME_TIPS = "The Peace Time is Over!  It‘s about time!!!",
 	}
 end
 

@@ -103,6 +103,7 @@ local function OnEat(inst, food)
             not inst.components.werebeast:IsInWereState() and
             food.components.edible:GetHealth(inst) < 0 then
 --            inst.components.werebeast:TriggerDelta(1)
+			inst.components.werebeast:TriggerDelta(1)
         end
     end
 end
@@ -134,6 +135,10 @@ local function IsNonWerePig(dude)
     return dude:HasTag("pig") and not dude:HasTag("werepig")
 end
 
+--local function OnlyMyGroupPig(dude)
+--    return dude:HasTag("pig") and dude.components.pkc_group and dude.components.pkc_group:getChooseGroup() 
+--end
+
 local function IsGuardPig(dude)
     return dude:HasTag("guard") and dude:HasTag("pig")
 end
@@ -147,13 +152,17 @@ local function OnAttacked(inst, data)
         OnAttackedByDecidRoot(inst, attacker.owner)
     elseif attacker.prefab ~= "deciduous_root" then
         inst.components.combat:SetTarget(attacker)
-
         if inst:HasTag("werepig") then
             inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, IsWerePig, MAX_TARGET_SHARES)
         elseif inst:HasTag("guard") then
             inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, attacker:HasTag("pig") and IsGuardPig or IsPig, MAX_TARGET_SHARES)
         elseif not (attacker:HasTag("pig") and attacker:HasTag("guard")) then
-            inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, IsNonWerePig, MAX_TARGET_SHARES)
+            inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, 
+			function(dude) 
+				return dude:HasTag("pig") and dude.components.pkc_group and inst.components.pkc_group 
+				and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup() 
+			end, 
+			MAX_TARGET_SHARES)
         end
     end
 end
@@ -166,7 +175,7 @@ end
 
 local builds = { "pig_build", "pigspotted_build" }
 local guardbuilds = { "pig_guard_build" }
-
+--[[
 local function NormalRetargetFn(inst)
     return FindEntity(
         inst,
@@ -180,6 +189,21 @@ local function NormalRetargetFn(inst)
         { "playerghost", "INLIMBO", "abigail" } or
         { "playerghost", "INLIMBO" }
     )
+end
+]]--
+
+local function NormalRetargetFn(inst)
+	local dist = TUNING.PIG_TARGET_DIST		
+	local invader = nil
+	invader = FindEntity(inst, dist, function(guy)
+		if not inst.components.pkc_group then
+			return guy:HasTag("monster") and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
+		end
+		return (guy:HasTag("monster") 
+		or  (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
+		and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
+	end)
+	return invader
 end
 
 local function NormalKeepTargetFn(inst, target)
@@ -205,6 +229,11 @@ local function SuggestTreeTarget(inst, data)
 end
 
 local function SetNormalPig(inst)
+	--变回正常时，记住自己所属的阵营
+	if inst.pkc_group_id ~= nil and inst.components.pkc_group then
+		inst.components.pkc_group:setChooseGroup(inst.pkc_group_id)
+	end
+	
     inst:RemoveTag("werepig")
     inst:RemoveTag("guard")
     inst:SetBrain(normalbrain)
@@ -212,6 +241,7 @@ local function SetNormalPig(inst)
     inst.AnimState:SetBuild(inst.build)
 
 --    inst.components.werebeast:SetOnNormalFn(SetNormalPig)
+	inst.components.werebeast:SetOnNormalFn(SetNormalPig)
     inst.components.sleeper:SetResistance(2)
 
     inst.components.combat:SetDefaultDamage(TUNING.PIG_DAMAGE)
@@ -224,11 +254,11 @@ local function SetNormalPig(inst)
     inst.components.sleeper:SetWakeTest(DefaultWakeTest)
 
     inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 3)
-    inst.components.lootdropper:AddRandomLoot("pigskin", 1)
+    inst.components.lootdropper:AddRandomLoot("meat", 2)
+    --inst.components.lootdropper:AddRandomLoot("pigskin", 1)
     inst.components.lootdropper.numrandomloot = 1
 
-    inst.components.health:SetMaxHealth(TUNING.PIG_HEALTH)
+    inst.components.health:SetMaxHealth(2.5 * TUNING.PIG_HEALTH)
     inst.components.combat:SetRetargetFunction(3, NormalRetargetFn)
     inst.components.combat:SetTarget(nil)
     inst:ListenForEvent("suggest_tree_target", SuggestTreeTarget)
@@ -311,11 +341,12 @@ local function SetGuardPig(inst)
     inst.AnimState:SetBuild(inst.build)
 
 --    inst.components.werebeast:SetOnNormalFn(SetGuardPig)
+	inst.components.werebeast:SetOnNormalFn(SetGuardPig)
     inst.components.sleeper:SetResistance(3)
 
     inst.components.health:SetMaxHealth(TUNING.PIG_GUARD_HEALTH)
     inst.components.combat:SetDefaultDamage(TUNING.PIG_GUARD_DAMAGE)
-    inst.components.combat:SetAttackPeriod(TUNING.PIG_GUARD_ATTACK_PERIOD)
+    inst.components.combat:SetAttackPeriod(1.1)
     inst.components.combat:SetKeepTargetFunction(GuardKeepTargetFn)
     inst.components.combat:SetRetargetFunction(1, GuardRetargetFn)
     inst.components.combat:SetTarget(nil)
@@ -344,7 +375,7 @@ local function WerepigRetargetFn(inst)
                 and not (guy.sg ~= nil and guy.sg:HasStateTag("transform"))
         end,
         { "_combat" }, --See entityreplica.lua (re: "_combat" tag)
-        { "werepig", "alwaysblock", "beaver" }
+        { "werepig", "alwaysblock", "beaver", "king" }
     )
 end
 
@@ -397,7 +428,11 @@ local function SetWerePig(inst)
     inst:SetBrain(werepigbrain)
     inst:SetStateGraph("SGwerepig")
     inst.AnimState:SetBuild("werepig_build")
-
+	--变成了疯猪，可攻击
+	if inst.components.pkc_group then
+		inst.components.pkc_group:setChooseGroup(0)
+	end
+	
     inst.components.sleeper:SetResistance(3)
 
     inst.components.combat:SetDefaultDamage(TUNING.WEREPIG_DAMAGE)
@@ -411,7 +446,7 @@ local function SetWerePig(inst)
     inst.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
     inst.components.lootdropper.numrandomloot = 0
 
-    inst.components.health:SetMaxHealth(TUNING.WEREPIG_HEALTH)
+    inst.components.health:SetMaxHealth(2.5 * TUNING.WEREPIG_HEALTH)
     inst.components.combat:SetTarget(nil)
     inst.components.combat:SetRetargetFunction(3, WerepigRetargetFn)
     inst.components.combat:SetKeepTargetFunction(WerepigKeepTargetFn)
@@ -440,8 +475,11 @@ local function OnLoad(inst, data)
     if data ~= nil then
         inst.build = data.build or builds[1]
 --        if not inst.components.werebeast:IsInWereState() then
-            inst.AnimState:SetBuild(inst.build)
+           -- inst.AnimState:SetBuild(inst.build)
 --        end
+		if not inst.components.werebeast:IsInWereState() then
+            inst.AnimState:SetBuild(inst.build)
+		end
     end
 end
 
@@ -449,7 +487,8 @@ local function CustomOnHaunt(inst)
     if not inst:HasTag("werepig") and math.random() <= TUNING.HAUNT_CHANCE_OCCASIONAL then
         local remainingtime = TUNING.TOTAL_DAY_TIME * (1 - TheWorld.state.time)
         local mintime = TUNING.SEG_TIME
---        inst.components.werebeast:SetWere(math.max(mintime, remainingtime) + math.random() * TUNING.SEG_TIME)
+--      inst.components.werebeast:SetWere(math.max(mintime, remainingtime) + math.random() * TUNING.SEG_TIME)
+		inst.components.werebeast:SetWere(math.max(mintime, remainingtime) + math.random() * TUNING.SEG_TIME)
         inst.components.hauntable.hauntvalue = TUNING.HAUNT_LARGE
     end
 end
@@ -492,7 +531,7 @@ end
 
 local function common(moonbeast)
     local inst = CreateEntity()
-
+	
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -505,8 +544,11 @@ local function common(moonbeast)
     inst.DynamicShadow:SetSize(1.5, .75)
     inst.Transform:SetFourFaced()
 
+	inst:AddComponent("pkc_group")
+	inst:AddTag("pkc_defences") --标记为防御力量
     inst:AddTag("character")
     inst:AddTag("pig")
+	inst:AddTag("pkc_pigman")
     inst:AddTag("scarytoprey")
     inst.AnimState:SetBank("pigman")
     inst.AnimState:PlayAnimation("idle_loop")
@@ -582,15 +624,23 @@ local function common(moonbeast)
 
     ------------------------------------------
     --MakeHauntablePanic(inst)
-
-    --[[if not moonbeast then
+	--[[
+    if not moonbeast then
         inst:AddComponent("werebeast")
         inst.components.werebeast:SetOnWereFn(SetWerePig)
         inst.components.werebeast:SetTriggerLimit(4)
 
         AddHauntableCustomReaction(inst, CustomOnHaunt, true, nil, true)
-    end--]]
+    end
+	]]--
+	
+	if not moonbeast then
+        inst:AddComponent("werebeast")
+        inst.components.werebeast:SetOnWereFn(SetWerePig)
+        inst.components.werebeast:SetTriggerLimit(4)
 
+        AddHauntableCustomReaction(inst, CustomOnHaunt, true, nil, true)
+    end
     ------------------------------------------
     inst:AddComponent("follower")
     inst.components.follower.maxfollowtime = TUNING.PIG_LOYALTY_MAXTIME
@@ -644,68 +694,65 @@ local function common(moonbeast)
     inst:ListenForEvent("attacked", OnAttacked)
     inst:ListenForEvent("newcombattarget", OnNewTarget)
 
+	--戴帽子
+	inst.AnimState:OverrideSymbol("swap_hat", "hat_football", "swap_hat")
+	inst.AnimState:Show("HAT")
+	inst.AnimState:Show("HAT_HAIR")
+	inst.AnimState:Hide("HAIR_NOHAT")
+	inst.AnimState:Hide("HAIR")
+	
     return inst
 end
 
-local function normal()
+local function normal(groupId)
     local inst = common(false)
-
     if not TheWorld.ismastersim then
         return inst
     end
-
     inst.build = builds[math.random(#builds)]
     inst.AnimState:SetBuild(inst.build)
     SetNormalPig(inst)
-	inst:AddComponent("pkc_group")
+	inst:AddTag("pkc_group"..groupId)
     return inst
 end
 
 return 
 Prefab("pkc_pigman_big", function()
-	local inst = normal()
-	if not TheWorld.ismastersim then
-        return inst
-    end
+	local inst = normal(GROUP_BIGPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.BIGPIG.color)
+	local r, g, b = HexToPercentColor(GROUP_INFOS.BIGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
+	inst.pkc_group_id = GROUP_BIGPIG_ID
 	return inst
-end),
+end, assets, prefabs),
 Prefab("pkc_pigman_red", function()
-	local inst = normal()
-	if not TheWorld.ismastersim then
-        return inst
-    end
+	local inst = normal(GROUP_REDPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.REDPIG.color)
+	local r, g, b = HexToPercentColor(GROUP_INFOS.REDPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
+	inst.pkc_group_id = GROUP_REDPIG_ID
 	return inst
-end),
+end, assets, prefabs),
 Prefab("pkc_pigman_cui", function()
-	local inst = normal()
-	if not TheWorld.ismastersim then
-        return inst
-    end
+	local inst = normal(GROUP_CUIPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
+	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_CUIPIG_ID)
+	inst.pkc_group_id = GROUP_CUIPIG_ID
 	return inst
-end),
+end, assets, prefabs),
 Prefab("pkc_pigman_long", function()
-	local inst = normal()
-	if not TheWorld.ismastersim then
-        return inst
-    end
+	local inst = normal(GROUP_LONGPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.LONGPIG.color)
+	local r, g, b = HexToPercentColor(GROUP_INFOS.LONGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_LONGPIG_ID)
+	inst.pkc_group_id = GROUP_LONGPIG_ID
 	return inst
-end)
+end, assets, prefabs)
 
 
 

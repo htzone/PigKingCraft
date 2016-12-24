@@ -148,7 +148,7 @@ local function fn()
 
     inst:AddTag("king")
 	inst:AddTag("cuipig")
-	inst:AddTag("pkc_group2")
+	inst:AddTag("pkc_group4")
 	inst:AddTag("pig")
 	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")
@@ -171,16 +171,17 @@ local function fn()
 	--设置颜色
 --	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
 --	inst.AnimState:SetMultColour(r, g, b, 1)
-	
-	--让猪王具备生命
-	inst:AddComponent("pkc_addhealth")
-	inst.components.pkc_addhealth:setMaxHealth(PIGKING_HEALTH) --设置最大生命值
-	inst.components.pkc_addhealth:setOnHealthDelta(healthdelta_fn) --监听生命变化
-	inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
-	inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
-	inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
-	if inst.components.health then
-		inst.components.health:StartRegen(100, 100)
+	if PIGKING_HEALTH ~= -1 then
+		--让猪王具备生命
+		inst:AddComponent("pkc_addhealth")
+		inst.components.pkc_addhealth:setMaxHealth(PIGKING_HEALTH) --设置最大生命值
+		inst.components.pkc_addhealth:setOnHealthDelta(healthdelta_fn) --监听生命变化
+		inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
+		inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
+		inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
+		if inst.components.health then
+			inst.components.health:StartRegen(100, 100)
+		end
 	end
 	
     inst.components.trader:SetAcceptTest(AcceptTest)

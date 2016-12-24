@@ -12,10 +12,10 @@ GLOBAL.GAME_SCORE = {
 		walrus = 20, --海象
 		warg = 50, --狗王
 		spiderqueen = 40, --蜘蛛女王
-		rook = 30, --战车
+		rook = 40, --战车
 		leif = 20, --树精
-		leif_sparse = 30, --稀有树精 
-		hound = 5, --狗
+		leif_sparse = 40, --稀有树精 
+		hound = 2, --狗
 		icehound = 6, --冰狗
 		firehound = 6, --火狗
 		tentacle = 30, --触手
@@ -23,7 +23,7 @@ GLOBAL.GAME_SCORE = {
 		moose = 400, --巨鸭
 		mossling = 25, --小鸭
 		bearger = 500, --巨熊
-		dragonfly = 1000, --龙蝇
+		dragonfly = 2000, --龙蝇
 		beequeen = 1000, --蜂后
 		--minotaur = 1000, --远古犀牛
 		--worm = 20, --远古虫子
@@ -40,6 +40,7 @@ GLOBAL.GAME_SCORE = {
 		orangegem = 20, --橙宝石
 		yellowgem = 20, --黄宝石
 		bluegem = 20, --蓝宝石
+		redgem = 20,--红宝石
 		horn = 20, --牛角
 		tentaclespots = 20, --触手皮
 		trunk_summer = 10, --夏象鼻
@@ -118,10 +119,12 @@ GLOBAL.GAME_SCORE = {
 		jammypreserves = 6, --果酱蜜饯
 		unagi = 10, --鳗鱼料理
 		wormlight = 20, --远古虫子果
-		cutgrass = 2, --草
-		twigs = 2, --树枝
-		flint = 2,--燧石
-		rocks = 2,--岩石
+		cutgrass = 1, --草
+		twigs = 1, --树枝
+		flint = 1,--燧石
+		rocks = 1,--岩石
+		nitre = 2,--硝石
+		log = 1,--木头
 		feather_crow = 4,--乌鸦羽毛
 		feather_robin = 6,--红雀羽毛
 		feather_robin_winter = 7,--雪雀羽毛
@@ -130,5 +133,13 @@ GLOBAL.GAME_SCORE = {
 	},
 }
 
-
+for k, v in pairs(GLOBAL.GAME_SCORE.GIVE) do
+	AddPrefabPostInit(k, function(inst)
+		if GLOBAL.TheWorld.ismastersim then
+			if not inst.components.tradable then
+				inst:AddComponent("tradable")
+			end
+		end
+	end)
+end
 	

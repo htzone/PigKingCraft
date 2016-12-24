@@ -53,10 +53,13 @@ function PKC_PREFABS:make(name, desc)
 	if self.inst.prefab == "gravestone" and self.inst:HasTag("kinggrave") then
 		table.insert(self.tags, "king")
 		table.insert(self.tags, "kinggrave")
-		table.insert(self.tags, "pkc_group"..self.inst.pkc_group_id)
-		self.attrs[1] = {}
-		self.attrs[1].name = "pkc_group_id"
-		self.attrs[1].value = self.inst.pkc_group_id
+		if self.inst.pkc_group_id then
+			table.insert(self.tags, "pkc_group"..self.inst.pkc_group_id)
+			self.attrs[1] = {}
+			self.attrs[1].name = "pkc_group_id"
+			self.attrs[1].value = self.inst.pkc_group_id
+		end
+		
 		makePigkingGrave(self.inst, name, desc)
 	end
 end

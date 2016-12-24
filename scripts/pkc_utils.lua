@@ -270,6 +270,118 @@ function pkc_spawnat(inst,prefname,offset,mode,fn)
 	end
 end
 
+--环绕安置
+--@RedPig 12-15
+--@param target 作为中心点的物体
+--@param prefab_name prefab名称
+--@param radius	半径
+--@param mode 需要安置的数量
+function pkc_roundSpawn(target, prefab_name, radius, num)
+	local pos = Vector3(target.Transform:GetWorldPosition())
+	local attempt_angle = (2*PI)/num
+	local tmp_angles = {}
+	for i=0, num-1 do
+		local a = i*attempt_angle
+		if a > PI then
+			a = a-(2*PI)
+		end
+		table.insert(tmp_angles, a)
+	end
+	local theta = math.random() * 2 * PI
+	for i, attempt in ipairs(tmp_angles) do
+		local check_angle = theta + attempt
+		if check_angle > 2*PI then check_angle = check_angle - 2*PI end
+		local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
+		local tmp_pos = pos + offset
+		local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
+		local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255) 
+		if canSpawn then
+			SpawnPrefab(prefab_name).Transform:SetPosition(tmp_pos:Get())
+		end
+	end
+end
+
+--判断在一定范围内有没有海
+function pkc_isValidRange(center_pos, radius)
+	--local pt = Vector3(target.Transform:GetWorldPosition())
+	local theta = math.random() * 2 * PI
+	local result_offset = FindValidPositionByFan(theta, radius, 36, function(offset) 
+		local pos = center_pos + offset
+		local tile = TheWorld.Map:GetTileAtPoint(pos.x, pos.y, pos.z)
+		local isValid = tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255 
+		if isValid then
+			return false
+		end
+		return true
+		--local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 1)
+		--return next(ents) == nil
+    end)
+	if result_offset == nil then
+        return true
+	end
+	return false
+end
+
+--判断在一定范围内有没有海
+function pkc_isNoOceanRange(center_pos, radius)
+	local num = 6
+	local attempt_angle = (2*PI)/num
+	local tmp_angles = {}
+	for i=0, num-1 do
+		local a = i*attempt_angle
+		if a > PI then
+			a = a-(2*PI)
+		end
+		table.insert(tmp_angles, a)
+	end
+	local theta = math.random() * 2 * PI
+	local isNearOcean = false
+	for i, attempt in ipairs(tmp_angles) do
+		local check_angle = theta + attempt
+		if check_angle > 2*PI then check_angle = check_angle - 2*PI end
+		local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
+		local tmp_pos = center_pos + offset
+		local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
+		local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
+		if not canSpawn then
+			isNearOcean = true
+			break
+		end
+	end
+	if isNearOcean then
+		return false
+	end
+	return true
+end
+
+--让所有的玩家说同一句话
+function pkc_makeAllPlayersSpeak(speech_str)
+	for _,player in pairs(AllPlayers) do 
+		if player and player.components.talker then
+			player.components.talker:Say(speech_str)
+		end
+	end
+end
+
+--根据权值获取物品,需传入一个table
+function pkc_weightedChoose(choices)
+    local function weighted_total(choices)
+        local total = 0
+        for choice, weight in pairs(choices) do
+            total = total + weight
+        end
+        return total
+    end
+    local threshold = math.random() * weighted_total(choices)
+    local last_choice
+    for choice, weight in pairs(choices) do
+        threshold = threshold - weight
+        if threshold <= 0 then return choice end
+        last_choice = choice
+    end
+    return last_choice
+end
+
 
 
 

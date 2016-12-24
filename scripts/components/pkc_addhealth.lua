@@ -11,6 +11,9 @@ local PKC_ADD_HEALTH = Class(function(self, inst)
 	if not self.inst.components.combat then
 		self.inst:AddComponent("combat")
 	end
+	if not self.inst.components.lootdropper then
+		self.inst:AddComponent("lootdropper")
+	end
 	self.inst.components.combat.hiteffectsymbol = "body"
 end)
 
@@ -34,9 +37,6 @@ end
 --设置掉落
 function PKC_ADD_HEALTH:setDropLoot(loot_table)
 	if next(loot_table) ~= nil then
-		if not self.inst.components.lootdropper then
-			self.inst:AddComponent("lootdropper")
-		end
 		self.inst.components.lootdropper:SetLoot(loot_table)
 		self.inst:ListenForEvent("death", function(inst)
 			inst.components.lootdropper:DropLoot()

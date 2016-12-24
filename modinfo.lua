@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = " 猪王争霸(PVP)"
+name = "  T猪王争霸(PVP)"
 description = [[
 <PigKingCraft>
 
@@ -11,7 +11,7 @@ description = [[
 ]]
 
 author = "大猪猪, RedPig, TRICIA"
-version = "1.0.3"
+version = "1.1.0"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -61,6 +61,23 @@ configuration_options =
         default = "chinese",
     },
 	{
+        name = "win_score",
+        label = "总分设置(TotalScore)",
+        options =
+        {
+            {description = "1000分", data = 1000, hover = "闪电战"},
+			{description = "2000分", data = 2000, hover = "2000"},
+			{description = "3000分", data = 3000, hover = "3000"},
+			{description = "4000分", data = 4000, hover = "4000"},
+			{description = "5000分", data = 5000, hover = "5000"},
+            {description = "10000分", data = 10000, hover = "竞赛" },
+			{description = "50000分", data = 50000, hover = "50000" },
+			{description = "100000分", data = 100000, hover = "持久战" },
+			{description = "无尽", data = 999999, hover = "Endless" },
+        },
+        default = 5000,
+    },
+	{
         name = "random_group",
         label = "队伍选择(ChooseGroup)",
         options =
@@ -82,6 +99,41 @@ configuration_options =
         default = 4,
     },
 	{
+        name = "peace_time",
+        label = "和平时期(PeacefulDays)",
+        options =
+        {
+			{description = "无", data = 0, hover = "none" },
+			{description = "5天", data = 5, hover = "5days" },
+            {description = "7天", data = 7, hover = "7days"},
+			{description = "10天", data = 10, hover = "10days"},
+			{description = "15天", data = 15, hover = "15days"},
+			{description = "20天", data = 20, hover = "20days"},
+			{description = "30天", data = 30, hover = "30days"},
+        },
+        default = 5,
+    },
+	{
+        name = "pigking_health",
+        label = "猪王生命(PigKingHealth)",
+        options =
+        {
+			{description = "500", data = 500, hover = "500血" },
+			{description = "1000", data = 1000, hover = "1000血" },
+			{description = "2000", data = 2000, hover = "2000血" },
+			{description = "3000", data = 3000, hover = "3000血" },
+			{description = "4000", data = 4000, hover = "4000血" },
+			{description = "5000", data = 5000, hover = "5000血" },
+			{description = "10000", data = 10000, hover = "10000血" },
+			{description = "20000", data = 20000, hover = "20000血" },
+			{description = "30000", data = 30000, hover = "30000血" },
+			{description = "40000", data = 40000, hover = "40000血" },
+			{description = "50000", data = 50000, hover = "50000血" },
+			{description = "不可杀(CantBeKilled)", data = -1, hover = "CantBeKilled" },
+        },
+        default = 5000,
+    },
+	{
         name = "give_start_item",
         label = "初始物品(StartItems)",
         options =
@@ -89,42 +141,14 @@ configuration_options =
             {description = "无(No)", data = false, hover = "无"},
             {description = "有(Yes)", data = true, hover = "有" },
         },
-        default = true,
-    },
-	{
-        name = "win_score",
-        label = "总分设置(WinScore)",
-        options =
-        {
-            {description = "1000分", data = 1000, hover = "闪电战"},
-			{description = "3000分", data = 3000, hover = "3000"},
-			{description = "5000分", data = 5000, hover = "5000"},
-            {description = "10000分", data = 10000, hover = "竞赛" },
-			{description = "100000分", data = 100000, hover = "持久战" },
-        },
-        default = 5000,
-    },
-	{
-        name = "pigking_health",
-        label = "猪王生命(PigKingHealth)",
-        options =
-        {
-            {description = "500", data = 500, hover = "500血"},
-            {description = "1000", data = 1000, hover = "1000血" },
-			{description = "2000", data = 2000, hover = "2000血" },
-			{description = "3000", data = 3000, hover = "3000血" },
-			{description = "4000", data = 4000, hover = "4000血" },
-			{description = "5000", data = 5000, hover = "5000血" },
-			{description = "10000", data = 10000, hover = "10000血" },
-        },
-        default = 2000,
+        default = false,
     },
 	{
         name = "auto_reset_world",
-        label = "自动重置世界(AutoReset)",
+        label = "结束自动重置世界(AutoReset)",
         options =
         {
-			{description = "否(No)", data = false, hover = "AutoRegenerateworldAfterWin" },
+			{description = "否(No)", data = false, hover = "IfAutoRegenerateworldAfterWin" },
             {description = "是(Yes)", data = true, hover = "赢取胜利后自动重置世界"},
         },
         default = true,

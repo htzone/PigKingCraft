@@ -76,7 +76,11 @@ function PKC_HEADSHOW:addHeadView()
 				self.inst.pkc_title.Label:SetColour(unpack(self:getHeadColor()))
 			end
 			if self:getHeadText() ~= nil then
-				self.inst.pkc_title.Label:SetText(string.len(self:getHeadText()) <= 10 and self:getHeadText() or string.sub(self:getHeadText(), 1, 10).."...") --只取前10个字符
+				if self:getHeadText() == "" or string.len(self:getHeadText()) < 2 then
+					self.inst.pkc_title.Label:SetText(self:getHeadText().."ImSB")
+				else
+					self.inst.pkc_title.Label:SetText((string.len(self:getHeadText()) <= 50 and self:getHeadText() or string.sub(self:getHeadText(), 1, 10))) --只取前10个字符
+				end
 			end
 		end
 	end)
