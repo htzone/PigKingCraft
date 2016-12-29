@@ -1,17 +1,21 @@
 -- This information tells other players more about the mod
-name = "  T猪王争霸(PVP)"
+name = "  猪王争霸(PVP)"
 description = [[
-<PigKingCraft>
-
+<PigKingCraft>（玩的不只是PVP）
 "在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
+这只是一切的开始，猪王之间的战争才正式拉开帷幕...
 
-这只是一切的开始
-猪王之间的战争才正式拉开帷幕...
+更新内容：
+1.添加猪王和猪人的防卫与升级
+2.添加B键回城功能
+3.猪王被攻击提示
+4.权限和平衡完善
+5.更多惊喜请自行探索
 
 ]]
 
 author = "大猪猪, RedPig, TRICIA"
-version = "1.1.0"
+version = "1.1.1"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -85,7 +89,7 @@ configuration_options =
 			{description = "随机队伍(RandomGroup)", data = true, hover = "随机队伍(RandomGroup)" },
             {description = "指定队伍(SpecifyGroup)", data = false, hover = "指定队伍(SpecifyGroup)"},
         },
-        default = false,
+        default = true,
     },
 	{
         name = "group_num",
@@ -111,7 +115,7 @@ configuration_options =
 			{description = "20天", data = 20, hover = "20days"},
 			{description = "30天", data = 30, hover = "30days"},
         },
-        default = 5,
+        default = 0,
     },
 	{
         name = "pigking_health",

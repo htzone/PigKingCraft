@@ -63,6 +63,7 @@ local function triggerlight(inst)
 end
 
 local function retargetfn(inst)
+	--[[
     local playertargets = {}
     for i, v in ipairs(AllPlayers) do
 		if inst and v and inst.components.pkc_group and v.components.pkc_group 
@@ -72,15 +73,16 @@ local function retargetfn(inst)
 			end
 		end
     end
-
+	]]--
     return FindEntity(inst, 20,
         function(guy)
             return inst.components.combat:CanTarget(guy)
-				and not guy:HasTag("werepig")
-				and not (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup())
-                and (playertargets[guy] 
-				or (guy.components.combat.target ~= nil and guy.components.combat.target.components.pkc_group and guy.components.combat.target.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()) 
-				or (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
+				and not guy:HasTag("werepig") 
+				and guy.components.pkc_group
+				and not (guy.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup())
+                --and (playertargets[guy] 
+				--or (guy.components.combat.target ~= nil and guy.components.combat.target.components.pkc_group and guy.components.combat.target.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()) 
+				--or (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
         end,
         { "_combat" }, --see entityreplica.lua
         { "INLIMBO", "eyeturret" }
@@ -260,6 +262,10 @@ local function fn(groupId)
     inst.components.sanityaura.aura = -TUNING.SANITYAURA_TINY    
 
     inst:AddComponent("inspectable")
+	if not inst.components.named then
+		inst:AddComponent("named")
+	end
+	inst.components.named:SetName("争霸眼球塔")
     inst:AddComponent("lootdropper")
 
     inst:ListenForEvent("attacked", OnAttacked)

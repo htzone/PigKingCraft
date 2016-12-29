@@ -395,8 +395,14 @@ local function fn(groupId)
     inst.components.playerprox:SetOnPlayerNear(onnear)
     inst.components.playerprox:SetOnPlayerFar(onfar)
 
-    inst:AddComponent("inspectable")
-
+	--名字
+	if not inst.components.inspectable then
+		inst:AddComponent("inspectable")
+	end
+	if not inst.components.named then
+		inst:AddComponent("named")
+	end
+	inst.components.named:SetName("争霸猪人房")
     inst.components.inspectable.getstatus = getstatus
 
     MakeSnowCovered(inst)

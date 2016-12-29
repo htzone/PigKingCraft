@@ -6,6 +6,26 @@
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()
 
+--获取当前的猪王等级
+local function getPigkingLevel(pigkingId)
+	local needLevelUpScore = GLOBAL.WIN_SCORE / 10
+	local currentLevel = 1
+	if pigkingId ==  GLOBAL.GROUP_BIGPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP1_SCORE
+		currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+	elseif pigkingId ==  GLOBAL.GROUP_REDPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP2_SCORE
+		currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+	elseif pigkingId ==  GLOBAL.GROUP_LONGPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP3_SCORE
+		currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+	elseif pigkingId ==  GLOBAL.GROUP_CUIPIG_ID then
+		local currentScore = GLOBAL.GROUP_SCORE.GROUP4_SCORE
+		currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+	end
+	return currentLevel
+end
+
 --通过组件模拟prefab
 local ComponentPrefabs = {
 	"gravestone",
@@ -40,4 +60,38 @@ end
 
 for _, v in pairs(toBigTable) do
 	AddPrefabPostInit(v.name, function(inst) toBig(inst, v.size) end)
+end
+
+local pkc_pigmans = {
+"pkc_pigman_big",
+"pkc_pigman_red",
+"pkc_pigman_cui",
+"pkc_pigman_long",
+}
+
+--猪人成长
+local function grow(inst)
+	if inst and inst.Transform then
+		if inst.components.pkc_group then
+			local level = getPigkingLevel(inst.components.pkc_group:getChooseGroup())
+			local scale = 1 + 0.05 * level
+			local damage = GLOBAL.PKC_PIGMAN_DAMAGE + (0.1 * GLOBAL.PKC_PIGMAN_DAMAGE) * level
+			local health = GLOBAL.PKC_PIGMAN_HEALTH + (0.1 * GLOBAL.PKC_PIGMAN_HEALTH) * level
+			local attack_period = GLOBAL.PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
+			inst.Transform:SetScale(scale, scale, scale)
+			inst:AddTag("pkc_level"..level)
+			inst.pkc_level = level
+			if inst.components.combat then
+				 inst.components.combat:SetDefaultDamage(damage)
+				 inst.components.combat:SetAttackPeriod(attack_period)
+			end
+			if inst.components.health then
+				 inst.components.health:SetMaxHealth(health)
+			end
+		end
+	end
+end
+
+for _, v in pairs(pkc_pigmans) do
+	AddPrefabPostInit(v, grow)
 end

@@ -9,8 +9,8 @@
 	--赢取最终胜利后是否自动重置世界
 	GLOBAL.AUTO_RESET_WORLD = GetModConfigData("auto_reset_world")
 	--猪王的生命值
-	--GLOBAL.PIGKING_HEALTH = GetModConfigData("pigking_health")
-	GLOBAL.PIGKING_HEALTH = 200
+	GLOBAL.PIGKING_HEALTH = GetModConfigData("pigking_health")
+	--GLOBAL.PIGKING_HEALTH = 100
 	--给初始物品
 	GLOBAL.GIVE_START_ITEM = GetModConfigData("give_start_item")
 	--随机队伍
@@ -22,15 +22,15 @@
 	--物品自动清理超过时间(秒)
 	GLOBAL.AUTO_DELETE_TIME = 60
 	--世界自动清理间隔时间(天)
-	GLOBAL.WORLD_DELETE_INTERVAL = 10
+	GLOBAL.WORLD_DELETE_INTERVAL = 5
 	--世界自动清理超过时间(天)
-	GLOBAL.WORLD_DELETE_TIME = 9
+	GLOBAL.WORLD_DELETE_TIME = 4
 	--下线掉落所有物品(附近有敌人时)
 	GLOBAL.LEVAE_DROP_EVERYTHING = true
 	--开始无敌时间（秒）
 	GLOBAL.INVINCIBLE_TIME = 30
 	--复活无敌时间（秒）
-	GLOBAL.REVIVE_INVINCIBLE_TIME = 30
+	GLOBAL.REVIVE_INVINCIBLE_TIME = 20
 	--玩家死亡自动复活时间（秒）
 	GLOBAL.PLAYER_REVIVE_TIME = 30
 	--猪王财产最大保护范围（码）
@@ -61,6 +61,7 @@
 				★将一些有价值的物品给自己的猪王可以换取分数★
 				★击杀玩家和部分怪物可以换取分数★
 				★猪王附近的建筑和农作物会被保护★
+				★按键盘B键可以回城★
 			]]
 			or [[
 				胜利条件
@@ -68,10 +69,10 @@
 				★杀掉其他阵营的猪王，只剩自己的猪王★
 				两个条件任意达成其一就能取得胜利！
 				提示
-				★将一些有价值的物品给自己的猪王可以换取分数★
-				★击杀玩家和部分怪物可以换取分数★
+				★可通过贡献物品给猪王或击杀怪物和玩家得分★
 				★猪王附近的建筑和农作物会被保护★
 				★自己阵营的猪王被杀时阵营会被解散，财产将被击杀势力占有★
+				★按键盘B键可以回城★
 			]]),
 			NEXT = "选择队伍",
 			RANDOM_NEXT = "随机队伍",
@@ -104,26 +105,27 @@
 	else
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "PigKingCraft",
-			SUBTITLE = "TotalScore:"..GLOBAL.WIN_SCORE.."   PeacefulDays:"..GLOBAL.PEACE_TIME.." days".."   PigKingCanBeKilled:"..(GLOBAL.PIGKING_HEALTH == -1 and "No" or "Yes"),
+			SUBTITLE = "TotalScore: "..GLOBAL.WIN_SCORE.."   PeacefulDays: "..GLOBAL.PEACE_TIME.." days".."   PigKingCanBeKilled: "..(GLOBAL.PIGKING_HEALTH == -1 and "No" or "Yes"),
 			DESC = (GLOBAL.PIGKING_HEALTH == -1 
 			and [[
-				How To Play
+				<How To Play>
 				★To win reach server-set score★
-				Tips
+				<Tips>
 				★Give some valuable items to your Pigking to get points.★
 				★Kill enemies, monsters or bosses to get points.★
-				★buildings or crops near Pigking will be protected.★
+				★Buildings or crops near Pigking will be protected.★
+				★Pressing key B can go back to the base.★
 			]] 
 			or [[
-				How To Play
+				<How To Play>
 				★To win reach server-set score★
 				★or Kill all other teams' Pigking's★
-				Tips
+				<Tips>
 				★Give some valuable items to your Pigking to get points.★
 				★Kill enemies, monsters or bosses to get points.★
-				★buildings or crops near Pigking will be protected.★
+				★Buildings or crops near Pigking will be protected.★
 				★If your Pigking is killed, your team will be disbanded.★
-				★In order to get the higher hand in the game you should first protect your pigking.★
+				★Pressing key B can go back to the base.★
 			]]),
 			NEXT = "ChooseGroup",
 			RANDOM_NEXT = "RandomGroup",

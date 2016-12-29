@@ -33,12 +33,15 @@ return Class(function(self, inst)
 						end
 					end
 					local title = ""
+					local button = ""
 					if isWinner then
-						title = "胜利"
+						title = PKC_SPEECH.WINDIALOG_VICTORY_TITLE
+						button = PKC_SPEECH.WINDIALOG_WIN_BUTTON
 					else
-						title = "失败"
+						title = PKC_SPEECH.WINDIALOG_FAILURE_TITLE
+						button = PKC_SPEECH.WINDIALOG_FAILED_BUTTON
 					end
-					local screen = PopupDialogScreen(title, data.message, { { text = data.buttonText, cb = function() TheFrontEnd:PopScreen() end } })
+					local screen = PopupDialogScreen(title, data.message, { { text = button, cb = function() TheFrontEnd:PopScreen() end } })
 					TheFrontEnd:PushScreen( screen )
 
 					local Namespace = "pkc_popDialog"

@@ -220,12 +220,27 @@ local function NormalShouldSleep(inst)
                 (inst.LightWatcher == nil or inst.LightWatcher:IsInLight())))
 end
 
-local normalbrain = require "brains/pigbrain"
+local normalbrain = require "brains/pkc_pigbrain"
 
 local function SuggestTreeTarget(inst, data)
     if data ~= nil and data.tree ~= nil and inst:GetBufferedAction() ~= ACTIONS.CHOP then
         inst.tree_target = data.tree
     end
+end
+
+local ClickPigSpeechTable = {
+"我们需要升级猪王获得更多的土地！",
+"我们需要升级猪王获得更强的猪人战士！",
+"获得足够的分数可以升级猪王！",
+}
+--点击猪时调用
+local function ongetstatus(inst, viewer)
+	viewer:DoTaskInTime(0, function ()	
+		if viewer and viewer.components.talker then
+			viewer.components.talker:Say(ClickPigSpeechTable[math.random(#ClickPigSpeechTable)])
+		end
+	end)
+    return nil
 end
 
 local function SetNormalPig(inst)
@@ -237,15 +252,15 @@ local function SetNormalPig(inst)
     inst:RemoveTag("werepig")
     inst:RemoveTag("guard")
     inst:SetBrain(normalbrain)
-    inst:SetStateGraph("SGpig")
+    inst:SetStateGraph("pkc_SGpig")
     inst.AnimState:SetBuild(inst.build)
 
 --    inst.components.werebeast:SetOnNormalFn(SetNormalPig)
 	inst.components.werebeast:SetOnNormalFn(SetNormalPig)
     inst.components.sleeper:SetResistance(2)
 
-    inst.components.combat:SetDefaultDamage(TUNING.PIG_DAMAGE)
-    inst.components.combat:SetAttackPeriod(TUNING.PIG_ATTACK_PERIOD)
+    inst.components.combat:SetDefaultDamage(PKC_PIGMAN_DAMAGE)
+    inst.components.combat:SetAttackPeriod(PKC_PIGMAN_ATTACKPERIOD)
     inst.components.combat:SetKeepTargetFunction(NormalKeepTargetFn)
     inst.components.locomotor.runspeed = TUNING.PIG_RUN_SPEED
     inst.components.locomotor.walkspeed = TUNING.PIG_WALK_SPEED
@@ -254,17 +269,30 @@ local function SetNormalPig(inst)
     inst.components.sleeper:SetWakeTest(DefaultWakeTest)
 
     inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 2)
+    inst.components.lootdropper:AddRandomLoot("meat", 1)
     --inst.components.lootdropper:AddRandomLoot("pigskin", 1)
     inst.components.lootdropper.numrandomloot = 1
 
-    inst.components.health:SetMaxHealth(2.5 * TUNING.PIG_HEALTH)
+    inst.components.health:SetMaxHealth(PKC_PIGMAN_HEALTH)
+	inst.components.health:StartRegen(5, 5) --回血
+	
     inst.components.combat:SetRetargetFunction(3, NormalRetargetFn)
     inst.components.combat:SetTarget(nil)
     inst:ListenForEvent("suggest_tree_target", SuggestTreeTarget)
 
     inst.components.trader:Enable()
     inst.components.talker:StopIgnoringAll("becamewerepig")
+	
+	--名字
+	if not inst.components.inspectable then
+		inst:AddComponent("inspectable")
+	end
+	inst.components.inspectable.getstatus = ongetstatus
+	if not inst.components.named then
+		inst:AddComponent("named")
+	end
+	inst.components.named:SetName("战斗猪")
+	
 end
 
 local function GuardRetargetFn(inst)
@@ -435,7 +463,7 @@ local function SetWerePig(inst)
 	
     inst.components.sleeper:SetResistance(3)
 
-    inst.components.combat:SetDefaultDamage(TUNING.WEREPIG_DAMAGE)
+    inst.components.combat:SetDefaultDamage(1.5 * TUNING.WEREPIG_DAMAGE)
     inst.components.combat:SetAttackPeriod(TUNING.WEREPIG_ATTACK_PERIOD)
     inst.components.locomotor.runspeed = TUNING.WEREPIG_RUN_SPEED 
     inst.components.locomotor.walkspeed = TUNING.WEREPIG_WALK_SPEED 
@@ -705,6 +733,18 @@ local function common(moonbeast)
 end
 
 local function normal(groupId)
+    local inst = common(false)
+    if not TheWorld.ismastersim then
+        return inst
+    end
+    inst.build = builds[math.random(#builds)]
+    inst.AnimState:SetBuild(inst.build)
+    SetNormalPig(inst)
+	inst:AddTag("pkc_group"..groupId)
+    return inst
+end
+
+local function nightpig(groupId)
     local inst = common(false)
     if not TheWorld.ismastersim then
         return inst

@@ -167,6 +167,19 @@ AddPlayerPostInit(function(inst)
     end
 end)
 
+--不能在猪王附近建墙
+local function ifBuildWallNearPigking(act)
+	local ents = GLOBAL.TheSim:FindEntities(act.pos.x, act.pos.y, act.pos.z, 8, {"king", "eyeturret"})
+	local hasPigKingNear = false
+	for _, obj in pairs(ents) do
+		if obj then
+			hasPigKingNear = true
+			break
+		end
+	end
+	return hasPigKingNear
+end
+
 --安置物品，为每个安置的新物品添加Tag
 local old_DEPLOY = GLOBAL.ACTIONS.DEPLOY.fn 
 GLOBAL.ACTIONS.DEPLOY.fn = function(act)
@@ -174,21 +187,29 @@ GLOBAL.ACTIONS.DEPLOY.fn = function(act)
 		local x = act.pos.x
 		local y = act.pos.y
 		local z = act.pos.z
-		act.doer:DoTaskInTime(0, function ()
-			--if act and act.invobject and string.find(act.invobject.prefab, "wall_") then --判断安置的是否为墙	
-			--end
-			if act.doer and act.doer.components.pkc_group then
-				local ents = GLOBAL.TheSim:FindEntities(x, y, z, 0)
-				for _, obj in pairs(ents) do
-					obj.saveTags = {}
-					obj:AddTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup())
-					obj.saveTags["pkc_group"..act.doer.components.pkc_group:getChooseGroup()] = 1
-					obj.pkc_group_id = act.doer.components.pkc_group:getChooseGroup()
-				end
+		--判断安置的是否为墙
+		if act and act.invobject and string.find(act.invobject.prefab, "wall_") then 	
+			if ifBuildWallNearPigking(act) then
+				act.doer:DoTaskInTime(0, function ()	
+					if act.doer and act.doer.components.talker then
+						act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH5)
+					end
+				end)
+				return false
 			end
-		end)
+		end
+		--为安置物添加标记
+		if act.doer and act.doer.components.pkc_group then
+			local ents = GLOBAL.TheSim:FindEntities(x, y, z, 0)
+			for _, obj in pairs(ents) do
+				obj.saveTags = {}
+				obj:AddTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup())
+				obj.saveTags["pkc_group"..act.doer.components.pkc_group:getChooseGroup()] = 1
+				obj.pkc_group_id = act.doer.components.pkc_group:getChooseGroup()
+			end
+		end
+		return old_DEPLOY(act)
 	end	
-    return old_DEPLOY(act)
 end
 
 --保存
@@ -423,6 +444,58 @@ GLOBAL.ACTIONS.HAUNT.fn = function(act)
 	end
 end
 
+--防睡帐篷
+AddStategraphPostInit("wilson", function(sg)
+	if GLOBAL.TheWorld.ismastersim then
+		local oldFn = sg.states["tent"].onenter
+		sg.states["tent"].onenter = function(inst)
+			local target = inst:GetBufferedAction().target
+			--本队的人无限制
+			if inst.components.pkc_group and target.pkc_group_id 
+			and inst.components.pkc_group:getChooseGroup() == target.pkc_group_id
+			then
+				return oldFn(inst)
+			end
+			--物品无队伍标记
+			if target.pkc_group_id == nil then
+				return oldFn(inst)
+			end
+			--猪王附近受保护
+			if not inst.components.pkc_group then
+				return oldFn(inst)
+			else
+				local x, y, z = target.Transform:GetWorldPosition()
+				local ents = GLOBAL.TheSim:FindEntities(x, y, z, GLOBAL.PIGKING_RANGE)
+				local hasEnemyPigKingNear = false
+				for _,obj in pairs(ents) do
+					if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..inst.components.pkc_group:getChooseGroup()) then
+						if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > target:GetPosition():Dist(obj:GetPosition()) then
+							hasEnemyPigKingNear = true
+							break
+						end
+					end
+				end	
+				if not hasEnemyPigKingNear then
+					return oldFn(inst)
+				else
+					inst:DoTaskInTime(0, function ()	
+						if inst then
+							inst:PushEvent("performaction", { action = inst.bufferedaction })
+							inst:ClearBufferedAction()
+							inst.sg:GoToState("idle")
+							if inst.components.talker then
+								inst.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH1)
+							end
+						end
+					end)
+					return 
+				end
+			end
+			
+		end
+	end
+end)
+	
 --防魔法
 local old_CASTSPELL = GLOBAL.ACTIONS.CASTSPELL.fn
 GLOBAL.ACTIONS.CASTSPELL.fn = function(act)
@@ -501,7 +574,7 @@ GLOBAL.ACTIONS.BUILD.fn = function(act)
 		if obj and obj:IsValid() and obj:HasTag("structure") and obj.pkc_group_id and obj.pkc_group_id ~= act.doer.components.pkc_group:getChooseGroup() then
 			act.doer:DoTaskInTime(0, function ()
 				if act.doer and act.doer.components.talker then
-					act.doer.components.talker:Say("离敌人建筑太近了，我不能建造！")
+					act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH4)
 				end
 			end)
 			return false
@@ -662,23 +735,23 @@ local function updateWorld(inst)
 	
 	if (GLOBAL.TheWorld.state.cycles + 2) <  GLOBAL.PEACE_TIME and (GLOBAL.TheWorld.state.cycles + 2) >= 0 then
 		inst:DoTaskInTime(1, function()
-			GLOBAL.pkc_makeAllPlayersSpeak("离和平期结束还有"..((GLOBAL.PEACE_TIME + 1) - (GLOBAL.TheWorld.state.cycles + 2)).."天！")
+			GLOBAL.pkc_makeAllPlayersSpeak(GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS.SPEECH2..((GLOBAL.PEACE_TIME + 1) - (GLOBAL.TheWorld.state.cycles + 2))..GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS.SPEECH3)
 		end)
 	end
 	
 	if (GLOBAL.TheWorld.state.cycles + 2) ==  GLOBAL.PEACE_TIME then --和平时期结束
 		inst:DoTaskInTime(1, function()
 			GLOBAL.SpawnPrefab("lightning")
-			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS)
-			GLOBAL.pkc_makeAllPlayersSpeak("啊，和平时期结束啦，战争开始了！！！")
+			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS.SPEECH1)
+			GLOBAL.pkc_makeAllPlayersSpeak(GLOBAL.PKC_SPEECH.PEACE_TIME_TIPS.SPEECH4)
 		end)
 	end
 	
 	if GLOBAL.TheWorld.state.cycles ~= 0 and (GLOBAL.TheWorld.state.cycles + 2) % GLOBAL.WORLD_DELETE_INTERVAL == 0 then
-		inst:DoTaskInTime(30, function()
+		inst:DoTaskInTime(12, function()
 			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH1..(GLOBAL.WORLD_DELETE_TIME+1)..GLOBAL.PKC_SPEECH.AUTO_CLEAR.SPEECH2)
 		end)
-		inst:DoTaskInTime(90, function()
+		inst:DoTaskInTime(42, function()
 			GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.CLEANING)
 			if inst then
 				for _, v in pairs(GLOBAL.Ents) do
@@ -851,7 +924,7 @@ local function readBookTenttaclesFn(inst, reader)
 			if result_offset ~= nil then
 				local pos = pt + result_offset
 				
-				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, GLOBAL.PIGKING_RANGE)
+				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, 40)
 				local hasPigKingNear = false
 				for _,obj in pairs(ents) do
 					if obj and obj:HasTag("king") then
@@ -862,7 +935,7 @@ local function readBookTenttaclesFn(inst, reader)
 				if hasPigKingNear then
 					reader:DoTaskInTime(0, function ()
 						if reader and reader.components.talker then
-							reader.components.talker:Say("离猪王太近了，我不能这么做！")
+							reader.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH5)
 						end
 					end)
 					return false
@@ -891,7 +964,7 @@ local function readBookSleepFn(inst, reader)
 	reader.components.sanity:DoDelta(-(GLOBAL.READ_BOOK_SLEEP_SANITY))
 
 	local x, y, z = reader.Transform:GetWorldPosition()
-	local range = 20
+	local range = 15
 	local ents = GLOBAL.TheNet:GetPVPEnabled() and
 				GLOBAL.TheSim:FindEntities(x, y, z, range, nil, { "playerghost" }, { "sleeper", "player" }) or
 				GLOBAL.TheSim:FindEntities(x, y, z, range, { "sleeper" }, { "player" })

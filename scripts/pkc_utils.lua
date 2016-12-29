@@ -382,7 +382,45 @@ function pkc_weightedChoose(choices)
     return last_choice
 end
 
-
+--[[
+local function pkc_isNearDanger(inst)
+    local hounded = TheWorld.components.hounded
+    if hounded ~= nil and (hounded:GetWarning() or hounded:GetAttacking()) then
+        return true
+    end
+    local burnable = inst.components.burnable
+    if burnable ~= nil and (burnable:IsBurning() or burnable:IsSmoldering()) then
+        return true
+    end
+    -- See entityreplica.lua (for _combat tag usage)
+    if inst:HasTag("spiderwhisperer") then
+        --Danger if:
+        -- being targetted
+        -- OR near monster or pig that is neither player nor spider
+        -- ignore shadow monsters when not insane
+        return FindEntity(inst, 10,
+            function(target)
+                return (target.components.combat ~= nil and target.components.combat.target == inst)
+                    or ((target:HasTag("monster") or target:HasTag("pig")) and
+                        not (target:HasTag("player") or target:HasTag("spider")) and
+                        not (inst.components.sanity:IsSane() and target:HasTag("shadowcreature")))
+            end,
+            nil, nil, { "monster", "pig", "_combat" }) ~= nil
+    end
+    --Danger if:
+    -- being targetted
+    -- OR near monster that is not player
+    -- ignore shadow monsters when not insane
+    return FindEntity(inst, 10,
+        function(target)
+            return (target.components.combat ~= nil and target.components.combat.target == inst)
+                or (target:HasTag("monster") and
+                    not target:HasTag("player") and
+                    not (inst.components.sanity:IsSane() and target:HasTag("shadowcreature")))
+        end,
+        nil, nil, { "monster", "_combat" }) ~= nil
+end
+]]--
 
 
 

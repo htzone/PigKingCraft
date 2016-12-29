@@ -107,6 +107,8 @@ local giftsTable = {
 	horn = 20,
 	krampus_sack = 5,
 	nightmarefuel = 100,
+	healingsalve = 150,
+	bandage = 100,
 }
 
 --扔礼物
@@ -163,7 +165,7 @@ local function OnIsNight(inst, isnight)
 		inst:DoTaskInTime(5, function()
 			if inst then
 				if inst.components.talker then
-					inst.components.talker:Say("大爷我今天高兴，赏你们的！")
+					inst.components.talker:Say(PKC_SPEECH.PIGKING.CHAT[math.random(#(PKC_SPEECH.PIGKING.CHAT))])
 				end
 				morningFunny(inst)
 			end
@@ -185,15 +187,32 @@ local function healthdelta_fn(inst, data)
 	end
 end
 
---被攻击时让猪人群殴之
+--遭受攻击时调用
 local function attacked_fn(inst, data)
-	local attacker = data and data.attacker
-	if attacker then
-		if inst.components.combat:CanTarget(attacker) and not attacker:HasTag("pig") then
-			inst.components.combat:ShareTarget(attacker, 100, function(dude)
-				return dude:HasTag("pig")	
-			end, 40)
+	--敢打我，群起而攻之
+	inst.components.combat:ShareTarget(data.attacker, 30,
+	function(dude) 
+		return (dude:HasTag("eyeturret") or dude:HasTag("pig")) and dude.components.pkc_group and inst.components.pkc_group 
+		and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup() 
+	end,
+	45)
+	--猪王被攻击时提示玩家
+	if not inst.isUnderAttack then
+		for _, player in pairs(AllPlayers) do 
+			if player and player.components.pkc_group and inst.components.pkc_group 
+			and player.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
+			then
+				player:DoTaskInTime(0, function ()	
+					if player and player.components.talker then
+						player.components.talker:Say(PKC_SPEECH.PIGKING.SPEECH2)
+					end
+				end)
+			end
 		end
+		inst.isUnderAttack = true
+		inst:DoTaskInTime(math.random(4, 8), function()
+			inst.isUnderAttack = false
+		end)
 	end
 end
 
@@ -253,25 +272,32 @@ local function onPigkingRemove(inst)
 	end
 end
 
---遭受攻击时调用
-local function onAttacked(inst, data)
-	
-	if not inst.isUnderAttack then
-		for _, player in pairs(AllPlayers) do 
-			if player and player.components.pkc_group and inst.components.pkc_group 
-			and player.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
-			then
-				player:DoTaskInTime(0, function ()	
-					if player and player.components.talker then
-						player.components.talker:Say("不好了，我们的猪王正在遭受攻击！")
-					end
-				end)
+--升级附近的猪人
+local function upgradeNearPigman(inst, level)
+	local x, y, z = inst.Transform:GetWorldPosition()
+	local ents = TheSim:FindEntities(x, y, z, 100, {"pkc_pigman"})
+	for _, pigman in pairs(ents) do
+		if pigman then
+			local scale = 1 + 0.05 * level
+			local damage = PKC_PIGMAN_DAMAGE + (0.1 * PKC_PIGMAN_DAMAGE) * level
+			local health = PKC_PIGMAN_HEALTH + (0.1 * PKC_PIGMAN_HEALTH) * level
+			local attack_period = PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
+			pigman.Transform:SetScale(scale, scale, scale)
+			local fx1 = SpawnPrefab("small_puff")
+			if fx1 then
+				fx1.Transform:SetScale(2, 2, 2)
+				fx1.Transform:SetPosition(Vector3(pigman.Transform:GetWorldPosition()):Get())
+			end
+			pigman:AddTag("pkc_level"..level)
+			pigman.pkc_level = level
+			if pigman.components.combat then
+				 pigman.components.combat:SetDefaultDamage(damage)
+				 pigman.components.combat:SetAttackPeriod(attack_period)
+			end
+			if pigman.components.health then
+				 pigman.components.health:SetMaxHealth(health)
 			end
 		end
-		inst.isUnderAttack = true
-		inst:DoTaskInTime(math.random(6, 12), function()
-			inst.isUnderAttack = false
-		end)
 	end
 end
 
@@ -285,7 +311,7 @@ local function onLevelUp(inst, data)
 				if inst then
 					--说话
 					if inst.components.talker then
-						inst.components.talker:Say("麻麻，我好像变大了！")
+						inst.components.talker:Say(PKC_SPEECH.PIGKING.SPEECH3)
 					end
 					--恩惠
 					morningFunny(inst)
@@ -300,8 +326,9 @@ local function onLevelUp(inst, data)
 					local health_percent = inst.components.health:GetPercent()
 					inst.components.health:SetMaxHealth(inst.initMaxHealth + (PIGKING_HEALTH/10) * data.level)
 					inst.components.health:SetPercent(health_percent)
-					print("pigking max health:"..inst.components.health.maxhealth)
-					print("pigking current health:"..inst.components.health.currenthealth)
+					upgradeNearPigman(inst, data.level)
+					--print("pigking max health:"..inst.components.health.maxhealth)
+					--print("pigking current health:"..inst.components.health.currenthealth)
 				end
 		end)
 		end
@@ -313,7 +340,6 @@ local pigking_loot_table = {"meat","meat","meat","meat","meat","meat","meat","go
 
 local function fn(group_id, build, name)
     local inst = CreateEntity()
-
 	
 	--添加头部显示组件
 	--inst:AddComponent("pkc_headshow")
@@ -337,6 +363,7 @@ local function fn(group_id, build, name)
 
     inst:AddTag("king")
 	inst:AddTag("pig")
+	inst:AddTag("eyeturret")
 	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")
     inst.AnimState:SetBuild(build)
@@ -374,7 +401,7 @@ local function fn(group_id, build, name)
 		inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
 		if inst.components.health then
 			inst.initMaxHealth = inst.components.health.maxhealth
-			inst.components.health:StartRegen(10, 5) --回血
+			inst.components.health:StartRegen(40, 5) --回血
 		end
 	end
 	
@@ -400,7 +427,7 @@ local function fn(group_id, build, name)
 	
 	--名字
 	inst:AddComponent("inspectable")
-	inst.components.inspectable.getstatus = ongetstatus
+	--inst.components.inspectable.getstatus = ongetstatus
 	inst:AddComponent("named")
 	inst.components.named:SetName(name)
 	
@@ -412,7 +439,7 @@ local function fn(group_id, build, name)
 	inst:ListenForEvent("pkc_pigkingLevelUp", onLevelUp)
 	
 	--监听被攻击
-	inst:ListenForEvent("attacked", onAttacked)
+	--inst:ListenForEvent("attacked", onAttacked)
 	--监听被删除
 	inst:ListenForEvent("onremove", onPigkingRemove)
 	
@@ -446,6 +473,7 @@ local function bigpigFn()
 	if not TheWorld.ismastersim then
         return inst
     end
+	inst.components.inspectable:SetDescription("大猪猪爱吃肉！")
 	inst:AddTag("bigpig")
 	inst:AddTag("pkc_group1")
 	inst.pkc_group_id = GROUP_BIGPIG_ID
@@ -462,6 +490,7 @@ local function redpigFn()
 	if not TheWorld.ismastersim then
         return inst
     end
+	inst.components.inspectable:SetDescription("万恶的小红猪！")
 	inst:AddTag("redpig")
 	inst:AddTag("pkc_group2")
 	inst.pkc_group_id = GROUP_REDPIG_ID
@@ -478,6 +507,7 @@ local function longpigFn()
 	if not TheWorld.ismastersim then
        return inst
     end
+	inst.components.inspectable:SetDescription("绿绿的龙猪猪！")
 	inst:AddTag("longpig")
 	inst:AddTag("pkc_group3")
 	inst.pkc_group_id = GROUP_LONGPIG_ID
@@ -494,6 +524,7 @@ local function cuipigFn()
 	if not TheWorld.ismastersim then
         return inst
     end
+	inst.components.inspectable:SetDescription("可爱的崔猪猪！")
 	inst:AddTag("cuipig")
 	inst:AddTag("pkc_group4")
 	inst.pkc_group_id = GROUP_CUIPIG_ID

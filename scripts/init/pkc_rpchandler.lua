@@ -90,9 +90,20 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			player.components.pkc_group:setBasePos({x, 0 , z}) --记住自己的基地位置
 			--player.Transform:SetPosition(x, 0, z)
 			player.Physics:Teleport(x, 0, z)
+			--fx
+			local fx1 = GLOBAL.SpawnPrefab("small_puff")
+			if fx1 then
+				fx1.Transform:SetScale(1.5, 1.5, 1.5)
+				fx1.Transform:SetPosition(x, 0, z)
+			end
 			player:DoTaskInTime(2, function()
 				if player and player.components.talker then
 					player.components.talker:Say(GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH3..v.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH4)
+				end
+			end)
+			player:DoTaskInTime(10, function()
+				if player and player.components.talker then
+					player.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH7)
 				end
 			end)
 			--根据选择的阵营进行相应的头部显示
@@ -119,14 +130,120 @@ AddModRPCHandler("pkc_popDialog", "showWinDialog", function(player, json_data)
 			end
 		end
 		local title = ""
+		local button = ""
 		if isWinner then
-			title = "胜利，然并卵"
+			title = GLOBAL.PKC_SPEECH.WINDIALOG_VICTORY_TITLE
+			button = GLOBAL.PKC_SPEECH.WINDIALOG_WIN_BUTTON
 		else
-			title = "失败，好气啊"
+			title = GLOBAL.PKC_SPEECH.WINDIALOG_FAILURE_TITLE
+			button = GLOBAL.PKC_SPEECH.WINDIALOG_FAILED_BUTTON
 		end
 		local Text = require "widgets/text"
 		local PopupDialogScreen = require("screens/popupdialog")
-		local screen = PopupDialogScreen(title, data.message, { { text = data.buttonText, cb = function() GLOBAL.TheFrontEnd:PopScreen() end } })
+		local screen = PopupDialogScreen(title, data.message, { { text = button, cb = function() GLOBAL.TheFrontEnd:PopScreen() end } })
 		GLOBAL.TheFrontEnd:PushScreen( screen )
+	end
+end)
+
+--检查是否能传送
+local function canTeleportFn(inst)
+	local canTeleport = true
+	if inst.components.sanity and inst.components.sanity.current >= GLOBAL.GOHOME_SANITY_DELTA then
+		inst.components.sanity:DoDelta(-(GLOBAL.GOHOME_SANITY_DELTA))
+	else
+		if inst.components.talker then
+			inst.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH5)
+		end
+		canTeleport = false
+	end
+	if inst.components.hunger and inst.components.hunger.current >= GLOBAL.GOHOME_HUNGER_DELTA then
+		inst.components.hunger:DoDelta(-(GLOBAL.GOHOME_HUNGER_DELTA))
+	else
+		if inst.components.talker then
+			inst.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH6)
+		end
+		canTeleport = false
+	end
+	return canTeleport
+end
+
+--回城任务
+local function goHomeTask(inst)
+	inst:DoTaskInTime(1, function()
+		if inst then
+			--遇到以下情况回城中断
+			if (inst.components.locomotor and inst.components.locomotor:WantsToMoveForward()) 
+			or (inst.components.burnable and inst.components.burnable:IsBurning())
+			or (inst.components.sleeper and inst.components.sleeper:IsAsleep())
+			or (inst.components.health and inst.components.health:IsDead())
+			then
+				if inst:HasTag("pkc_gohome") then
+					inst:RemoveTag("pkc_gohome")
+				end
+			end
+			--回城计时
+			if inst:HasTag("pkc_gohome") then
+				if inst.goHomeCooldown > 1 then
+					inst.goHomeCooldown = inst.goHomeCooldown - 1
+					inst.AnimState:SetMultColour(0, 0, 0, (inst.goHomeCooldown/GLOBAL.GOHOME_WAIT_TIME))
+					inst:DoTaskInTime(0, function()
+						if inst and inst.components.talker then
+							inst.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH3..inst.goHomeCooldown..GLOBAL.PKC_SPEECH.GO_HOME.SPEECH4)
+						end
+					end)
+					goHomeTask(inst)
+				else
+					if canTeleportFn(inst) then
+						--fx1
+						local fx1 = GLOBAL.SpawnPrefab("small_puff")
+						if fx1 then
+							fx1.Transform:SetScale(1.5, 1.5, 1.5)
+							fx1.Transform:SetPosition(GLOBAL.Vector3(inst.Transform:GetWorldPosition()):Get())
+						end
+						--teleport
+						local x, y, z = GLOBAL.unpack(inst.components.pkc_group:getBasePos()) 
+						inst.Physics:Teleport(x, 0, z)
+						--fx2
+						local fx2 = GLOBAL.SpawnPrefab("small_puff")
+						if fx2 then
+							fx2.Transform:SetScale(1.5, 1.5, 1.5)
+							fx2.Transform:SetPosition(x, y, z)
+						end
+					end
+					--over
+					--设置颜色
+					inst.AnimState:SetMultColour(1, 1, 1, 1)
+					inst.goHomeCooldown = nil
+					inst:RemoveTag("pkc_gohome")
+				end
+			else
+				inst:DoTaskInTime(0, function()
+					if inst.components.talker then
+						inst.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH2)
+						inst.goHomeCooldown = nil
+						inst.AnimState:SetMultColour(1, 1, 1, 1)
+					end
+				end)
+			end
+		end
+	end)
+end
+
+--回城按键处理
+--@RedPig 12-23
+AddModRPCHandler("pkc_keydown", "goHome", function(inst)
+	if inst and inst.components.pkc_group then
+		inst:AddTag("pkc_gohome")
+		if inst.goHomeCooldown == nil then
+			inst.goHomeCooldown = GLOBAL.GOHOME_WAIT_TIME
+			inst:DoTaskInTime(0, function()
+				if inst.components.talker then
+					inst.components.talker:Say(GLOBAL.PKC_SPEECH.GO_HOME.SPEECH1)
+				end
+				--设置颜色
+				inst.AnimState:SetMultColour(0, 0, 0, 1)
+			end)
+			goHomeTask(inst)
+		end
 	end
 end)

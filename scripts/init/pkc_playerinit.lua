@@ -4,6 +4,7 @@
 --@date 2016-10-23
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()
+local TheInput = GLOBAL.TheInput
 
 --让玩家在一段时间内无敌
 local function makePlayerInvincible(player, timeDelay)
@@ -65,6 +66,9 @@ end
 --当玩家被攻击时有一定几率虚弱
 local function onAttacked(inst, data)
 	if data.attacker then
+		if inst and inst:HasTag("pkc_gohome") then
+			inst:RemoveTag("pkc_gohome")
+		end
 		if data.attacker:HasTag("player") then
 			if math.random() < .5 then
 				if inst.components.grogginess ~= nil then
@@ -92,6 +96,10 @@ AddPlayerPostInit(function(inst)
 		--添加头部显示组件
 		inst:AddComponent("pkc_headshow")
 		
+		if not GLOBAL.TheNet:IsDedicated() then
+			cKeyHandler = simpleKeyHandler()
+		end
+		
 		--人物分组测试
 		--[[
 		if inst.prefab == "wilson" then
@@ -101,7 +109,6 @@ AddPlayerPostInit(function(inst)
 				end
 			end)
 		end
-		]]--
 		if inst.prefab == "willow" then
 			inst:DoTaskInTime(0, function()
 				if inst.components.talker then
@@ -109,16 +116,14 @@ AddPlayerPostInit(function(inst)
 				end
 			end)
 		end
-		
+		]]--
 		
 		--显示头部名字
-		--[[
 		inst:DoTaskInTime(0, function()
 			if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() ~= 0 then
 				inst.components.pkc_headshow:addHeadView()
 			end
 		end)
-		]]--
 		
 		if IsServer then
 			--出生提示属于哪个阵营（前提是已选择了阵营）
@@ -149,35 +154,20 @@ AddPlayerPostInit(function(inst)
 	end
 end)
 
---[[
---给蜘蛛加阵营组件 测试
-AddPrefabPostInit("tallbird",function(inst)
-	inst:AddComponent("pkc_group")
-	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_REDPIG_ID)
-	--if inst.components.combat then
-	--	local o_CanTarget = inst.components.combat.CanTarget
-	--	function inst.components.combat:CanTarget(target)
-	--	if target and target.components.pkc_group.hasChoosen==inst.components.pkc_group.hasChoosen then
-	--			return false
-	--		end
-	--		return o_CanTarget(self,target)
-	--	end
-	--end
---end
+simpleKeyHandler = Class(function(self, inst) 
+  
+	self.handler = TheInput:AddKeyHandler(function(key, down) self:OnRawKey(key, down, inst) end )
+	
 end)
 
-AddPrefabPostInit("spider",function(inst)
-	inst:AddComponent("pkc_group")
-	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
-end)
-
-AddPrefabPostInit("merm",function(inst)
-	inst:AddComponent("pkc_group")
-	inst.components.pkc_group:setChooseGroup(GLOBAL.GROUP_BIGPIG_ID)
-end)
-]]--
-
-
+function simpleKeyHandler:OnRawKey(key, down, inst)
+	local handleName = "pkc_keydown"
+	local actionName = "goHome"
+	if (key == GLOBAL.KEY_B and down) then
+		print("key_down------")
+		SendModRPCToServer(MOD_RPC[handleName][actionName])
+	end
+end
 
 
 

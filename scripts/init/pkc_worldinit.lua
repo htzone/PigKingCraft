@@ -171,7 +171,8 @@ end
 --监听胜利
 local function onWin(win_data, inst)
 	if win_data then
-		inst:DoTaskInTime(.5, function()
+		inst:DoTaskInTime(.1, function()
+			GLOBAL.SpawnPrefab("lightning")
 			if inst and inst.components.pkc_popdialog then
 				local data = {}
 				local winPlayers = {}
@@ -183,7 +184,7 @@ local function onWin(win_data, inst)
 				data.type = GLOBAL.WIN_POPDIALOG
 				data.title = GLOBAL.PKC_SPEECH.WINDIALOG_TITLE
 				data.message = GLOBAL.PKC_SPEECH.WINDIALOG_CONTENT.SPEECH1..GLOBAL.getNamebyGroupId(win_data.winner)..GLOBAL.PKC_SPEECH.WINDIALOG_CONTENT.SPEECH2
-				data.buttonText = GLOBAL.PKC_SPEECH.WINDIALOG_BUTTON
+				data.buttonText = GLOBAL.PKC_SPEECH.WINDIALOG_FAILED_BUTTON
 				data.winPlayers = winPlayers
 				inst.components.pkc_popdialog:setData(data)
 				inst.components.pkc_popdialog:show()

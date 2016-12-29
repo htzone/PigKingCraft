@@ -9,9 +9,12 @@ end)
 
 --是否为安全位置
 local function isSavePos(pos)
-	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 15)
+	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 20)
 	for _, obj in ipairs(ents) do
-		 if obj and (obj:HasTag("houndmound") or obj:HasTag("beehive") or obj:HasTag("tallbird") or obj:HasTag("lava") or obj:HasTag("blocker")) then
+		if obj and (obj:HasTag("blocker") or obj:HasTag("spiderden")) and obj:GetPosition():Dist(pos) < 10 then
+			return false
+		end
+		 if obj and (obj:HasTag("houndmound") or obj:HasTag("beehive") or obj:HasTag("tallbird") or obj:HasTag("lava")) then
 			return false
 		end
 	end
