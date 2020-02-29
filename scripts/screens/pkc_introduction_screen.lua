@@ -49,7 +49,7 @@ local PauseScreen = Class(Screen, function(self)
 
     --title
     self.title = self.proot:AddChild(Text(BUTTONFONT, 50))
-    self.title:SetPosition(0, 165, 0)
+    self.title:SetPosition(0, 170, 0)
     self.title:SetString(STRINGS.UI.INTRO.TITLE)
     self.title:SetColour(0,0,0,1)
 
@@ -61,7 +61,7 @@ local PauseScreen = Class(Screen, function(self)
 	
 	--description
 	self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 25))
-    self.subtitle:SetPosition(-220, 100, 0)
+    self.subtitle:SetPosition(-43, -5, 0)
     self.subtitle:SetString(STRINGS.UI.INTRO.DESC)
     self.subtitle:SetColour(0,0,0,1)
 
@@ -73,9 +73,13 @@ local PauseScreen = Class(Screen, function(self)
 
 	--添加按钮
     local buttons = {}
-    table.insert(buttons, {text=STRINGS.UI.INTRO.NEXT, cb=function() self:nextStep() end }) 
+	if not RANDOM_GROUP then
+		table.insert(buttons, {text=STRINGS.UI.INTRO.NEXT, cb=function() self:nextStep() end }) 
+	else
+		table.insert(buttons, {text=STRINGS.UI.INTRO.RANDOM_NEXT, cb=function() self:nextStep() end }) 
+	end
     self.menu = self.proot:AddChild(Menu(buttons, -button_h, false))
-    self.menu:SetPosition(0, -135, 0)
+    self.menu:SetPosition(0, -150, 0)
     for i,v in pairs(self.menu.items) do
         v:SetScale(.8)
     end
@@ -89,11 +93,34 @@ local PauseScreen = Class(Screen, function(self)
     self.default_focus = self.menu
 end)
 
+--把请求发送给主机,这样就省去网络变量的定义了
+--@param player 玩家
+--@param group_id 玩家选择的营地ID
+--@大猪猪 10-31
+local function teleportToBase(player, group_id)
+	local Namespace="pkc_teleport"
+	local Action="TeleportToBase"
+	if TheWorld.ismastersim then
+		MOD_RPC_HANDLERS[Namespace][MOD_RPC[Namespace][Action].id](player, group_id)
+	else
+		SendModRPCToServer( MOD_RPC[Namespace][Action], group_id)
+	end
+end
+
 --下一步（开始游戏）
 function PauseScreen:nextStep()
     TheFrontEnd:PopScreen()
-	local pkc_choosegroup_screen = require "screens/pkc_choosegroup_screen"
-	TheFrontEnd:PushScreen(pkc_choosegroup_screen())
+	if not RANDOM_GROUP then
+		local pkc_choosegroup_screen = require "screens/pkc_choosegroup_screen"
+		TheFrontEnd:PushScreen(pkc_choosegroup_screen())
+	else
+		--根据队伍人数随机选取groupId
+		if ThePlayer then
+			local groupId = -1 --为-1时说明是随机选队伍
+			teleportToBase(ThePlayer, groupId)
+			self:unpause()
+		end
+	end
 end
 
 function PauseScreen:unpause()

@@ -1,7 +1,13 @@
+--@name pkc_redpig
+--@description 红猪首领
+--@auther RedPig
+--@date 2016-11-01
+
 local assets =
 {
     Asset("ANIM", "anim/pig_king.zip"),
     Asset("SOUND", "sound/pig.fsb"),
+	Asset("ANIM", "anim/pigkingred.zip"),
 }
 
 local prefabs =
@@ -34,19 +40,28 @@ local function onendhappytask(inst)
     inst.endhappytask = nil
 end
 
+--从玩家那里获得物品
 local function OnGetItemFromPlayer(inst, giver, item)
-    if item.components.tradable.goldvalue > 0 then
-        inst.AnimState:PlayAnimation("cointoss")
+	if item and (containsKey(GAME_SCORE.GIVE, item.prefab) or item.components.tradable.goldvalue > 0) then
+		local addScore = GAME_SCORE.GIVE[item.prefab]
+		TheWorld:PushEvent("pkc_giveScoreItem", { getter = inst, giver = giver, item = item,  addScore = addScore})
+		if item.components.tradable.goldvalue > 0 then
+			inst.AnimState:PlayAnimation("cointoss")
+		end
+		inst.happy = false
+		inst.endhappytask = nil
         inst.AnimState:PushAnimation("happy")
-        inst.AnimState:PushAnimation("idle", true)
-        inst:DoTaskInTime(20/30, ontradeforgold, item)
-        inst:DoTaskInTime(1.5, onplayhappysound)
+		inst.AnimState:PushAnimation("idle", true)
+		if item.components.tradable.goldvalue > 0 then
+			inst:DoTaskInTime(20/30, ontradeforgold, item)
+			inst:DoTaskInTime(1.5, onplayhappysound)
+		end
         inst.happy = true
         if inst.endhappytask ~= nil then
             inst.endhappytask:Cancel()
         end
-        inst.endhappytask = inst:DoTaskInTime(5, onendhappytask)
-    end
+        inst.endhappytask = inst:DoTaskInTime(1, onendhappytask)
+	end
 end
 
 local function OnRefuseItem(inst, giver, item)
@@ -57,7 +72,7 @@ local function OnRefuseItem(inst, giver, item)
 end
 
 local function AcceptTest(inst, item)
-    return item.components.tradable.goldvalue > 0
+	return containsKey(GAME_SCORE.GIVE, item.prefab) or item.components.tradable.goldvalue > 0
 end
 
 local function OnIsNight(inst, isnight)
@@ -72,9 +87,114 @@ local function OnIsNight(inst, isnight)
     end
 end
 
+--被攻击时播放动画
+local function healthdelta_fn(inst, data)
+	if inst and data then
+		if data.newpercent > 0 and data.newpercent < data.oldpercent then
+			inst.AnimState:PlayAnimation("happy")
+			inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingReject")
+		end
+		if data.newpercent == 0 then
+			inst.AnimState:PlayAnimation("sleep_pre")
+			inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingHappy")
+		end
+	end
+end
+
+--被攻击时让猪人群殴之
+local function attacked_fn(inst, data)
+	local attacker = data and data.attacker
+	if attacker then
+		if inst.components.combat:CanTarget(attacker) and not attacker:HasTag("pig") then
+			inst.components.combat:ShareTarget(attacker, 100, function(dude)
+				return dude:HasTag("pig")	
+			end, 40)
+		end
+	end
+end
+
+--死亡
+local function death_fn(inst)
+	if inst then
+		--local beKilledKing = inst.components.pkc_group:getChooseGroup() or 0
+		--TheWorld:PushEvent("pkc_kingbekilled", {inst = inst, king = beKilledKing})
+	end
+end
+
+local PigKingSpeechTable = {
+"猪王的保护范围！",
+"我们需要升级猪王获得更多的土地！",
+"我们需要升级猪王获得更强的猪人战士！",
+"获得足够的分数可以升级猪王！",
+}
+
+--显示猪王保护范围
+local function showRangeIndicator(inst)
+	inst:DoTaskInTime(.5, function ()	
+		local pos = Point(inst.Transform:GetWorldPosition())
+		local indicators = TheSim:FindEntities(pos.x, pos.y, pos.z, 2, {"pkc_range_indicator"})
+		if #indicators < 1 then
+			inst.rangeIndicator = SpawnPrefab("pkc_range")
+			if inst.rangeIndicator then
+				inst.rangeIndicator.Transform:SetPosition(pos.x, pos.y, pos.z)
+			end
+		end
+	end)
+end
+
+--点击猪王时调用
+local function ongetstatus(inst, viewer)
+	viewer:DoTaskInTime(0, function ()	
+		if viewer and viewer.components.talker then
+			viewer.components.talker:Say(PigKingSpeechTable[math.random(#PigKingSpeechTable)])
+		end
+	end)
+    return nil
+end
+
+--删除猪王时调用
+local function onPigkingRemove(inst)
+	local pos = Point(inst.Transform:GetWorldPosition())
+	local range_indicators = TheSim:FindEntities(pos.x,pos.y,pos.z, 2, {"pkc_range_indicator"})
+	for i,v in ipairs(range_indicators) do
+		if v:IsValid() then
+			v:Remove()
+		end
+	end
+end
+
+--遭受攻击时调用
+local function onAttacked(inst, data)
+	
+	if not inst.isUnderAttack then
+		for _, player in pairs(AllPlayers) do 
+			if player and player.components.pkc_group and inst.components.pkc_group 
+			and player.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
+			then
+				player:DoTaskInTime(0, function ()	
+					if player and player.components.talker then
+						player.components.talker:Say("不好了，我们的猪王正在遭受攻击！")
+					end
+				end)
+			end
+		end
+		inst.isUnderAttack = true
+		inst:DoTaskInTime(math.random(6, 12), function()
+			inst.isUnderAttack = false
+		end)
+	end
+end
+
+--掉落
+local pigking_loot_table = {"meat","meat","meat","meat","meat","meat","meat","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget","goldnugget",}
+
 local function fn()
     local inst = CreateEntity()
 
+	--设置阵营
+	inst:AddComponent("pkc_group")
+	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
+	
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -90,11 +210,15 @@ local function fn()
 
     inst.DynamicShadow:SetSize(10, 5)
 
-    --inst.Transform:SetScale(1.5, 1.5, 1.5)
+    inst.Transform:SetScale(1, 1, 1)
 
     inst:AddTag("king")
+	inst:AddTag("redpig")
+	inst:AddTag("pkc_group2")
+	inst:AddTag("pig")
+	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")
-    inst.AnimState:SetBuild("Pig_King")
+    inst.AnimState:SetBuild("pigkingred")
     inst.AnimState:PlayAnimation("idle", true)
 
     --trader (from trader component) added to pristine state for optimization
@@ -106,10 +230,21 @@ local function fn()
         return inst
     end
 
-    inst:AddComponent("inspectable")
-
     inst:AddComponent("trader")
-
+	
+	if PIGKING_HEALTH ~= -1 then
+		--让猪王具备生命
+		inst:AddComponent("pkc_addhealth")
+		inst.components.pkc_addhealth:setMaxHealth(PIGKING_HEALTH) --设置最大生命值
+		inst.components.pkc_addhealth:setOnHealthDelta(healthdelta_fn) --监听生命变化
+		inst.components.pkc_addhealth:setOnAttackedFn(attacked_fn) --监听被攻击
+		inst.components.pkc_addhealth:setDropLoot(pigking_loot_table) --设置掉落
+		inst.components.pkc_addhealth:setDeathFn(death_fn) --监听死亡
+		if inst.components.health then
+			inst.components.health:StartRegen(100, 100) --回血
+		end
+	end
+	
     inst.components.trader:SetAcceptTest(AcceptTest)
     inst.components.trader.onaccept = OnGetItemFromPlayer
     inst.components.trader.onrefuse = OnRefuseItem
@@ -126,8 +261,19 @@ local function fn()
         end
         return false
     end)
-
+	
+	--显示猪王保护范围
+	showRangeIndicator(inst)
+	--监听被攻击
+	inst:ListenForEvent("attacked", onAttacked)
+	--名字
+	inst:AddComponent("inspectable")
+	inst:AddComponent("named")
+	inst.components.named:SetName("小红猪")
+	inst.components.inspectable.getstatus = ongetstatus
+	inst:ListenForEvent("onremove", onPigkingRemove)
+	
     return inst
 end
 
-return Prefab("pigking", fn, assets, prefabs)
+return Prefab("pkc_redpig", fn, assets, prefabs)

@@ -2,7 +2,8 @@
 --@description 选择阵营弹框
 --@auther redpig
 --@date 2016-10-23
-
+local _G = _G or GLOBAL
+require "util"
 local Screen = require "widgets/screen"
 local Button = require "widgets/button"
 local AnimButton = require "widgets/animbutton"
@@ -14,6 +15,16 @@ local UIAnim = require "widgets/uianim"
 local Widget = require "widgets/widget"
 local PopupDialogScreen = require "screens/popupdialog"
 local TEMPLATES = require "widgets/templates"
+
+local function getExistGroups(groupNum)
+	local exist_groups = {}
+	for i = 1, groupNum do
+		if EXIST_GROUPS[i] ~= nil and next(EXIST_GROUPS[i]) ~= nil then
+			exist_groups[i] = EXIST_GROUPS[i]
+		end
+	end
+	return exist_groups
+end
 
 local PauseScreen = Class(Screen, function(self)
     Screen._ctor(self, "PauseScreen")
@@ -49,13 +60,13 @@ local PauseScreen = Class(Screen, function(self)
   
     --title
     self.title = self.proot:AddChild(Text(BUTTONFONT, 50))
-    self.title:SetPosition(0, 105, 0)
+    self.title:SetPosition(0, 130, 0)
     self.title:SetString(STRINGS.UI.CHOOSEGROUP.TITLE)
     self.title:SetColour(0,0,0,1)
 
     --subtitle
     self.subtitle = self.proot:AddChild(Text(NEWFONT_SMALL, 16))
-    self.subtitle:SetPosition(0, 75, 0)
+    self.subtitle:SetPosition(0, 90, 0)
     self.subtitle:SetString(STRINGS.UI.CHOOSEGROUP.SUBTITLE)
     self.subtitle:SetColour(0,0,0,1)
 
@@ -63,15 +74,34 @@ local PauseScreen = Class(Screen, function(self)
     local player = ThePlayer
     local can_save = player and player:IsValid() and player.components.health and not player.components.health:IsDead() and IsGamePurchased()
     local button_w = 160
-    local button_h = 70 --竖排按钮间的距离
+   -- local button_h = 70 --竖排按钮间的距离 （两个）
+    local button_h = 90
 
-	--选择阵营按钮
+	--添加选择阵营按钮
     local buttons = {}
-    table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.BIGPIG, cb=function() self:chooseGroup(GROUP_BIGPIG_ID) end })
-    table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.REDPIG, cb=function() self:chooseGroup(GROUP_REDPIG_ID) end })
-
+	
+	--根据设置的阵营数和存在的阵营数来设置button
+	local exist_groups = CURRENT_EXIST_GROUPS
+	
+	for k, v in pairs(exist_groups) do
+		table.insert(buttons, {text=STRINGS.UI.CHOOSEGROUP.BUTTON_NAME[k], cb=function() self:chooseGroup(v) end })
+	end
+	
+	if GROUP_NUM >= 3 then
+		button_h = 70
+	end
+	
+	if GROUP_NUM >= 4 then
+		button_h = 50
+	end
+	
     self.menu = self.proot:AddChild(Menu(buttons, -button_h, false))
-    self.menu:SetPosition(0, 20, 0)
+	if GROUP_NUM < 3 then
+		self.menu:SetPosition(0, 20, 0)
+	else
+		self.menu:SetPosition(0, 50, 0)
+	end
+    
     for i,v in pairs(self.menu.items) do
         v:SetScale(.8)
     end
@@ -84,39 +114,26 @@ local PauseScreen = Class(Screen, function(self)
     self.default_focus = self.menu
 end)
 
---取消无敌状态
-local function cnancleInvincible(player, delay_time)
-	player:DoTaskInTime(delay_time, function()
-		if player then
-			if player.components.health then
-				player.components.health:SetInvincible(false)
-			end
-			if player._fx then
-				player._fx:kill_fx()
-				player._fx:Remove()
-				player._fx = nil
-			end
-		end
-	end)
+--把请求发送给主机,这样就省去网络变量的定义了
+--@param player 玩家
+--@param group_id 玩家选择的营地ID
+--@大猪猪 10-31
+local function teleportToBase(player, group_id)
+	local Namespace="pkc_teleport"
+	local Action="TeleportToBase"
+	if TheWorld.ismastersim then
+		MOD_RPC_HANDLERS[Namespace][MOD_RPC[Namespace][Action].id](player, group_id)
+	else
+		SendModRPCToServer( MOD_RPC[Namespace][Action], group_id)
+	end
 end
 
 --选择阵营势力
+--选择后进入基地
+--@大猪猪 10-31
 function PauseScreen:chooseGroup(group_id)
-	if ThePlayer  then 
-		if not ThePlayer.components.pkc_group then
-			ThePlayer:AddComponent("pkc_group")
-		end
-		--标记已选择阵营
-		ThePlayer.components.pkc_group:setChoosen(true)
-		cnancleInvincible(ThePlayer, 5)
-	end
-	if GROUP_BIGPIG_ID == group_id then
-		--TODO 选择阵营之后的操作，记录选择的阵营并传送至对应基地
-
-		self:unpause()
-	elseif GROUP_REDPIG_ID == group_id then
-		--TODO 选择阵营之后的操作，记录选择的阵营并传送至对应基地
-		
+	if ThePlayer then
+		teleportToBase(ThePlayer, group_id)
 		self:unpause()
 	end
 end
