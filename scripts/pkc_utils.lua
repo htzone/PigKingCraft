@@ -486,6 +486,27 @@ function getFromServer(key, handleFn)
 
 end
 
+function table_maxn(t)
+	local mn;
+	for k, v in pairs(t) do
+		if (mn == nil) then
+			mn = v
+		end
+		if mn < v then
+			mn = v
+		end
+	end
+	return mn
+end
+
+function table_leng(t)
+	local leng = 0
+	for k, v in pairs(t) do
+		leng = leng + 1
+	end
+	return leng;
+end
+
 --[[
 local function pkc_isNearDanger(inst)
     local hounded = TheWorld.components.hounded
