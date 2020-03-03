@@ -1,6 +1,6 @@
 --@name pkc_headshow
 --@description 玩家头部显示名字组件
---@auther redpig
+--@author redpig
 --@date 2016-11-08
 
 --local json = require "json"

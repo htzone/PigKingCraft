@@ -1,6 +1,6 @@
 --@name pkc_playerinit
 --@description 玩家初始化
---@auther 大猪猪，redpig
+--@author 大猪猪，redpig
 --@date 2016-10-23
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()

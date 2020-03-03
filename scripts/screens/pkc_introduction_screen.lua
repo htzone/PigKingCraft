@@ -1,6 +1,6 @@
 --@name pkc_introduction_screen
 --@description 玩法介绍弹框
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local Screen = require "widgets/screen"

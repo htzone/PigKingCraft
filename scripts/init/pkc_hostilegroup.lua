@@ -1,6 +1,6 @@
 --
 -- 怪物阵营
--- Auther: RedPig
+-- author: RedPig
 -- Date: 2017/1/06
 --
 

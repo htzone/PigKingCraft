@@ -1,6 +1,6 @@
 --@name pkc_pigkings
 --@description 猪王首领
---@auther RedPig
+--@author RedPig
 --@date 2016-11-01
 
 local assets =

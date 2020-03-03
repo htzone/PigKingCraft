@@ -1,6 +1,6 @@
 --@name pkc_producebase
 --@description 基地生成
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local TheNet = GLOBAL.TheNet

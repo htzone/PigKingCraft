@@ -1,6 +1,6 @@
 --@name pkc_getscore
 --@description 分数设定
---@auther redpig
+--@author redpig
 --@date 2016-11-18
 
 --分数设定

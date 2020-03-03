@@ -1,6 +1,6 @@
 --@name pkc_playercount
 --@description 
---@auther redpig
+--@author redpig
 --@date 2016-11-20
 
 local PKC_PLAYER_COUNT = Class(function(self, inst)

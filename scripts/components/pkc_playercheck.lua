@@ -1,6 +1,6 @@
 --@name pkc_playercheck
 --@description 玩家自动检查组件
---@auther redpig
+--@author redpig
 --@date 2016-11-20
 
 local function isMyGroupExist(groupId)

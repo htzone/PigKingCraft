@@ -1,6 +1,6 @@
 --@name pkc_popdialog
 --@description 简单弹框组件
---@auther redpig
+--@author redpig
 --@date 2016-11-20
 
 local json = require "json"

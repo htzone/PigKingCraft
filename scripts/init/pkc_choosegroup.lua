@@ -1,6 +1,6 @@
 --@name pkc_multiplayer_portal
 --@description 阵营选择
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local require = GLOBAL.require

@@ -1,6 +1,6 @@
 --@name pkc_title
 --@description 头部名字
---@auther 大猪猪
+--@author 大猪猪
 --@date 2016-11-05
 
 local function fn()

@@ -1,6 +1,6 @@
 --
 -- WEZY
--- Auther: RedPig
+-- author: RedPig
 --
 local jsonUtil = require "json"
 local TheNet = GLOBAL.TheNet

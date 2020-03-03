@@ -1,6 +1,6 @@
 --@name pkc_existgroup
 --@description 设置当前存在队伍组件
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 json = require "json"

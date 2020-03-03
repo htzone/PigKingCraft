@@ -1,6 +1,6 @@
 --@name pkc_playerstatus_screen
 --@description 个人积分显示
---@auther redpig
+--@author redpig
 --@date 2016-11-23
 
 local require = GLOBAL.require

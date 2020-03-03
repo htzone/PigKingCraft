@@ -1,6 +1,6 @@
 --@name pkc_checkattack
 --@description 防止队友互相攻击组件
---@auther redpig
+--@author redpig
 --@date 2016-11-05
 
 local PKC_CHECK_ATTACK = Class(function(self, inst)

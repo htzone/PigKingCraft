@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = "   猪王争霸II"
+name = "   A猪王争霸III(开发版)"
 description = [[
 "在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
 在MOD设置页面可设置更多选项(V2.1.1)

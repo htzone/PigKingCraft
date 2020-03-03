@@ -1,4 +1,4 @@
---@Auther Star
+--@author Star
 
 local _G = GLOBAL
 

@@ -1,5 +1,5 @@
 --
--- Auther: RedPig
+-- author: RedPig
 -- Date: 2017/2/23
 --
 

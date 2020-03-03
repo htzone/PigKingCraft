@@ -1,6 +1,6 @@
 --@name pkc_base
 --@description 生成基地组件
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local PKC_BASE = Class(function(self, inst)

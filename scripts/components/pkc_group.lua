@@ -1,6 +1,6 @@
 --@name pkc_group
 --@description 玩家所属阵营组件
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 --@大猪猪 10-31
 

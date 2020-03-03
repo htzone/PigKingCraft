@@ -1,6 +1,6 @@
 --@name 草翻GOLBAL
 --@description 原有全局变量和函数不用加GLOBAL前缀
---@auther 大猪猪
+--@author 大猪猪
 --@date 2016-10-23
 
 local function FuckGlobalUsingMetatable()

@@ -1,6 +1,6 @@
 --@name pkc_prefabinit
 --@description prefab初始化
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local TheNet = GLOBAL.TheNet

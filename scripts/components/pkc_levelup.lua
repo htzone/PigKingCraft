@@ -1,6 +1,6 @@
 --@name pkc_levelup
 --@description 升级组件
---@auther redpig
+--@author redpig
 --@date 2016-12-20
 local _G = _G or GLOBAL
 

@@ -1,6 +1,6 @@
 --@name pkc_autodelete
 --@description 自动清理组件
---@auther redpig
+--@author redpig
 --@date 2016-11-26
 
 local PKC_AUTO_DELETE = Class(function(self, inst)

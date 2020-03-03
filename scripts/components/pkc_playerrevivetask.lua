@@ -1,6 +1,6 @@
 --
 -- 玩家复活任务
--- Auther: RedPig
+-- author: RedPig
 -- Date: 2017/2/22
 --
 

@@ -1,6 +1,6 @@
 --@name pkc_rpchandler
 --@description RPC调用处理
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 
 local TheNet = GLOBAL.TheNet

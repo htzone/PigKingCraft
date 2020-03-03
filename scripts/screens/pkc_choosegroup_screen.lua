@@ -1,6 +1,6 @@
 --@name pkc_choosegroup_screen
 --@description 选择阵营弹框
---@auther redpig
+--@author redpig
 --@date 2016-10-23
 local _G = _G or GLOBAL
 require "util"

@@ -1,6 +1,6 @@
 --@name pkc_addhealth
 --@description 让prefab具有生命且可被杀死组件
---@auther redpig
+--@author redpig
 --@date 2016-11-02
 
 local PKC_ADD_HEALTH = Class(function(self, inst)

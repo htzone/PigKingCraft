@@ -1,6 +1,6 @@
 --@name pkc_score
 --@description 阵营分数
---@auther redpig
+--@author redpig
 --@date 2016-11-16
 
 --保存分数的全局变量

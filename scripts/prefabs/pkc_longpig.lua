@@ -1,6 +1,6 @@
 --@name pkc_redpig
 --@description 红猪首领
---@auther RedPig
+--@author RedPig
 --@date 2016-11-01
 
 local assets =
