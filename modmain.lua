@@ -99,9 +99,8 @@ modimport("scripts/init/pkc_hostilegroup")
 --生物变大
 modimport("scripts/init/pkc_mobtobig")
 --modimport("scripts/init/pkc_studypy")
---TODO
 --地图分组显示
---modimport("scripts/init/pkc_group_postion")
+modimport("scripts/init/pkc_group_postion")
 
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
