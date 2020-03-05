@@ -7,6 +7,7 @@ local GlobalPositions = Class(function(self, inst)
     self.positions = {}
     if not TheWorld.ismastersim
             or not TheNet:IsDedicated() then return end
-    -- Players will wait to get their map from here until this says it's loaded
     self.map_loaded = false
 end)
+
+return GlobalPositions

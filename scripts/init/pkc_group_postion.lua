@@ -3,12 +3,12 @@
 -- author: RedPig
 -- Date: 2017/1/06
 --
-GLOBAL._GLOBALPOSITIONS_MAP_ICONS = {}
 
 -- 从其他mod中获取地图的小图标
-for i,atlases in ipairs(GLOBAL.ModManager:GetPostInitData("MinimapAtlases")) do
-    for i,path in ipairs(atlases) do
-        local file = GLOBAL.io.open(GLOBAL.resolvefilepath(path), "r")
+GLOBAL._PKC_POSITIONS_MAP_ICONS = {}
+for _, atlases in ipairs(ModManager:GetPostInitData("MinimapAtlases")) do
+    for _, path in ipairs(atlases) do
+        local file = io.open(resolvefilepath(path), "r")
         if file then
             local xml = file:read("*a")
             if xml then
@@ -16,7 +16,7 @@ for i,atlases in ipairs(GLOBAL.ModManager:GetPostInitData("MinimapAtlases")) do
                     if element then
                         local elementName = string.match(element, "^(.*)[.]")
                         if elementName then
-                            GLOBAL._GLOBALPOSITIONS_MAP_ICONS[elementName] = element
+                            GLOBAL._PKC_POSITIONS_MAP_ICONS[elementName] = element
                         end
                     end
                 end
@@ -25,41 +25,29 @@ for i,atlases in ipairs(GLOBAL.ModManager:GetPostInitData("MinimapAtlases")) do
         end
     end
 end
-
-for _,prefab in pairs(GLOBAL.DST_CHARACTERLIST) do
-    GLOBAL._GLOBALPOSITIONS_MAP_ICONS[prefab] = prefab .. ".png"
+for _, prefab in pairs(DST_CHARACTERLIST) do
+    GLOBAL._PKC_POSITIONS_MAP_ICONS[prefab] = prefab .. ".png"
 end
 
-
-local is_dedicated = TheNet:IsDedicated()
-
-local function PlayerPostInit(TheWorld, player)
-    player:ListenForEvent("setowner", function()
-        player:AddComponent("globalposition")
-        if SHAREMINIMAPPROGRESS then
-            if is_dedicated then
-                local function TryLoadingWorldMap()
-                    if not TheWorld.net.components.globalpositions.map_loaded or not player.player_classified.MapExplorer:LearnRecordedMap(TheWorld.worldmapexplorer.MapExplorer:RecordMap()) then
-                        player:DoTaskInTime(0, TryLoadingWorldMap)
-                    end
-                end
-                TryLoadingWorldMap()
-            elseif player ~= GLOBAL.AllPlayers[1] then --The host always has the master map
-                local function TryLoadingHostMap()
-                    if not player.player_classified.MapExplorer:LearnRecordedMap(GLOBAL.AllPlayers[1].player_classified.MapExplorer:RecordMap()) then
-                        player:DoTaskInTime(0, TryLoadingHostMap)
-                    end
-                end
-                TryLoadingHostMap()
-            end
+--为世界添加位置组件（保存所有玩家位置）
+AddPrefabPostInit("forest_network", function(inst) inst:AddComponent("pkc_globalpositions") end)
+AddPrefabPostInit("cave_network", function(inst) inst:AddComponent("pkc_globalpositions") end)
+local isDedicated = TheNet:IsDedicated()
+AddPrefabPostInit("world", function(inst)
+    if PKC_IS_DEDICATED then
+        print("test world.")
+    end
+    inst:DoTaskInTime(30, function()
+        for i = 1, 10 do
+            print("test------red")
+        end
+        if isDedicated then
+            inst.worldmapexplorer = SpawnPrefab("pkc_worldmapexplorer")
+            local isExist = inst.worldmapexplorer ~= nil
+            print("test:"..isExist)
         end
     end)
-end
 
-AddPrefabPostInit("world", function(inst)
-    if is_dedicated then
-        inst.worldmapexplorer = GLOBAL.SpawnPrefab("worldmapexplorer")
-    end
-    inst:ListenForEvent("ms_playerspawn", PlayerPostInit)
+--    inst:ListenForEvent("ms_playerspawn", PlayerPostInit)
 end)
 

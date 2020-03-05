@@ -52,6 +52,8 @@ PrefabFiles = {
     "pkc_pighouses",
     "pkc_eyeturret",
     "pkc_range",
+    "pck_worldmapexplorer",
+    "pkc_globalposition_classified",
 }
 
 modimport("scripts/newxiugai")

@@ -2,8 +2,17 @@
 -- Author: RedPig
 -- Date: 2020/3/4
 
-local function AddGlobalIcon(inst, isplayer, classified)
-    if not (_GLOBALPOSITIONS_MAP_ICONS[inst.prefab] or inst.MiniMapEntity) then return end
+local function AddMapRevealer(inst)
+    if not inst.components.maprevealer then
+        inst:AddComponent("maprevealer")
+    end
+    inst.components.maprevealer.revealperiod = 0.5
+    inst.components.maprevealer:Stop()
+    inst.components.maprevealer:Start()
+end
+
+local function AddGlobalIcon(inst, classified)
+    if not (_PKC_POSITIONS_MAP_ICONS[inst.prefab] or inst.MiniMapEntity) then return end
     classified.icon = SpawnPrefab("globalmapicon_noproxy")
     classified.icon.MiniMapEntity:SetPriority(10)
     classified.icon.MiniMapEntity:SetRestriction("player")
@@ -22,23 +31,13 @@ local function AddGlobalIcon(inst, isplayer, classified)
     classified:AddChild(classified.icon2)
 end
 
-local function AddMapRevealer(inst)
-    if not inst.components.maprevealer then
-        inst:AddComponent("maprevealer")
-    end
-    inst.components.maprevealer.revealperiod = 0.5
-    inst.components.maprevealer:Stop()
-    if _GLOBALPOSITIONS_SHAREMINIMAPPROGRESS then
-        inst.components.maprevealer:Start()
-    end
-end
-
 local GlobalPosition = Class(function(self, inst)
     self.inst = inst
+    self.globalpositions = nil
     self.classified = nil
+    self.inittask = nil
 
     local isplayer = inst:HasTag("player")
-
     if isplayer then
         AddMapRevealer(inst)
         self.respawnedfromghostfn = function()
@@ -57,9 +56,8 @@ local GlobalPosition = Class(function(self, inst)
         self.inittask = nil
         self.globalpositions = TheWorld.net.components.globalpositions
         self.classified = self.globalpositions:AddServerEntity(self.inst)
-        if ((isplayer and _GLOBALPOSITIONS_SHOWPLAYERICONS)
-                or (not isplayer and (self.inst.prefab:find("ping_") or _GLOBALPOSITIONS_SHOWFIREICONS))) then
-            AddGlobalIcon(inst, isplayer, self.classified)
+        if isplayer then
+            AddGlobalIcon(inst, self.classified)
         end
         self.inst:StartUpdatingComponent(self)
     end)
@@ -67,3 +65,5 @@ end,
 nil,
 {
 })
+
+return GlobalPosition
