@@ -1,19 +1,15 @@
 -- This information tells other players more about the mod
 name = "   A猪王争霸III(开发版)"
 description = [[
+(V3.0.0)
 "在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
-在MOD设置页面可设置更多选项(V2.1.1)
 
-更新内容(Update):
-1.所有猪王房间通用等级称号系统
-2.Tab键查看当局比赛击杀和得分信息
-3.Shift键冲刺技能
-4.防止队友恶意破坏选项
-5.更多平衡和完善细节
+可在MOD设置页面可设置更多选项
+
 ]]
 
-author = "RedPig,大猪猪"
-version = "2.2.0"
+author = "RedPig"
+version = "3.0.0"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -53,6 +49,16 @@ icon = "modicon.tex"
 
 configuration_options =
 {
+    {
+        name = "is_test",
+        label = "是否测试模式(test)",
+        options =
+        {
+            {description = "否(No)", data = false, hover = "no" },
+            {description = "是(Yes)", data = true, hover = "yes"},
+        },
+        default = true,
+    },
 	{
         name = "language",
         label = "游戏语言(Language)",
@@ -113,6 +119,7 @@ configuration_options =
 			{description = "15天", data = 15, hover = "15days"},
 			{description = "20天", data = 20, hover = "20days"},
 			{description = "30天", data = 30, hover = "30days"},
+            {description = "永远和平", data = 99999, hover = "forever"},
         },
         default = 0,
     },
@@ -168,7 +175,7 @@ configuration_options =
 			{description = "5", data = 5, hover = "EyeTurretNumNearPigking"},
 			{description = "6", data = 6, hover = "EyeTurretNumNearPigking"},
         },
-        default = 4,
+        default = 6,
     },
 	{
         name = "init_pighouse_num",
@@ -182,7 +189,7 @@ configuration_options =
 			{description = "5", data = 5, hover = "PigHouseNumNearPigking"},
 			{description = "6", data = 6, hover = "PigHouseNumNearPigking"},
         },
-        default = 4,
+        default = 6,
     },
     {
         name = "prevent_bad_boy",

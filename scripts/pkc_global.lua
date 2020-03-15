@@ -1,5 +1,8 @@
 ----[[声明全局变量]]----
 
+	--测试模式
+	GLOBAL.PKC_ISTEST = GetModConfigData("is_test")
+
 	--游戏语言
 	GLOBAL.GAME_LANGUAGE = GetModConfigData("language")
 	--分组数
@@ -31,18 +34,16 @@
 	GLOBAL.PKC_WORLD_DELETE_INTERVAL = 5
 	--世界自动清理超过时间(天)
 	GLOBAL.PKC_WORLD_DELETE_TIME = 4
-	--下线掉落所有物品(附近有敌人时)
+	--下线掉落所有物品(只在当附近有敌人时)
 	GLOBAL.PKC_LEVAE_DROP_EVERYTHING = true
 	--开始无敌时间（秒）
 	GLOBAL.PKC_INVINCIBLE_TIME = 30
 	--复活无敌时间（秒）
 	GLOBAL.PKC_REVIVE_INVINCIBLE_TIME = 20
 	--玩家死亡初始自动复活时间（秒）
-	GLOBAL.PLAYER_REVIVE_TIME = 30
+	GLOBAL.PLAYER_REVIVE_TIME = 10
 	--猪王财产最大保护范围（码）
 	GLOBAL.PIGKING_RANGE = 50
-	--猪王村范围显示时间
-	GLOBAL.PIGKING_RANGE_SHOW_TIME = 60
 	--冲刺冷却时间
 	GLOBAL.PKC_SPRINT_COOLDOWN = 10
 	--冲刺速度

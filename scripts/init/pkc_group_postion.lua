@@ -34,13 +34,7 @@ AddPrefabPostInit("forest_network", function(inst) inst:AddComponent("pkc_global
 AddPrefabPostInit("cave_network", function(inst) inst:AddComponent("pkc_globalpositions") end)
 local isDedicated = TheNet:IsDedicated()
 AddPrefabPostInit("world", function(inst)
-    if PKC_IS_DEDICATED then
-        print("test world.")
-    end
     inst:DoTaskInTime(30, function()
-        for i = 1, 10 do
-            print("test------red")
-        end
         if isDedicated then
             inst.worldmapexplorer = SpawnPrefab("pkc_worldmapexplorer")
             local isExist = inst.worldmapexplorer ~= nil

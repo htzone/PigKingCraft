@@ -488,7 +488,7 @@ end
 
 function table_maxn(t)
 	local mn;
-	for k, v in pairs(t) do
+	for _, v in pairs(t) do
 		if (mn == nil) then
 			mn = v
 		end
@@ -499,58 +499,38 @@ function table_maxn(t)
 	return mn
 end
 
-function table_leng(t)
-	local leng = 0
-	for k, v in pairs(t) do
-		leng = leng + 1
+--table深拷贝
+function clone(object)
+	local lookup_table = {}
+	local function _copy(object)
+		if type(object) ~= "table" then
+			return object
+		elseif lookup_table[object] then
+			return lookup_table[object]
+		end
+		local new_table = {}
+		lookup_table[object] = new_table
+		for key, value in pairs(object) do
+			new_table[_copy(key)] = _copy(value)
+		end
+		return setmetatable(new_table, getmetatable(object))
 	end
-	return leng;
+	return _copy(object)
 end
 
---[[
-local function pkc_isNearDanger(inst)
-    local hounded = TheWorld.components.hounded
-    if hounded ~= nil and (hounded:GetWarning() or hounded:GetAttacking()) then
-        return true
-    end
-    local burnable = inst.components.burnable
-    if burnable ~= nil and (burnable:IsBurning() or burnable:IsSmoldering()) then
-        return true
-    end
-    -- See entityreplica.lua (for _combat tag usage)
-    if inst:HasTag("spiderwhisperer") then
-        --Danger if:
-        -- being targetted
-        -- OR near monster or pig that is neither player nor spider
-        -- ignore shadow monsters when not insane
-        return FindEntity(inst, 10,
-            function(target)
-                return (target.components.combat ~= nil and target.components.combat.target == inst)
-                    or ((target:HasTag("monster") or target:HasTag("pig")) and
-                        not (target:HasTag("player") or target:HasTag("spider")) and
-                        not (inst.components.sanity:IsSane() and target:HasTag("shadowcreature")))
-            end,
-            nil, nil, { "monster", "pig", "_combat" }) ~= nil
-    end
-    --Danger if:
-    -- being targetted
-    -- OR near monster that is not player
-    -- ignore shadow monsters when not insane
-    return FindEntity(inst, 10,
-        function(target)
-            return (target.components.combat ~= nil and target.components.combat.target == inst)
-                or (target:HasTag("monster") and
-                    not target:HasTag("player") and
-                    not (inst.components.sanity:IsSane() and target:HasTag("shadowcreature")))
-        end,
-        nil, nil, { "monster", "_combat" }) ~= nil
+function isNullOrEmpty(str)
+	if type(str) == "string" then
+		return not str or string.len(str) == 0
+	end
+	return false
 end
-]]--
 
-
-
-
-
+function startWith(str, start)
+	if type(str) == "string" and type(start) == "string" then
+		return start == string.sub(str, 1, start:len())
+	end
+	return false
+end
 
 
 

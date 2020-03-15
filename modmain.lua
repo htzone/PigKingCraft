@@ -52,7 +52,7 @@ PrefabFiles = {
     "pkc_pighouses",
     "pkc_eyeturret",
     "pkc_range",
-    "pck_worldmapexplorer",
+    "pkc_worldmapexplorer",
     "pkc_globalposition_classified",
 }
 
@@ -61,6 +61,8 @@ modimport("scripts/newxiugai")
 local require = GLOBAL.require
 --自定义工具函数（常用的工具函数放这里）
 require "pkc_utils"
+--重写系统网络函数
+require "pkc_networking_override"
 --木牌传送
 modimport("scripts/mods/pkc_fasttravel")
 --属性显示
@@ -103,6 +105,8 @@ modimport("scripts/init/pkc_mobtobig")
 --modimport("scripts/init/pkc_studypy")
 --地图分组显示
 modimport("scripts/init/pkc_group_postion")
+--分组会话
+modimport("scripts/init/pkc_group_chat")
 
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
