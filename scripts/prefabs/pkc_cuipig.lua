@@ -169,7 +169,7 @@ local function fn()
     inst:AddComponent("trader")
 	
 	--设置颜色
---	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
+--	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.color)
 --	inst.AnimState:SetMultColour(r, g, b, 1)
 	if PIGKING_HEALTH ~= -1 then
 		--让猪王具备生命

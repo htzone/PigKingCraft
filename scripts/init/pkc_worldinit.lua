@@ -442,10 +442,10 @@ AddClassPostConstruct("widgets/controls", function(wdt)
 			wdt.pvp_widget4 = wdt.top_root:AddChild(pkc_scoreboard())
 		end
 		
-		wdt.d_colour1,wdt.d_colour2,wdt.d_colour3 = GLOBAL.HexToPercentColor(GLOBAL.GROUP_INFOS.BIGPIG.score_color)
-		wdt.r_colour1,wdt.r_colour2,wdt.r_colour3 = GLOBAL.HexToPercentColor(GLOBAL.GROUP_INFOS.REDPIG.score_color)
-		wdt.l_colour1,wdt.l_colour2,wdt.l_colour3 = GLOBAL.HexToPercentColor(GLOBAL.GROUP_INFOS.LONGPIG.score_color)
-		wdt.c_colour1,wdt.c_colour2,wdt.c_colour3 = GLOBAL.HexToPercentColor(GLOBAL.GROUP_INFOS.CUIPIG.score_color)
+		wdt.d_colour1,wdt.d_colour2,wdt.d_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.BIGPIG.score_color)
+		wdt.r_colour1,wdt.r_colour2,wdt.r_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.REDPIG.score_color)
+		wdt.l_colour1,wdt.l_colour2,wdt.l_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.LONGPIG.score_color)
+		wdt.c_colour1,wdt.c_colour2,wdt.c_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.CUIPIG.score_color)
 		
 		local old_OnUpdate = wdt.OnUpdate
 		wdt.OnUpdate = function(self, dt)

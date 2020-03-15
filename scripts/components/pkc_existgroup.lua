@@ -25,7 +25,7 @@ function PKC_EXISTGROUP:init()
 	--第一次初始化
 	if next(self.existGroups) == nil then
 		for i=1, GROUP_NUM do
-			CURRENT_EXIST_GROUPS[GROUP_ORDER[i]] = GROUP_INFOS[GROUP_ORDER[i]].id
+			CURRENT_EXIST_GROUPS[GROUP_ORDER[i]] = PKC_GROUP_INFOS[GROUP_ORDER[i]].id
 		end
 		self.existGroups = CURRENT_EXIST_GROUPS
 		self._existGroups:set(json.encode(CURRENT_EXIST_GROUPS))

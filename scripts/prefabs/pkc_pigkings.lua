@@ -467,7 +467,7 @@ local function fn(group_id, build, name)
 	
 	--头部显示
 	--inst.components.pkc_headshow:setHeadText(name.."<4352/5000>")
-	--inst.components.pkc_headshow:setHeadColor(GROUP_INFOS.REDPIG.head_color)
+	--inst.components.pkc_headshow:setHeadColor(PKC_GROUP_INFOS.REDPIG.head_color)
 	--inst.components.pkc_headshow:setChoose(true)
 
 	--inst:AddComponent("maprevealer")
@@ -503,7 +503,7 @@ local function bigpigFn()
 	inst:AddTag("pkc_group1")
 	inst.pkc_group_id = GROUP_BIGPIG_ID
 	--发光
-	local r, p, g = HexToPercentColor(GROUP_INFOS.BIGPIG.color)
+	local r, p, g = HexToPercentColor(PKC_GROUP_INFOS.BIGPIG.color)
 	inst.Light:SetColour(r, p, g)
 	inst.Light:Enable(false)
 				
@@ -520,7 +520,7 @@ local function redpigFn()
 	inst:AddTag("pkc_group2")
 	inst.pkc_group_id = GROUP_REDPIG_ID
 	--发光
-	local r, p, g = HexToPercentColor(GROUP_INFOS.REDPIG.color)
+	local r, p, g = HexToPercentColor(PKC_GROUP_INFOS.REDPIG.color)
 	inst.Light:SetColour(r, p, g)
 	inst.Light:Enable(false)
 	
@@ -537,7 +537,7 @@ local function longpigFn()
 	inst:AddTag("pkc_group3")
 	inst.pkc_group_id = GROUP_LONGPIG_ID
 	--发光
-	local r, p, g = HexToPercentColor(GROUP_INFOS.LONGPIG.color)
+	local r, p, g = HexToPercentColor(PKC_GROUP_INFOS.LONGPIG.color)
 	inst.Light:SetColour(r, p, g)
 	inst.Light:Enable(false)
 	
@@ -554,7 +554,7 @@ local function cuipigFn()
 	inst:AddTag("pkc_group4")
 	inst.pkc_group_id = GROUP_CUIPIG_ID
 	--发光
-	local r, p, g = HexToPercentColor(GROUP_INFOS.CUIPIG.color)
+	local r, p, g = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.color)
 	inst.Light:SetColour(r, p, g)
 	inst.Light:Enable(false)
 	

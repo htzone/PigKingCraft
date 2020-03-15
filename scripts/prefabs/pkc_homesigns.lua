@@ -120,7 +120,7 @@ Prefab("pkc_homesign_big", function()
         return inst
     end
     --设置颜色
-    local r, g, b = HexToPercentColor(GROUP_INFOS.BIGPIG.pighouse_color)
+    local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.BIGPIG.pighouse_color)
     inst.AnimState:SetMultColour(r, g, b, 1)
     --inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
     inst.saveTags = {}
@@ -135,7 +135,7 @@ Prefab("pkc_homesign_red", function()
         return inst
     end
     --设置颜色
-    local r, g, b = HexToPercentColor(GROUP_INFOS.REDPIG.pighouse_color)
+    local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.REDPIG.pighouse_color)
     inst.AnimState:SetMultColour(r, g, b, 1)
     --inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
     inst.saveTags = {}
@@ -150,7 +150,7 @@ Prefab("pkc_homesign_long", function()
         return inst
     end
     --设置颜色
-    local r, g, b = HexToPercentColor(GROUP_INFOS.LONGPIG.pighouse_color)
+    local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.LONGPIG.pighouse_color)
     inst.AnimState:SetMultColour(r, g, b, 1)
     --inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
     inst.saveTags = {}
@@ -165,7 +165,7 @@ Prefab("pkc_homesign_cui", function()
     return inst
     end
     --设置颜色
-    local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.pighouse_color)
+    local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.pighouse_color)
     inst.AnimState:SetMultColour(r, g, b, 1)
     --inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
     inst.saveTags = {}

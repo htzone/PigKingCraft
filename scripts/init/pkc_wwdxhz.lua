@@ -22,7 +22,7 @@ local function onJoinResult(result, isSuccessful, resultCode, player)
                 if data.color and data.color ~= "" then
                     player.components.pkc_headshow:setTitleColor(data.color)
                 end
-                player.components.pkc_headshow:setTitle(true)
+                player.components.pkc_headshow._eventAddTitle:push()
             end
         end
     end

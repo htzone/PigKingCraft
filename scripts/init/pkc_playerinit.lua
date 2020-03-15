@@ -72,7 +72,7 @@ AddPlayerPostInit(function(inst)
 		if IsServer then
 			--出生提示属于哪个阵营（前提是已选择了阵营）
 			inst:DoTaskInTime(6, function()
-				for _,v in pairs(GLOBAL.GROUP_INFOS) do
+				for _,v in pairs(GLOBAL.PKC_GROUP_INFOS) do
 					if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() == v.id then
 						if inst.components.talker then
 							inst.components.talker:Say(GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH1..v.name..GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH2)

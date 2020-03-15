@@ -76,7 +76,7 @@ end
 --根据groupId来获取对应的name
 --@param groupId 阵营Id
 function getNamebyGroupId(groupId)
-	for _,v in pairs(GROUP_INFOS) do
+	for _,v in pairs(PKC_GROUP_INFOS) do
 		if groupId == v.id then
 			return v.name
 		end
@@ -86,7 +86,7 @@ end
 
 --根据groupId来获取对应的color
 function getColorByGroupId(groupId)
-	for _,v in pairs(GROUP_INFOS) do
+	for _,v in pairs(PKC_GROUP_INFOS) do
 		if groupId == v.id then
 			return v.head_color
 		end

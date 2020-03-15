@@ -103,11 +103,15 @@
 			},
 		}
 		--阵营信息
-		GLOBAL.GROUP_INFOS = {
-			BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "大猪猪", color = "#4DA0FF", head_color = "#1958FF", score_color = "#0E4199", pighouse_color = "#4DA0FF", pigman_color = "#4DA0FF"},
-			REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "红猪猪", color= "#FF1A1A", head_color = "#FF0000", score_color = "#9E130E", pighouse_color = "#FF908D", pigman_color = "#FF908D"},
-			LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "龙猪猪", color = "#47ED47", head_color = "#009A3A", score_color = "#005205", pighouse_color = "#6FDB6F", pigman_color = "#6FDB6F"},
-			CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#A58DFF", head_color = "#7900FF", score_color = "#5D0694", pighouse_color = "#A58DFF", pigman_color = "#A58DFF"},
+		GLOBAL.PKC_GROUP_INFOS = {
+			BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "大猪猪", color = "#4DA0FF", head_color = "#1958FF",
+				head_tag = "♠", score_color = "#0E4199", pighouse_color = "#4DA0FF", pigman_color = "#4DA0FF"},
+			REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "红猪猪", color= "#FF1A1A", head_color = "#FF0000",
+				head_tag = "♥", score_color = "#9E130E", pighouse_color = "#FF908D", pigman_color = "#FF908D"},
+			LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "龙猪猪", color = "#47ED47", head_color = "#009A3A",
+				head_tag = "♣", score_color = "#005205", pighouse_color = "#6FDB6F", pigman_color = "#6FDB6F"},
+			CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "崔猪猪", color = "#A58DFF", head_color = "#7900FF",
+				head_tag = "♦", score_color = "#5D0694", pighouse_color = "#A58DFF", pigman_color = "#A58DFF"},
 		}
 		--名字简写
 		GLOBAL.SHORT_NAME = {
@@ -156,11 +160,15 @@
 			},
 		}
 		--阵营信息
-		GLOBAL.GROUP_INFOS = {
-			BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "BLUPIG", color = "#4DA0FF", head_color = "#1958FF", score_color = "#0E4199", pighouse_color = "#4DA0FF", pigman_color = "#4DA0FF"},
-			REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "REDPIG", color= "#FF1A1A", head_color = "#FF0000", score_color = "#9E130E", pighouse_color = "#FF908D", pigman_color = "#FF908D"},
-			LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "GREPIG", color = "#47ED47", head_color = "#009A3A", score_color = "#005205", pighouse_color = "#6FDB6F", pigman_color = "#6FDB6F"},
-			CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "PURPIG", color = "#A58DFF", head_color = "#7900FF", score_color = "#5D0694", pighouse_color = "#A58DFF", pigman_color = "#A58DFF"},
+		GLOBAL.PKC_GROUP_INFOS = {
+			BIGPIG = { id = GLOBAL.GROUP_BIGPIG_ID, name = "BLUPIG", color = "#4DA0FF", head_color = "#1958FF",
+				head_tag = "♠", score_color = "#0E4199", pighouse_color = "#4DA0FF", pigman_color = "#4DA0FF"},
+			REDPIG = { id = GLOBAL.GROUP_REDPIG_ID, name = "REDPIG", color= "#FF1A1A", head_color = "#FF0000",
+				head_tag = "♥", score_color = "#9E130E", pighouse_color = "#FF908D", pigman_color = "#FF908D"},
+			LONGPIG = { id = GLOBAL.GROUP_LONGPIG_ID, name = "GREPIG", color = "#47ED47", head_color = "#009A3A",
+				head_tag = "♣", score_color = "#005205", pighouse_color = "#6FDB6F", pigman_color = "#6FDB6F"},
+			CUIPIG = { id = GLOBAL.GROUP_CUIPIG_ID, name = "PURPIG", color = "#A58DFF", head_color = "#7900FF",
+				head_tag = "♦", score_color = "#5D0694", pighouse_color = "#A58DFF", pigman_color = "#A58DFF"},
 		}
 		--名字简写
 		GLOBAL.SHORT_NAME = {

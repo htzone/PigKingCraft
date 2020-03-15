@@ -63,7 +63,7 @@ local function compareGroupPlayerNum(groupPlayerNum)
 		end	
 	end
 	--多个则随机选择其中一个
-	return GLOBAL.GROUP_INFOS[minNumGroup[math.random(#minNumGroup)]].id
+	return GLOBAL.PKC_GROUP_INFOS[minNumGroup[math.random(#minNumGroup)]].id
 end
 
 ------handle group choose---------
@@ -84,8 +84,8 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 	--取消无敌状态
 	cancelInvincible(player, GLOBAL.PKC_INVINCIBLE_TIME)
 	--传送至对应的基地
-	for k, v in pairs(GLOBAL.GROUP_INFOS) do
-		if group_id == GLOBAL.GROUP_INFOS[k].id then
+	for k, v in pairs(GLOBAL.PKC_GROUP_INFOS) do
+		if group_id == GLOBAL.PKC_GROUP_INFOS[k].id then
 			GLOBAL.pkc_announce(player.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH1..v.name..GLOBAL.PKC_SPEECH.GROUP_JOIN.SPEECH2)
 			local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_x"]
 			local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_"..k.."_POS_z"]
@@ -119,7 +119,8 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 			--根据选择的阵营进行相应的头部显示
 			player.components.pkc_headshow:setHeadText(player:GetDisplayName())
 			player.components.pkc_headshow:setHeadColor(v.head_color)
-			player.components.pkc_headshow:setChoose(true)
+			player.components.pkc_headshow:setHeadGroupTag(v.head_tag)
+			player.components.pkc_headshow._eventAddHeader:push()
 			break
 		end
 	end

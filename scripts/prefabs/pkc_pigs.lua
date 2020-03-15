@@ -769,7 +769,7 @@ return
 Prefab("pkc_pigman_big", function()
 	local inst = normal(GROUP_BIGPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.BIGPIG.pigman_color)
+	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.BIGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
 	inst.pkc_group_id = GROUP_BIGPIG_ID
@@ -778,7 +778,7 @@ end, assets, prefabs),
 Prefab("pkc_pigman_red", function()
 	local inst = normal(GROUP_REDPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.REDPIG.pigman_color)
+	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.REDPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
 	inst.pkc_group_id = GROUP_REDPIG_ID
@@ -787,7 +787,7 @@ end, assets, prefabs),
 Prefab("pkc_pigman_cui", function()
 	local inst = normal(GROUP_CUIPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.CUIPIG.pigman_color)
+	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_CUIPIG_ID)
 	inst.pkc_group_id = GROUP_CUIPIG_ID
@@ -796,7 +796,7 @@ end, assets, prefabs),
 Prefab("pkc_pigman_long", function()
 	local inst = normal(GROUP_LONGPIG_ID)
 	--设置颜色
-	local r, g, b = HexToPercentColor(GROUP_INFOS.LONGPIG.pigman_color)
+	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.LONGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
 	inst.components.pkc_group:setChooseGroup(GROUP_LONGPIG_ID)
 	inst.pkc_group_id = GROUP_LONGPIG_ID
