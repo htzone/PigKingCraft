@@ -38,7 +38,7 @@
            ,,,     ,,:,::::::i:iiiii:i::::,, ::::iiiir@xingjief.r;7:i,
         , , ,,,:,,::::::::iiiiiiiiii:,:,:::::::::iiir;ri7vL77rrirri::
          :,, , ::::::::i:::i:::i:i::,,,,,:,::i:i:::iir;@Secbone.ii:::
-                           单身狗，别看了...
+                           曾经是一只单身狗...
                     A single dog（pig） is looking at you...
 
 ]]--
@@ -54,6 +54,7 @@ PrefabFiles = {
     "pkc_range",
     "pkc_worldmapexplorer",
     "pkc_globalposition_classified",
+    "pkc_globalmapicon_noproxy",
 }
 
 modimport("scripts/newxiugai")
@@ -107,10 +108,8 @@ modimport("scripts/init/pkc_mobtobig")
 modimport("scripts/init/pkc_group_postion")
 --分组会话
 modimport("scripts/init/pkc_group_chat")
-
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
-
 --人物修改部分

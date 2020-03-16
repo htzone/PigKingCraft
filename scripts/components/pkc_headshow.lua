@@ -95,7 +95,7 @@ function PKC_HEADSHOW:addHeadView()
                 self.inst.pkc_title.Label:SetColour(unpack(self:getHeadColor()))
             end
             local tag = self:getHeadGroupTag() or "★"
-            local headText = self:getHeadText() or "Unknow"
+            local headText = self:getHeadText() or "Unknown"
             headText = trim(headText)
             self.inst.pkc_title.Label:SetText(tag .. (string.len(headText) <= 20
                         and headText or string.sub(headText, 1, 22)) .. tag) --截取前面字符，避免名字太长
@@ -129,16 +129,20 @@ function PKC_HEADSHOW:OnSave()
     return
     {
         headText = self._headText:value(),
+        headTag = self._headGroupTag:value(),
         headColor = self._headColor:value(),
     }
 end
 
 function PKC_HEADSHOW:OnLoad(data)
     if data ~= nil then
-        if data.headText ~= nil then
+        if data.headText then
             self._headText:set(data.headText)
         end
-        if data.headColor ~= nil then
+        if data.headTag then
+            self._headGroupTag:set(data.headTag)
+        end
+        if data.headColor then
             self._headColor:set(data.headColor)
         end
     end

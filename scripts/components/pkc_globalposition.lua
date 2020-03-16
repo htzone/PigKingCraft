@@ -12,8 +12,8 @@ local function AddMapRevealer(inst)
 end
 
 local function AddGlobalIcon(inst, classified)
-    if not (_PKC_POSITIONS_MAP_ICONS[inst.prefab] or inst.MiniMapEntity) then return end
-    classified.icon = SpawnPrefab("globalmapicon_noproxy")
+    if not (PKC_POSITIONS_MAP_ICONS[inst.prefab] or inst.MiniMapEntity) then return end
+    classified.icon = SpawnPrefab("pkc_globalmapicon_noproxy")
     classified.icon.MiniMapEntity:SetPriority(10)
     classified.icon.MiniMapEntity:SetRestriction("player")
     classified.icon2 = SpawnPrefab("globalmapicon")
@@ -24,8 +24,8 @@ local function AddGlobalIcon(inst, classified)
         classified.icon.MiniMapEntity:CopyIcon(inst.MiniMapEntity)
         classified.icon2.MiniMapEntity:CopyIcon(inst.MiniMapEntity)
     else
-        classified.icon.MiniMapEntity:SetIcon(_GLOBALPOSITIONS_MAP_ICONS[inst.prefab])
-        classified.icon2.MiniMapEntity:SetIcon(_GLOBALPOSITIONS_MAP_ICONS[inst.prefab])
+        classified.icon.MiniMapEntity:SetIcon(PKC_POSITIONS_MAP_ICONS[inst.prefab])
+        classified.icon2.MiniMapEntity:SetIcon(PKC_POSITIONS_MAP_ICONS[inst.prefab])
     end
     classified:AddChild(classified.icon)
     classified:AddChild(classified.icon2)
@@ -42,11 +42,9 @@ local GlobalPosition = Class(function(self, inst)
         AddMapRevealer(inst)
         self.respawnedfromghostfn = function()
             self:SetMapSharing(true)
-            self:PushPortraitDirty()
         end
         self.becameghostfn = function()
             self:SetMapSharing(false)
-            self:PushPortraitDirty()
         end
         self.inst:ListenForEvent("ms_respawnedfromghost", self.respawnedfromghostfn)
         self.inst:ListenForEvent("ms_becameghost", self.becameghostfn)
@@ -54,7 +52,7 @@ local GlobalPosition = Class(function(self, inst)
 
     self.inittask = self.inst:DoTaskInTime(0, function()
         self.inittask = nil
-        self.globalpositions = TheWorld.net.components.globalpositions
+        self.globalpositions = TheWorld.net.components.pkc_globalpositions
         self.classified = self.globalpositions:AddServerEntity(self.inst)
         if isplayer then
             AddGlobalIcon(inst, self.classified)
@@ -65,5 +63,47 @@ end,
 nil,
 {
 })
+
+function GlobalPosition:OnUpdate(dt)
+    local pos = self.inst:GetPosition()
+    if self._x ~= pos.x or self._z ~= pos.z then
+        self._x = pos.x
+        self._z = pos.z
+        self.classified.Transform:SetPosition(pos:Get())
+    end
+end
+
+function GlobalPosition:OnRemoveEntity()
+    if self.inst.MiniMapEntity then
+        self.inst.MiniMapEntity:SetEnabled(true)
+    end
+
+    if self.inst.components.maprevealer then
+        self:SetMapSharing(false)
+    end
+
+    if self.respawnedfromghostfn then
+        self.inst:RemoveEventCallback("ms_respawnedfromghost", self.respawnedfromghostfn)
+    end
+    if self.becameghostfn then
+        self.inst:RemoveEventCallback("ms_becameghost", self.becameghostfn)
+    end
+
+    if self.inittask then self.inittask:Cancel() end
+
+    if self.globalpositions then
+        self.globalpositions:RemoveServerEntity(self.inst)
+    end
+end
+
+GlobalPosition.OnRemoveFromEntity = GlobalPosition.OnRemoveEntity
+
+function GlobalPosition:SetMapSharing(enabled)
+    if enabled then
+        self.inst.components.maprevealer:Start()
+    else
+        self.inst.components.maprevealer:Stop()
+    end
+end
 
 return GlobalPosition
