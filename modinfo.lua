@@ -94,7 +94,7 @@ configuration_options =
 			{description = "随机队伍(RandomGroup)", data = true, hover = "随机队伍(RandomGroup)" },
             {description = "指定队伍(SpecifyGroup)", data = false, hover = "指定队伍(SpecifyGroup)"},
         },
-        default = true,
+        default = false,
     },
 	{
         name = "group_num",
