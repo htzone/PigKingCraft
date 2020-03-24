@@ -94,23 +94,42 @@ local function isSameGroup(curUserid, userid)
 end
 
 local function hideIcon(gpc)
-    if gpc and gpc.icon and gpc.icon2 then
-        gpc.icon.MiniMapEntity:SetEnabled(false)
-        gpc.icon2.MiniMapEntity:SetEnabled(false)
+    if gpc then
+--        gpc._disenableGlobalIcon:push()
+        if gpc.icon2 then
+            gpc.icon2.MiniMapEntity:SetEnabled(false)
+            print("inst.icon2.MiniMapEntity:SetEnabled:true")
+        else
+            print("hideIcon:icon2 is nil")
+        end
     end
 end
 
 local function showIcon(gpc)
-    if gpc and gpc.icon and gpc.icon2 then
-        gpc.icon.MiniMapEntity:SetEnabled(true)
-        gpc.icon2.MiniMapEntity:SetEnabled(true)
+    if gpc then
+--        gpc._enableGlobalIcon:push()
+        if gpc.icon2 then
+            gpc.icon2.MiniMapEntity:SetEnabled(true)
+            print("inst.icon2.MiniMapEntity:SetEnabled:false")
+        else
+            print("showIcon:icon2 is nil")
+        end
     end
 end
 
-
+local function mapPosToWidgetPos(mappos)
+    return Vector3(
+        mappos.x * RESOLUTION_X/2,
+        mappos.y * RESOLUTION_Y/2,
+        0
+    )
+end
+local DEFAULT_PLAYER_COLOUR = { 1, 1, 1, 1 }
 AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     MapWidget.offset = GLOBAL.Vector3(0, 0, 0)
     MapWidget.nametext = require("widgets/pkc_maphoverer")()
+    MapWidget.mapIcons = {}
+
     function MapWidget:OnUpdate(dt)
         if not self.shown then
             return
@@ -135,12 +154,16 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
         local p = self:GetWorldMousePosition()
         local mindistsq, gpc = math.huge, nil
         for _, v in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
-            if not isSameGroup(ThePlayer and ThePlayer.userid or nil, v.userid:value()) then
-                hideIcon(v)
-            else
-                showIcon(v)
-            end
             local x, y, z = v.Transform:GetWorldPosition()
+            print("---pos1:"..x..","..y..","..z)
+            local iconPos = Vector3(self:WorldPosToMapScreenPos(x, y, z))
+            print("---pos3:"..tostring(iconPos))
+            if not self.mapIcons[v.userid:value()] then
+                self.mapIcons[v.userid:value()] = require("widgets/pkc_mapicon")()
+            end
+            self.mapIcons[v.userid:value()]:SetString("Test")
+            self.mapIcons[v.userid:value()]:SetColour(DEFAULT_PLAYER_COLOUR)
+            self.mapIcons[v.userid:value()].text:SetPosition(iconPos:Get())
             local dq = GLOBAL.distsq(p.x, p.z, x, z)
             if dq < mindistsq then
                 mindistsq = dq
@@ -149,12 +172,12 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
         end
 --        if isSameGroup(GLOBAL.ThePlayer and GLOBAL.ThePlayer.userid or nil, gpc.userid) and math.sqrt(mindistsq) < self.minimap:GetZoom() * 10 then
         if isSameGroup(ThePlayer and ThePlayer.userid or nil, gpc.userid:value()) and math.sqrt(mindistsq) < self.minimap:GetZoom() * 10 then
-            if self.nametext:GetString() ~= gpc.name then
-                self.nametext:SetString(gpc.name)
-                self.nametext:SetColour(gpc.playercolour)
-            end
+--            if self.nametext:GetString() ~= gpc.name then
+--                self.nametext:SetString(gpc.name)
+--                self.nametext:SetColour(gpc.playercolour)
+--            end
         else
-            self.nametext:SetString("")
+--            self.nametext:SetString("")
         end
     end
 
@@ -192,6 +215,37 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
         end
     end
 
+    function MapWidget:WorldPosToMapScreenPos(x,y,z)
+        local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
+        local dx = x - px
+        local dy = z - pz
+        local md = math.sqrt(dx * dx + dy * dy) * 4.5 / self.minimap:GetZoom()
+        local angle = GLOBAL.TheCamera:GetHeadingTarget() * math.pi / 180
+        print("--angle:"..angle)
+        local wa = math.atan2(dx, dy) + angle
+        local screenwidth, screenheight = GLOBAL.TheSim:GetScreenSize()
+        local cx = screenwidth * .5 + self.offset.x * 4.5
+        local cy = screenheight * .5 + self.offset.y * 4.5
+        local mx = cx - md * math.cos(wa) * -1
+        local my = cy + md * math.sin(wa) * -1
+        return mx, my, 0
+    end
+
+    function MapWidget:MapScreenPosToWorldPos(x,y)
+        local screenwidth, screenheight = GLOBAL.TheSim:GetScreenSize()
+        local cx = screenwidth * .5 + self.offset.x * 4.5
+        local cy = screenheight * .5 + self.offset.y * 4.5
+        local ox = x - cx
+        local oy = y - cy
+        local angle = GLOBAL.TheCamera:GetHeadingTarget() * math.pi / 180
+        local wd = math.sqrt(ox * ox + oy * oy) * self.minimap:GetZoom() / 4.5
+        local wa = math.atan2(ox, oy) - angle
+        local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
+        local wx = px - wd * math.cos(wa)
+        local wz = pz + wd * math.sin(wa)
+        return wx, 0, wz
+    end
+
     function MapWidget:GetWorldMousePosition()
         local screenwidth, screenheight = GLOBAL.TheSim:GetScreenSize()
         local cx = screenwidth * .5 + self.offset.x * 4.5
@@ -212,11 +266,41 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     end
 end)
 
+AddModRPCHandler("pkc_group_position", "iconshow", function(player)
+    for _, gpc in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
+        if not isSameGroup(player and player.userid or nil, gpc.userid:value()) then
+            hideIcon(gpc)
+        else
+            showIcon(gpc)
+        end
+    end
+end)
+
 AddClassPostConstruct("screens/mapscreen", function(MapScreen)
+    local OldOnBecomeActive = MapScreen.OnBecomeActive
+    function MapScreen:OnBecomeActive(...)
+        for _, gpc in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
+            if not isSameGroup(ThePlayer and ThePlayer.userid or nil, gpc.userid:value()) then
+                hideIcon(gpc)
+            else
+                showIcon(gpc)
+            end
+        end
+        local Namespace="pkc_group_position"
+        local Action="iconshow"
+        SendModRPCToServer(MOD_RPC[Namespace][Action])
+        OldOnBecomeActive(self, ...)
+    end
+
     local OldOnBecomeInactive = MapScreen.OnBecomeInactive
     function MapScreen:OnBecomeInactive(...)
         --当地图关闭时名字消失
         self.minimap.nametext:SetString("")
+        for _, v in pairs(self.minimap.mapIcons) do
+            if v then
+                v:SetString("")
+            end
+        end
         OldOnBecomeInactive(self, ...)
     end
 end)

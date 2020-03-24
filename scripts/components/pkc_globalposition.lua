@@ -16,9 +16,11 @@ local function AddGlobalIcon(inst, classified)
     classified.icon = SpawnPrefab("pkc_globalmapicon_noproxy")
     classified.icon.MiniMapEntity:SetPriority(10)
     classified.icon.MiniMapEntity:SetRestriction("player")
+    classified.icon.MiniMapEntity:SetDrawOverFogOfWar(true)
     classified.icon2 = SpawnPrefab("globalmapicon")
     classified.icon2.MiniMapEntity:SetPriority(10)
     classified.icon2.MiniMapEntity:SetRestriction("player")
+    classified.icon2.MiniMapEntity:SetDrawOverFogOfWar(true)
     if inst.MiniMapEntity then
         inst.MiniMapEntity:SetEnabled(false)
         classified.icon.MiniMapEntity:CopyIcon(inst.MiniMapEntity)
@@ -49,14 +51,19 @@ local GlobalPosition = Class(function(self, inst)
         self.inst:ListenForEvent("ms_respawnedfromghost", self.respawnedfromghostfn)
         self.inst:ListenForEvent("ms_becameghost", self.becameghostfn)
     end
+    self.globalpositions = TheWorld.net.components.pkc_globalpositions
+    self.classified = self.globalpositions:AddServerEntity(self.inst)
+    if isplayer then
+        AddGlobalIcon(inst, self.classified)
+    end
 
     self.inittask = self.inst:DoTaskInTime(0, function()
         self.inittask = nil
-        self.globalpositions = TheWorld.net.components.pkc_globalpositions
-        self.classified = self.globalpositions:AddServerEntity(self.inst)
-        if isplayer then
-            AddGlobalIcon(inst, self.classified)
-        end
+--        self.globalpositions = TheWorld.net.components.pkc_globalpositions
+--        self.classified = self.globalpositions:AddServerEntity(self.inst)
+--        if isplayer then
+--            AddGlobalIcon(inst, self.classified)
+--        end
         self.inst:StartUpdatingComponent(self)
     end)
 end,
