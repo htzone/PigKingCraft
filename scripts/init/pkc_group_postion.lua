@@ -94,23 +94,25 @@ local function isSameGroup(curUserid, userid)
             and GLOBAL.PKC_PLAYER_INFOS[curUserid].GROUP_ID == GLOBAL.PKC_PLAYER_INFOS[userid].GROUP_ID
 end
 
-local function mapPosToWidgetPos(mappos)
-    return Vector3(
-        mappos.x * RESOLUTION_X/2,
-        mappos.y * RESOLUTION_Y/2,
-        0
-    )
-end
-
 local DEFAULT_PLAYER_COLOUR = { 1, 1, 1, 1 }
 local function showMapIcon(self, userid, x, y, z)
     local iconPos = Vector3(self:WorldPosToMapScreenPos(x, y, z))
     if not self.mapIcons[userid] then
-        self.mapIcons[userid] = require("widgets/pkc_mapicon")()
+        self.mapIcons[userid] = require("widgets/pkc_player_mapicon")()
     end
-    self.mapIcons[userid]:SetString("Test")
-    self.mapIcons[userid]:SetColour(DEFAULT_PLAYER_COLOUR)
-    self.mapIcons[userid].text:SetPosition(iconPos:Get())
+    self.mapIcons[userid]:Set("", DEFAULT_PLAYER_COLOUR)
+    self.mapIcons[userid]:SetPosition(iconPos:Get())
+    self.mapIcons[userid]:ShowIcon()
+end
+
+local function scaleMapIcon(self, zoom)
+    for _, v in pairs(self.mapIcons) do
+        if v and v.shown then
+            local scale = 0.2 + 0.15 * ((20 - math.min(zoom, 20)) / 20)
+            print("zoom:"..tostring(zoom).."---scale:"..tostring(scale))
+            v:Scale(scale)
+        end
+    end
 end
 
 
@@ -185,6 +187,7 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     local OldOnZoomIn = MapWidget.OnZoomIn
     function MapWidget:OnZoomIn(...)
         local zoom1 = self.minimap:GetZoom()
+        scaleMapIcon(self, zoom1)
         OldOnZoomIn(self, ...)
         local zoom2 = self.minimap:GetZoom()
         if self.shown then
@@ -195,6 +198,7 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     local OldOnZoomOut = MapWidget.OnZoomOut
     function MapWidget:OnZoomOut(...)
         local zoom1 = self.minimap:GetZoom()
+        scaleMapIcon(self, zoom1)
         OldOnZoomOut(self, ...)
         local zoom2 = self.minimap:GetZoom()
         if self.shown and zoom1 < 20 then
@@ -204,13 +208,13 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
 
     -- 世界位置转地图位置
     function MapWidget:WorldPosToMapScreenPos(x, y, z)
-        local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
+        local px, _, pz = ThePlayer:GetPosition():Get()
         local dx = x - px
         local dy = z - pz
         local md = math.sqrt(dx * dx + dy * dy) * 4.5 / self.minimap:GetZoom()
-        local angle = GLOBAL.TheCamera:GetHeadingTarget() * math.pi / 180
+        local angle = TheCamera:GetHeadingTarget() * math.pi / 180
         local wa = math.atan2(dx, dy) + angle
-        local screenwidth, screenheight = GLOBAL.TheSim:GetScreenSize()
+        local screenwidth, screenheight = TheSim:GetScreenSize()
         local cx = screenwidth * .5 + self.offset.x * 4.5
         local cy = screenheight * .5 + self.offset.y * 4.5
         local mx = cx - md * math.cos(wa) * -1
@@ -220,15 +224,15 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
 
     -- 地图位置转世界位置
     function MapWidget:MapScreenPosToWorldPos(x, y)
-        local screenwidth, screenheight = GLOBAL.TheSim:GetScreenSize()
+        local screenwidth, screenheight = TheSim:GetScreenSize()
         local cx = screenwidth * .5 + self.offset.x * 4.5
         local cy = screenheight * .5 + self.offset.y * 4.5
         local ox = x - cx
         local oy = y - cy
-        local angle = GLOBAL.TheCamera:GetHeadingTarget() * math.pi / 180
+        local angle = TheCamera:GetHeadingTarget() * math.pi / 180
         local wd = math.sqrt(ox * ox + oy * oy) * self.minimap:GetZoom() / 4.5
         local wa = math.atan2(ox, oy) - angle
-        local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
+        local px, _, pz = ThePlayer:GetPosition():Get()
         local wx = px - wd * math.cos(wa)
         local wz = pz + wd * math.sin(wa)
         return wx, 0, wz
@@ -255,39 +259,19 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     end
 end)
 
---AddModRPCHandler("pkc_group_position", "iconshow", function(player)
---    for _, gpc in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
---        if not isSameGroup(player and player.userid or nil, gpc.userid:value()) then
---            hideIcon(gpc)
---        else
---            showIcon(gpc)
---        end
---    end
---end)
-
 AddClassPostConstruct("screens/mapscreen", function(MapScreen)
     local OldOnBecomeActive = MapScreen.OnBecomeActive
     function MapScreen:OnBecomeActive(...)
---        for _, gpc in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
---            if not isSameGroup(ThePlayer and ThePlayer.userid or nil, gpc.userid:value()) then
---                hideIcon(gpc)
---            else
---                showIcon(gpc)
---            end
---        end
---        local Namespace="pkc_group_position"
---        local Action="iconshow"
---        SendModRPCToServer(MOD_RPC[Namespace][Action])
         OldOnBecomeActive(self, ...)
     end
 
     local OldOnBecomeInactive = MapScreen.OnBecomeInactive
     function MapScreen:OnBecomeInactive(...)
-        --当地图关闭时名字消失
+        --当地图关闭时让图标消失
         self.minimap.nametext:SetString("")
         for _, v in pairs(self.minimap.mapIcons) do
             if v then
-                v:SetString("")
+                v:HideIcon()
             end
         end
         OldOnBecomeInactive(self, ...)
