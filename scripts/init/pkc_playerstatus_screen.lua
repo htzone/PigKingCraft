@@ -26,12 +26,28 @@ local PERF_CLIENT_LEVELS =
     "performance_indicator1.tex", --BAD
 }
 
+local function getPlayerKillNum(userid)
+    return PKC_PLAYER_SCORES[userid] and PKC_PLAYER_SCORES[userid].KILL_PLAYER_NUM or 0
+end
+
+local function getPlayerScore(userid)
+    return PKC_PLAYER_SCORES[userid] and PKC_PLAYER_SCORES[userid].SCORE or 0
+end
+
+local function getGroupColor(userid)
+    if PKC_PLAYER_INFOS[userid] then
+        return HexToPercentColor(getGroupColorByGroupId(PKC_PLAYER_INFOS[userid].GROUP_ID))
+    end
+    return 1, 1, 1
+end
+
+
 --根据得分对玩家进行排序
 local function sortClient(clientObjs)
     if not isDedicated then
         table.sort(clientObjs, function(a, b)
-            local aScore = PKC_PLAYER_INFOS[a.userid].SCORE or 0
-            local bScore = PKC_PLAYER_INFOS[b.userid].SCORE or 0
+            local aScore = getPlayerScore(a.userid)
+            local bScore = getPlayerScore(b.userid)
             return aScore > bScore
         end)
     else
@@ -42,8 +58,8 @@ local function sortClient(clientObjs)
             if b.performance then
                 return false
             end
-            local aScore = PKC_PLAYER_INFOS[a.userid].SCORE or 0
-            local bScore = PKC_PLAYER_INFOS[b.userid].SCORE or 0
+            local aScore = getPlayerScore(a.userid)
+            local bScore = getPlayerScore(b.userid)
             return aScore > bScore
         end)
     end
@@ -93,16 +109,16 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
             if PKC_PLAYER_INFOS[playerListing.userid] ~= nil then
                 --设置队伍名颜色
                 playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                = GLOBAL.HexToPercentColor(GLOBAL.getColorByGroupId(PKC_PLAYER_INFOS[playerListing.userid].GROUP_ID))
+                = getGroupColor(playerListing.userid)
                 --设置击杀数和颜色
                 playerListing.killNum:Show()
                 playerListing.killNum:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH1
-                        .. pkc_numToString(PKC_PLAYER_INFOS[playerListing.userid].KILLNUM or 0))
+                        .. tostring(getPlayerKillNum(playerListing.userid)))
                 playerListing.killNum:SetColour(playerListing.pkc_colour)
                 --设置得分数和颜色
                 playerListing.score:Show()
                 playerListing.score:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH2
-                        .. pkc_numToString(PKC_PLAYER_INFOS[playerListing.userid].SCORE or 0))
+                        .. tostring(getPlayerScore(playerListing.userid)))
                 playerListing.score:SetColour(playerListing.pkc_colour)
 
                 playerListing.characterBadge.headframe:SetTint(unpack(playerListing.pkc_colour))
@@ -120,14 +136,14 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
             if PKC_PLAYER_INFOS[client.userid] ~= nil then
                 --设置队伍名颜色
                 playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                = GLOBAL.HexToPercentColor(GLOBAL.getColorByGroupId(PKC_PLAYER_INFOS[client.userid].GROUP_ID))
+                = getGroupColor(playerListing.userid)
                 --设置击杀数和颜色
                 playerListing.killNum:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH1
-                        .. pkc_numToString(PKC_PLAYER_INFOS[playerListing.userid].KILLNUM or 0))
+                        .. tostring(getPlayerKillNum(playerListing.userid)))
                 playerListing.killNum:SetColour(playerListing.pkc_colour)
                 --设置得分数和颜色
                 playerListing.score:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH2
-                        .. pkc_numToString(PKC_PLAYER_INFOS[playerListing.userid].SCORE or 0))
+                        .. tostring(getPlayerScore(playerListing.userid)))
                 playerListing.score:SetColour(playerListing.pkc_colour)
 
                 playerListing.characterBadge.headframe:SetTint(unpack(playerListing.pkc_colour))
@@ -196,7 +212,7 @@ function PlayerStatusScreen:OnUpdate(dt)
 
                             playerListing.pkc_colour = playerListing.pkc_colour or { 1, 1, 1, 1 }
                             playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                            = HexToPercentColor(getColorByGroupId(PKC_PLAYER_INFOS[client.userid].GROUP_ID))
+                            = getGroupColor(playerListing.userid)
                             playerListing.characterBadge:Set(
                                 client.prefab or "",
                                 playerListing.pkc_colour,

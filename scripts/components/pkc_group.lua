@@ -4,25 +4,22 @@
 -- Date: 2016/10/31
 --
 
-local function onchooseGroup(self, v)
-	self._chooseGroup:set(v)
-end
-
 local PKC_GROUP = Class(function(self, inst)
 	self.inst = inst
+	self.inst.pkc_groupid = 0
+	-- 队伍ID (网络变量，客户端也需要访问)
 	self._chooseGroup = net_shortint(self.inst.GUID, "pkc_group._chooseGroup", "_chooseGroupDirty")
-	self.chooseGroup = 0
-	self.basePos = {0, 0, 0} --队伍所在基地的位置
+	-- 基地位置
+	self.basePos = {0, 0, 0}
 end,
 nil,
 {
-	chooseGroup = onchooseGroup,
 })
 
 function PKC_GROUP:setChooseGroup(chooseGroup)
-	self.chooseGroup = chooseGroup
+	self._chooseGroup:set(chooseGroup)
+	self.inst.pkc_groupid = chooseGroup
 	self.inst:AddTag("pkc_group_"..chooseGroup)
-	self.inst.chooseGroup = chooseGroup 
 end
 
 function PKC_GROUP:getChooseGroup()
@@ -40,7 +37,7 @@ end
 function PKC_GROUP:OnSave()
 	return
 	{	
-		chooseGroup = self.chooseGroup,
+		chooseGroup = self._chooseGroup:value(),
 		basePos = self.basePos,
 	}
 end
@@ -48,9 +45,9 @@ end
 function PKC_GROUP:OnLoad(data)
 	if data ~= nil then
 		if data.chooseGroup ~= nil then
-			self.chooseGroup = data.chooseGroup
-			self.inst:AddTag("pkc_group_"..self.chooseGroup)
-			self.inst.chooseGroup = data.chooseGroup
+			self._chooseGroup:set(data.chooseGroup)
+			self.inst.pkc_groupid = data.chooseGroup
+			self.inst:AddTag("pkc_group_"..data.chooseGroup)
 		end
 		if data.basePos ~= nil then
 			self.basePos = data.basePos

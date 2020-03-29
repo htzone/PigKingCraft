@@ -191,15 +191,14 @@
 		"LONGPIG",
 		"CUIPIG",
 	}
-	
+
+	--弹窗类型
+	GLOBAL.WIN_POPDIALOG = 1
 	--保存当前存在的队伍
 	GLOBAL.CURRENT_EXIST_GROUPS = {}
 	--保存队伍分数
 	GLOBAL.GROUP_SCORE = {}
-	--保存玩家的全局变量
-	GLOBAL.PLAYERS = {}
-	
-	--弹窗类型
-	GLOBAL.WIN_POPDIALOG = 1
-	--保存玩家信息
+	--保存玩家基本信息
 	GLOBAL.PKC_PLAYER_INFOS = {}
+	--保存玩家得分信息
+	GLOBAL.PKC_PLAYER_SCORES = {}

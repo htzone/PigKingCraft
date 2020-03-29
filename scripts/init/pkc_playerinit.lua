@@ -36,6 +36,8 @@ AddPlayerPostInit(function(player)
 	if player then
 		--添加分组组件
 		player:AddComponent("pkc_group")
+		--添加玩家得分组件
+		player:AddComponent("pkc_playerscore")
 		--添加头部显示组件
 		player:AddComponent("pkc_headshow")
 		--玩家复活任务

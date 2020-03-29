@@ -63,7 +63,7 @@ function chat_queue:OnMessageReceivedForPKC(userid, name, prefab, message, colou
         profileflair = "default"
     end
     colour = {}
-    colour[1], colour[2], colour[3] = HexToPercentColor(getColorByGroupId(PKC_PLAYER_INFOS[userid].GROUP_ID))
+    colour[1], colour[2], colour[3] = HexToPercentColor(getGroupColorByGroupId(PKC_PLAYER_INFOS[userid].GROUP_ID))
     --调换了下原始设定，改为按Y发起队伍内，按U发起所有人
     whisper = not whisper
     if whisper then

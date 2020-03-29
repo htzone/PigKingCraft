@@ -91,7 +91,7 @@ function getNamebyGroupId(groupId)
 end
 
 --根据groupId来获取对应的color
-function getColorByGroupId(groupId)
+function getGroupColorByGroupId(groupId)
 	for _,v in pairs(PKC_GROUP_INFOS) do
 		if groupId == v.id then
 			return v.head_color

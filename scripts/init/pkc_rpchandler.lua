@@ -81,7 +81,7 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 		player:AddComponent("pkc_group")
 	end
 	player.components.pkc_group:setChooseGroup(group_id)
-	GLOBAL.TheWorld:PushEvent("pkc_completeChooseGroup", { chooser = player, groupId = group_id}) --触发完成选人事件
+	GLOBAL.TheWorld:PushEvent("pkc_completedChooseGroup", { chooser = player}) --触发完成选人事件
 	--取消无敌状态
 	cancelInvincible(player, GLOBAL.PKC_INVINCIBLE_TIME)
 	--传送至对应的基地

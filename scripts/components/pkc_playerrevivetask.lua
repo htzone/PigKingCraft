@@ -50,8 +50,8 @@ local PKC_PLAYER_REVIVE_TASK = Class(function(self, inst)
         --监听玩家复活
         self.inst:ListenForEvent("respawnfromghost", function(inst, data)
             if inst then
-                if inst.pkc_hasKilled then --重置死亡标记
-                    inst.pkc_hasKilled = nil
+                if inst.pkc_hasBeKilled then --重置死亡标记
+                    inst.pkc_hasBeKilled = nil
                 end
                 inst.components.pkc_playerrevivetask.reviveTime = -1
                 inst:DoTaskInTime(4.3, function()

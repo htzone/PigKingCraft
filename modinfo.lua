@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = "    猪王争霸III"
+name = "     猪王争霸III(开发版)"
 description = [[
 版本(V3.0.0) 请确保版本最新
 

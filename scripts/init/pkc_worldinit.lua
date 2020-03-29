@@ -135,41 +135,53 @@ end
 
 --监听死亡
 local function onEntityDied(data, inst)
-	if data and data.inst and data.afflicter and not data.inst.pkc_hasKilled then
-		data.inst.pkc_hasKilled = true
+	local killer = data.afflicter
+	local dead = data.inst
+	if data and dead and killer and not dead.pkc_hasBeKilled then
+		dead.pkc_hasBeKilled = true
 		--击杀者必须有队伍才能得分
-		if data.afflicter.components.pkc_group then
-			local killer_group_id = data.afflicter.components.pkc_group:getChooseGroup()
+		if killer.components.pkc_group then
+			local killer_group_id = killer.components.pkc_group:getChooseGroup()
 			if killer_group_id ~= nil and killer_group_id > 0 then
-				if data.inst.components.pkc_group then --被击杀者有队伍
-					if data.inst.components.pkc_group:getChooseGroup() ~= data.afflicter.components.pkc_group:getChooseGroup() then --击杀的是其他队伍的成员
-						if data.inst:HasTag("player") then --击杀的是玩家
+				if dead.components.pkc_group then --被击杀者有队伍
+					if dead.components.pkc_group:getChooseGroup() ~= killer.components.pkc_group:getChooseGroup() then --击杀的是其他队伍的成员
+						if dead:HasTag("player") then --击杀的是玩家
 							inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL.PLAYER)
-							inst.components.pkc_playerinfos:addPlayerKillNum(data.afflicter)
-							inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL.PLAYER)
-						elseif data.inst:HasTag("king") then --敌对首领
+							if killer.components.pkc_playerscore then
+								killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL.PLAYER)
+								killer.components.pkc_playerscore:AddKillPlayerNum()
+							end
+--							inst.components.pkc_playerinfos:addPlayerKillNum(killer)
+--							inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL.PLAYER)
+						elseif dead:HasTag("king") then --敌对首领
 							inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL.KING)
-							setGravestoneForKing(data.inst, killer_group_id) --设置墓碑
-							GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = data.inst.components.pkc_group:getChooseGroup(), killer = data.afflicter})
+							setGravestoneForKing(dead, killer_group_id) --设置墓碑
+							GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = dead.components.pkc_group:getChooseGroup(), killer = killer})
 						else --其他成员
-							if data.inst.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[data.inst.prefab] ~= nil then
-								inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
-								inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
+							if dead.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[dead.prefab] ~= nil then
+								inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[dead.prefab])
+								if killer.components.pkc_playerscore then
+									killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL[dead.prefab])
+								end
+--								inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL[dead.prefab])
 							end
 						end
 					end
 				else --被击杀者没有队伍
-					bossKilledAnnounce(data.inst, data.afflicter) --boss击杀公告
-					if data.inst.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[data.inst.prefab] ~= nil then
-						inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
-						inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
+					bossKilledAnnounce(dead, killer) --boss击杀公告
+					if dead.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[dead.prefab] ~= nil then
+						inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[dead.prefab])
+--						inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL[dead.prefab])
+						if killer.components.pkc_playerscore then
+							killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL[dead.prefab])
+						end
 					end
 				end
 			end
 		else
-			if data.inst.components.pkc_group and data.inst:HasTag("king") then
-				setGravestoneForKing(data.inst) --设置墓碑
-				GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = data.inst.components.pkc_group:getChooseGroup(), killer = data.afflicter})
+			if dead.components.pkc_group and dead:HasTag("king") then
+				setGravestoneForKing(dead) --设置墓碑
+				GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = dead.components.pkc_group:getChooseGroup(), killer = killer})
 			end
 		end
 	end
@@ -180,7 +192,10 @@ local function onGiveScoreItem(data, inst)
 	if data then
 		if data.giver and data.getter and data.addScore and data.giver.components.pkc_group and data.getter.components.pkc_group then
 			inst.components.pkc_groupscore:addGroupScore(data.getter.components.pkc_group:getChooseGroup(), data.addScore)
-			inst.components.pkc_playerinfos:addPlayerScore(data.giver, data.addScore)
+			if data.giver.components.pkc_playerscore then
+				data.giver.components.pkc_playerscore:AddScore(data.addScore)
+			end
+--			inst.components.pkc_playerinfos:addPlayerScore(data.giver, data.addScore)
 		end
 	end
 end
