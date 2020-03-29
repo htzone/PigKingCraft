@@ -1,14 +1,25 @@
 -- This information tells other players more about the mod
-name = "   A猪王争霸III(开发版)"
+name = "    猪王争霸III"
 description = [[
-(V3.0.0)
+版本(V3.0.0) 请确保版本最新
+
 "在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
 
-可在MOD设置页面可设置更多选项
+饥荒分组对抗与生存
+允许你和你的小伙伴们一起对抗其他组的成员，最多可分四组
+保护你的猪王，并通过生存和对抗得分赢得这场比赛的胜利
+具体玩法请自行探索
+
+游戏模式
+建议在无尽和PVP模式下开启该模组
+比赛结束后会自动重置世界，如果想关闭该功能可在配置界面进行配置
+
+
+		  				点击下方的“配置模组”可设置更多选项
 
 ]]
 
-author = "RedPig"
+author = "RedPig, 大猪猪, LongFei, 老崔"
 version = "3.0.0"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
