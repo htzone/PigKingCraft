@@ -37,7 +37,7 @@ client_only_mod = false
 dst_compatible = true
 
 --These tags allow the server running this mod to be found with filters from the server listing screen
-server_filter_tags = {"redpig","pvp","hard","challenge","group","pigking"}
+server_filter_tags = {"pkc","redpig","pvp","hard","challenge","group","pigking"}
 
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
