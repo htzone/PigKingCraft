@@ -61,6 +61,7 @@ local PKC_PLAYER_SCORE = Class(function(self, inst)
 
 	self.inst:ListenForEvent("_scoreDirty", onScoreDirty)
 	self.inst:ListenForEvent("_killplayernumDirty", onKillplayernumDirty)
+
 end, nil, {})
 
 function PKC_PLAYER_SCORE:AddScore(score)
