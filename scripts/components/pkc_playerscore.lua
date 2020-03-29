@@ -51,7 +51,7 @@ end
 local PKC_PLAYER_SCORE = Class(function(self, inst)
 	self.inst = inst
 	self.userid = self.inst.userid
-	self._score = net_int(self.inst.GUID, "pkc_group._score", "_scoreDirty")
+	self._score = net_int(self.inst.GUID, "_scoreDirty", "_scoreDirty")
 	self._killplayernum = net_int(self.inst.GUID, "_killplayernumDirty", "_killplayernumDirty")
 	self._contribution = net_int(self.inst.GUID, "_contributionDirty", "_contributionDirty")
 
@@ -59,35 +59,33 @@ local PKC_PLAYER_SCORE = Class(function(self, inst)
 	self.inst.pkc_killplayernum = 0
 	self.inst.pkc_contribution = 0
 
-	if not TheNet:GetIsServer() then
-		self.inst:ListenForEvent("_scoreDirty", onScoreDirty)
-		self.inst:ListenForEvent("_killplayernumDirty", onKillplayernumDirty)
-	end
+	self.inst:ListenForEvent("_scoreDirty", onScoreDirty)
+	self.inst:ListenForEvent("_killplayernumDirty", onKillplayernumDirty)
 end, nil, {})
 
 function PKC_PLAYER_SCORE:AddScore(score)
 	self.inst.pkc_score = self.inst.pkc_score + (score or 1)
-	if not PKC_PLAYER_SCORES[self.userid] then
-		local playerScoreInfo = {}
-		playerScoreInfo.SCORE = self.inst.pkc_score
-		playerScoreInfo.KILL_PLAYER_NUM = 0
-		PKC_PLAYER_SCORES[self.userid] = playerScoreInfo
-	else
-		PKC_PLAYER_SCORES[self.userid].SCORE = self.inst.pkc_score
-	end
+--	if not PKC_PLAYER_SCORES[self.userid] then
+--		local playerScoreInfo = {}
+--		playerScoreInfo.SCORE = self.inst.pkc_score
+--		playerScoreInfo.KILL_PLAYER_NUM = 0
+--		PKC_PLAYER_SCORES[self.userid] = playerScoreInfo
+--	else
+--		PKC_PLAYER_SCORES[self.userid].SCORE = self.inst.pkc_score
+--	end
 	self._score:set(self.inst.pkc_score)
 end
 
 function PKC_PLAYER_SCORE:AddKillPlayerNum(num)
 	self.inst.pkc_killplayernum = self.inst.pkc_killplayernum + (num or 1)
-	if not PKC_PLAYER_SCORES[self.userid] then
-		local playerScoreInfo = {}
-		playerScoreInfo.SCORE = 0
-		playerScoreInfo.KILL_PLAYER_NUM = self.inst.pkc_killplayernum
-		PKC_PLAYER_SCORES[self.userid] = playerScoreInfo
-	else
-		PKC_PLAYER_SCORES[self.userid].KILL_PLAYER_NUM = self.inst.pkc_killplayernum
-	end
+--	if not PKC_PLAYER_SCORES[self.userid] then
+--		local playerScoreInfo = {}
+--		playerScoreInfo.SCORE = 0
+--		playerScoreInfo.KILL_PLAYER_NUM = self.inst.pkc_killplayernum
+--		PKC_PLAYER_SCORES[self.userid] = playerScoreInfo
+--	else
+--		PKC_PLAYER_SCORES[self.userid].KILL_PLAYER_NUM = self.inst.pkc_killplayernum
+--	end
 	self._killplayernum:set(self.inst.pkc_killplayernum)
 end
 
@@ -114,21 +112,28 @@ function PKC_PLAYER_SCORE:OnSave()
 		score = self._score:value(),
 		killplayernum = self._killplayernum:value(),
 		contribution = self._contribution:value(),
-		playercores = json.encode(PKC_PLAYER_SCORES)
+		playerscores = json.encode(PKC_PLAYER_SCORES)
 	}
 end
 
 function PKC_PLAYER_SCORE:OnLoad(data)
 	if data then
 		if data.playercores then
-			PKC_PLAYER_SCORES = json.decode(data.playercores)
+			PKC_PLAYER_SCORES = json.decode(data.playerscores)
 		end
-		self.inst.pkc_score = data.score
-		self.inst.pkc_killplayernum = data.killplayernum
-		self.inst.pkc_contribution = data.contribution
-		self._score:set(data.score)
-		self._killplayernum:set(data.killplayernum)
-		self._contribution:set(data.contribution)
+		if data.score then
+			self.inst.pkc_score = data.score
+			self._score:set(data.score)
+		end
+		if data.killplayernum then
+			self.inst.pkc_killplayernum = data.killplayernum
+			self._killplayernum:set(data.killplayernum)
+		end
+
+		if data.contribution then
+			self.inst.pkc_contribution = data.contribution
+			self._contribution:set(data.contribution)
+		end
 	end
 end
 
