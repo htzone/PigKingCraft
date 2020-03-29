@@ -1,7 +1,8 @@
---@name pkc_levelup
---@description 升级组件
---@author redpig
---@date 2016-12-20
+--
+-- 生物变大组件
+-- Author: 大猪猪, Redpig
+-- Date: 2016/12/20
+--
 
 local PKC_TOBIG = Class(function(self, inst)
 	self.inst = inst 

@@ -45,7 +45,6 @@ icon = "modicon.tex"
 --如果是搭建专属服务器，可通过两种方式更改MOD配置。
 --一种是直接修改该modinfo文件各配置项的default值（注意UTF-8编码格式）。
 --另一种是在modoverride文件中进行配置，具体配置详情请参考链接http://www.lyun.me/lyun/427。
---不图名，不图利，但希望喜欢该MOD的朋友不要忘了点个赞哦
 
 configuration_options =
 {

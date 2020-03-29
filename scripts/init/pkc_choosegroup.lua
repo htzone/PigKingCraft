@@ -1,7 +1,8 @@
---@name pkc_multiplayer_portal
---@description 阵营选择
---@author redpig
---@date 2016-10-23
+--
+-- 阵营选择
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local require = GLOBAL.require
 local SpawnPrefab = GLOBAL.SpawnPrefab

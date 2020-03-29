@@ -1,7 +1,8 @@
---@name pkc_rpchandler
---@description RPC调用处理
---@author redpig
---@date 2016-10-23
+--
+-- RPC调用处理
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()

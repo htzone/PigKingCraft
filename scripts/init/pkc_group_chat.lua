@@ -1,6 +1,8 @@
--- 分组聊天实现
+--
+-- 玩家分组聊天
 -- Author: RedPig
--- Date: 2020/3/14
+-- Date: 2020/03/14
+--
 
 local CHAT_QUEUE_SIZE = 7
 local CHAT_EXPIRE_TIME = 10.0

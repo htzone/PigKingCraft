@@ -1,4 +1,8 @@
---@author Star
+--
+-- 属性显示
+-- Author: Star
+-- Date: 2016/10/23
+--
 
 local _G = GLOBAL
 

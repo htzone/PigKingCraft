@@ -1,9 +1,7 @@
 --
--- Created by IntelliJ IDEA.
--- User: Redpig
--- Date: 2017/2/18
--- Time: 18:48
--- To change this template use File | Settings | File Templates.
+-- 属性显示
+-- Author: RedPig
+-- Date: 2016/11/05
 --
 
 local _G = GLOBAL
@@ -17,7 +15,6 @@ local GetGlobal=function(gname,default)
     return res
 end
 
---Locals (Add compatibility with any other mineable mods).
 local mods = GetGlobal("mods",{})
 
 local GetTime = _G.GetTime
@@ -25,33 +22,11 @@ local TheNet = _G.TheNet
 local CLIENT_SIDE =	 _G.TheNet:GetIsClient() or (TheNet:GetIsServer() and not TheNet:IsDedicated())
 
 local tonumber = _G.tonumber
---local food_order = tonumber(GetModConfigData("food_order",true)) or 0
 local food_order = 0
-if food_order == 0 then
-    --food_order = tonumber(GetModConfigData("food_order")) or 0
-end
---TUNING.SHOWME_FOOD_ORDER = food_order --для Tell Me
---local food_style = tonumber(GetModConfigData("food_style",true)) or 0
 local food_style = 0
-if food_style == 0 then
-    --food_style = tonumber(GetModConfigData("food_style")) or 0
-end
---TUNING.SHOWME_FOOD_STYLE = food_style
-
---local food_estimation = tonumber(GetModConfigData("food_estimation",true)) or -1
 local food_estimation = -1
-if food_estimation == -1 then
-    --food_estimation = tonumber(GetModConfigData("food_estimation")) or 0
-end
-
---local show_food_units = tonumber(GetModConfigData("show_food_units",true)) or -1
 local show_food_units = -1
-if show_food_units == -1 then
-    --show_food_units = tonumber(GetModConfigData("show_food_units")) or 0
-end
 
---Название на английском, краткая сетевая строка-алиас (для пересылки).
---Если алиас начинается с маленькой буквы, то он обязан быть длиной в 1 букву. Если с большой, то 2 (вторая буква может быть любого регистра).
 local MY_STRINGS =
 {
     {armor = "护甲: " }, --A
@@ -162,15 +137,15 @@ for i,v in ipairs(MY_STRINGS) do
             fn = nil, --Function to return the proper string. By default: desc + " " + param1
             percent = nil, --To add "%" at the end of the number
         }
-        v.key = k --Записываем ключ в отдельную переменную. Вообще это ужасный костыль, лучше не трогать теперь.
+        v.key = k
         break
     end
 end
 
 
-local function DefaultDisplayFn(arr) --На вход особая структура: { data, param }. data - ссылка на элемент MY_DATA, a param - ссылка на массив п.
+local function DefaultDisplayFn(arr)
     if arr.data == nil then
-        return arr.param_str --Выводим строку в том виде, в каком пришла от сервера (без первого символа)
+        return arr.param_str
     end
     if arr.data.sign ~= nil and (tonumber(arr.param[1]) or -1) >= 0 then
         arr.param[1] = "+" .. tostring(arr.param[1])
@@ -181,20 +156,20 @@ local function DefaultDisplayFn(arr) --На вход особая структу
     end
     return s
 end
-CallDefaultDisplayFn = DefaultDisplayFn --Для языкового модуля.
+CallDefaultDisplayFn = DefaultDisplayFn
 
-MY_DATA.hp.fn = function(arr) --Формирование строки на клиенте.
+MY_DATA.hp.fn = function(arr)
     local cur,mx = arr.param[1], arr.param[2]
     return cur .. " / " .. mx
 end
-MY_DATA.owner.fn = function(arr) --Формирование строки на клиенте
-    return arr.data.desc .. " " .. arr.param_str  --Игнорируем запятые, если есть в имени.
+MY_DATA.owner.fn = function(arr)
+    return arr.data.desc .. " " .. arr.param_str
 end
-MY_DATA.loyal.fn = function(arr) --Формирование строки на клиенте
+MY_DATA.loyal.fn = function(arr)
     if (tonumber(arr.param[1]) or 0) > 9000 then
         return arr.data.desc .. " " .. SHOWME_STRINGS.loyal
     end
-    return DefaultDisplayFn(arr) --Игнорируем запятые, если есть в имени.
+    return DefaultDisplayFn(arr)
 end
 
 MY_DATA.sanity_character.percent = true
@@ -271,19 +246,12 @@ end
 MY_DATA.heal.sign = true
 MY_DATA.fuel.percent = true
 MY_DATA.obedience.percent = true
---MY_DATA.fuel.percent = true
---MY_DATA.fuel.percent = true
---MY_DATA.fuel.percent = true
-
---MY_STRINGS_OVERRIDE = nil
-
---Сокрытие некоторой (назойливой) информации.
 if show_food_units == 0 or show_food_units == 2 then
     MY_DATA.units_of.hidden = true --Work on client only.
 end
 
 
-do --Пытаемся определить язык и загрузить соответствующий файл
+do
     local support_languages = { ru = true, chs = true, cht = true, br = true, pl = true, }
     --For override: name=file. Example: ,cht="chs",
 
@@ -528,27 +496,6 @@ if TheNet and TheNet:GetIsServer() then
 
     local cooking = require("cooking")
     local ing = cooking.ingredients
-    --local config = GetModConfigData("message_style") or 1
-
-    --local backdoors = GetGlobal("backdoors",{})
-    --backdoors.ShowMe={MY_STRINGS=MY_STRINGS} --welcome for translaters!
-    --for k,v in pairs(MY_STRINGS) do
-    --	MY_STRINGS[k]=v[config] --overwrites with string config values --Нельзя заменять, т.к. мы теперь используем ключи.
-    --end
-
-    --Добавляет строку в конец дескрипшена
-    --desc - исходная строка (копия), val - готовое значение, txt - ключ описания, no_table - если true, то ключ используется как строка.
-    --[[local function cn(desc,val,txt,no_table)
-        if no_table then
-            return (desc=="" and "" or (desc.."\n"))..txt.." "..tostring(val)
-        elseif MY_STRINGS[txt] ~= nil and MY_STRINGS[txt][2] ~= nil then
-            return (desc=="" and "" or (desc.."\n"))
-                ..MY_STRINGS[txt][2]
-                ..tostring(val)
-        else
-            return (desc=="" and "" or (desc.."\n"))..val.." (bug?)"
-        end
-    end--]]
 
     local ww
     AddPrefabPostInit("world",function(inst)
@@ -637,19 +584,6 @@ if TheNet and TheNet:GetIsServer() then
         return
     end
 
-    --Hack for LRP
-    --[[if _G.rawget(_G,"RussificationVersion") and _G.RussificationVersion<"3.6" then
-        local player = _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.PLAYER
-        if player then --Add some spaces to strings. So they are incorruptible.
-            player.GENERIC = "It  is %s!"
-            player.ATTACKER = "That %s looks  shifty..."
-            player.MURDERER = "Murderer !"
-            player.REVIVER = "%s, friend  of ghosts."
-            player.GHOST = "%s could use a	heart."
-        end
-    end --]]
-
-
     --nice round function
     local round2=function(num, idp)
         return _G.tonumber(string.format("%." .. (idp or 0) .. "f", num))
@@ -693,7 +627,6 @@ if TheNet and TheNet:GetIsServer() then
     end
     --GetGlobal("name_by_id",name_by_id)
 
-    --Основная функция получения описания.
     function GetTestString(item,viewer) --Отныне форкуемся от Tell Me, ибо всё сложно.
         --line_cnt = 0
         desc_table = {} --старый desc отменяется
@@ -713,9 +646,6 @@ if TheNet and TheNet:GetIsServer() then
             end
             cn("remaining_days",w.remainingdaysinseason)
             cn("temperature",tt)
-            --..MY_STRINGS["remaining_days"][2]..": "..w.remainingdaysinseason.."\n"
-            --.."t "..(tt>=0 and "+" or "")..tt
-            --end
         elseif c.health and not item.grow_stage then --Health, Hunger, Sanity Bar
             local h=c.health
             --cheat
@@ -752,13 +682,6 @@ if TheNet and TheNet:GetIsServer() then
                     end
                 end
             end
-            --[[if c.locomotor and type(c.locomotor.walkspeed)=="number" then
-                local speed = (c.locomotor.walkspeed + (type(c.locomotor.bonusspeed)=="number" and c.locomotor.bonusspeed or 0))
-                    / TUNING.WILSON_WALK_SPEED
-                if speed>1.01 or speed<0.99 then
-                    desc = cn(desc,"x"..round2(speed,2),"speed")
-                end
-            end --]]
             if item.kills and item.kills>0 then
                 cn(item.kills==1 and "kill" or "kills",item.kills)
             end
@@ -879,15 +802,6 @@ if TheNet and TheNet:GetIsServer() then
                     --desc = (desc=="" and "" or (desc.."\n")).."Waterproofer"
                 end
             end
-            --if c.striker and c.striker.chance and type(c.striker.chance) == "number" then
-            --	desc = cn(desc,round2((c.striker.chance)*100,0).."%","striker")
-            --end
-            --if c.tinder and c.tinder.tinder and c.tinder.GetTinder then
-            --	local power = c.tinder:GetTinder()
-            --	if power >= 0.005 then
-            --		desc = cn(desc,round2(power*100,0).."%","tinder")
-            --	end
-            --end
             if c.edible and not is_DisplayFoodValues then
                 local can_eat = false
                 if viewer and viewer.components.eater then
@@ -910,9 +824,7 @@ if TheNet and TheNet:GetIsServer() then
                         hg=round2(c.edible.hungervalue,1)
                         sn=round2(c.edible.sanityvalue,1)
                     end
-                    if viewer ~= nil and viewer.FoodValuesChanger ~= nil then --Особая функция, призвание которой - менять еду при съедании.
-                        --print("+")
-                        --Правда, здесь мы можешь слегка подсмотреть ее результаты до поедания.
+                    if viewer ~= nil and viewer.FoodValuesChanger ~= nil then
                         local hp2, hg2, sn2 = viewer:FoodValuesChanger(item)
                         if sn2 ~= nil then
                             --print("++")
@@ -949,16 +861,6 @@ if TheNet and TheNet:GetIsServer() then
             if c.healer then
                 cn("heal",round2(c.healer.health,1))
             end
-            --[[if item.grow_stage and type(item.grow_stage) == "number" then --Support Clan System mod
-                local val = math.floor(item.grow_stage+0.5)
-                desc = cn(desc,tostring(val).."%","power")
-                if IsAdmin(viewer) then
-                    desc = cn(desc,item.show_stage,"show_stage",true)
-                    desc = cn(desc,item.grow_stage,"grow_stage",true)
-                    desc = cn(desc,item.active,"active",true)
-                    desc = cn(desc,item.fuel,"fuel",true)
-                end
-            else--]]
             if c.finiteuses then
                 local mult = 1
                 if c.finiteuses.consumption then
@@ -971,7 +873,6 @@ if TheNet and TheNet:GetIsServer() then
                     cur = cur + 1
                 end
                 cn("uses_of",cur,c.finiteuses.total * mult)
-                --desc = (desc=="" and "" or (desc.."\n"))..cur.." use"..(cur~=1 and "s" or "").." of "..c.finiteuses.total
             end
             if c.temperature and c.temperature.current and type(c.temperature.current) == "number" then
                 cn("temperature",round2(c.temperature.current,1))
@@ -995,15 +896,6 @@ if TheNet and TheNet:GetIsServer() then
                     cn("owner",c.mine.nick)
                     has_owner = true
                 end
-                --[[if c.mine.pret and viewer and viewer.userid then
-                    for k,v in pairs(c.mine.pret) do
-                        if k==viewer.userid then
-                            --desc = (desc=="" and "" or (desc.."\n")).."I can see it!"
-                            desc = cn(desc,v,"known",true)
-                            break
-                        end
-                    end
-                end--]]
             end
             if not has_owner then
                 if item.stealable and item.stealable.owner and item.stealable.owner ~= "_?\1" then
@@ -1019,14 +911,6 @@ if TheNet and TheNet:GetIsServer() then
             if prefab=="panflute" then
                 --desc = cn("power","10")
             elseif prefab=="blowdart_sleep" then
-                --desc = cn(desc,"1","power")
-                --[[elseif prefab=="pond" and item.targettime then
-                    local tm = item.targettime - _G.GetTime()
-                    if tm>0 then
-                        desc = "Broken "..cn(desc,tm,"sec")
-                    elseif item.broken then
-                        desc = (desc=="" and "" or (desc.."\n")).."Broken"
-                    end--]]
             elseif prefab=="pond" or prefab=="pond_mos" then
                 cn(c.fishable.fishleft==1 and "fish" or "fishes",c.fishable.fishleft)
             elseif prefab=="aqvarium" and item.data then
@@ -1073,131 +957,29 @@ if TheNet and TheNet:GetIsServer() then
                 cn("love",item.inlove)
             end
         end
-        --Additional
-        --[[
-        if prefab=="chester" then
-            local name = name_by_id(self.inst.userid)
-            desc = (desc=="" and "" or (desc.."\n")).."Owner: "..name
-                .."\nuserid="..tostring(self.inst.userid)
-                .."\nLeader: "..tostring(c.follower.leader)
-            has_owner = true
-        end
-        if prefab=="chester_eyebone" then
-            local name = name_by_id(self.inst.userid)
-            desc = (desc=="" and "" or (desc.."\n")).."Owner: "..name
-                .."\nuserid="..tostring(self.inst.userid)
-            has_owner = true
-        end
-        --]]
-        --print("GetTestString: "..tostring(item)..", "..tostring(viewer)..", "..tostring(desc))
-        --for i=1,line_cnt do
-        --	desc = desc .. "\n" --Поднимаем описание предмета, чтобы оно было НАД предметом. Но лучше это сделать на клиенте.
-        --end
-
         return table.concat(desc_table,"\2")
     end
-
-    --Main description function
-    --[[
-    AddComponentPostInit("inspectable", function(inst)
-        local oldGetDesc = inst.GetDescription
-        function inst:GetDescription(viewer)
-            local desc = oldGetDesc(self,viewer)
-            if self.inst and self.inst.components then
-                local item = self.inst
-                if type(desc)~="string" then
-                    desc=""
-                end
-                local desc = GetTestString(item,viewer,desc)
-            end
-            return desc
-        end
-    end)
-    --]]
-
-    --[[
-    AddPrefabPostInit("wes",function(wes)
-        if wes.components and wes.components.talker then
-            local oldSay = wes.components.talker.Say
-            function wes.components.talker:Say(script, time, noanim)
-                local test=type(script)=="string" and string.match(script,"([0-9]+ / [0-9]+)$") or ""
-                if test then
-                    script=test
-                else
-                    script=""
-                end
-                oldSay(self, script, time, noanim)
-            end
-            wes.components.talker.special_speech = false
-        end
-    end)
-
-    GetGlobal("fol",function()
-
-    end)
-    --]]
-
-
 end
 
-
-
-
-
-
-
-
---Добавляем подсказку для игрока, через которую будем пересылать данные (всплывающий текст с инфой под именем предмета)
 do
-    --Функция возвращает подсказку, если она в точности совпадает с присланной информацией (в player_classified).
-    --И возвращает подсказку, либо "".
     local function CheckUserHint(inst)
         local c = _G.ThePlayer and _G.ThePlayer.player_classified
-        if c == nil then --Нет локального игрока или classified
+        if c == nil then
             return ""
         end
         --c.showme_hint
         local i = string.find(c.showme_hint,';',1,true)
-        if i == nil then --Строка имеет неправильный формат.
+        if i == nil then
             return ""
         end
         local guid = _G.tonumber(c.showme_hint:sub(1,i-1))
-        if guid ~= inst.GUID then --guid не совпадает (либо вообще nil)
+        if guid ~= inst.GUID then --guid не совпадает
             return ""
         end
         return c.showme_hint:sub(i+1)
     end
     if CLIENT_SIDE then
-        --patching Get Display Name. Нужно только клиенту.
-        --[[local old_GetDisplayName = _G.EntityScript.GetDisplayName
-        _G.EntityScript.GetDisplayName = function(self)
-            local old_name = old_GetDisplayName(self)
-            if type(old_name) ~= "string" then
-                return old_name
-            end
-            local str2 = CheckUserHint(self)
-            return old_name .. str2
-        end--]]
-
-        --Разбираем случаи, когда нужно отправить guid об объекте под мышью.
-        local old_inst --Запоминаем, чтобы не спамить один и тот же inst по несколько раз.
-        --[[AddWorldPostInit(function(w)
-            w:DoPeriodicTask(0.1,function(w)
-                if _G.ThePlayer == nil then
-                    return
-                end
-                local inst = _G.TheInput:GetWorldEntityUnderMouse()
-                if inst ~= nil then
-                    if inst == old_inst then
-                        return
-                    end
-                    old_inst = inst
-                    --Посылаем желаемую подсказку.
-                    SendModRPCToServer(MOD_RPC.ShowMeHint.Hint, inst.GUID, inst)
-                end
-            end)
-        end)--]]
-
+        local old_inst
         local function UnpackData(str,div)
             local pos,arr = 0,{}
             -- for each divider found
@@ -1210,8 +992,8 @@ do
         end
 
         local save_target
-        local last_check_time = 0 --последнее время проверки. Будет устаревать каждые 2 сек.
-        local LOCAL_STRING_CACHE = {} --База данных строк, чтобы не обсчитывать замены каждый раз (правда, будет потихоньку пожирать память)
+        local last_check_time = 0
+        local LOCAL_STRING_CACHE = {}
         AddClassPostConstruct("widgets/hoverer",function(hoverer) --hoverer=self
             local old_SetString = hoverer.text.SetString
             hoverer.text.SetString = function(text,str) --text=self
@@ -1219,18 +1001,15 @@ do
                 local target = _G.TheInput:GetHUDEntityUnderMouse()
                 if target ~= nil then
                     --target.widget.parent - это ItemTile
-                    target = target.widget ~= nil and target.widget.parent ~= nil and target.widget.parent.item --реальный итем (на клиенте)
+                    target = target.widget ~= nil and target.widget.parent ~= nil and target.widget.parent.item
                 else
                     target = _G.TheInput:GetWorldEntityUnderMouse()
                 end
-                --local lmb = hoverer.owner.components.playercontroller:GetLeftMouseAction()
                 if target ~= nil then
                     --print(tostring(target))
-                    --Проверяем совпадение с данными.
                     local str2 = CheckUserHint(target)
                     if str2 ~= "" then
-                        --Так, сначала чистим старую строку от переходов на новую строку. Мало ли какие там моды чего добавили.
-                        local cnt_newlines, _ = 0 --Считаем переходы строк в конце строки (совместимость с DFV)
+                        local cnt_newlines, _ = 0
                         while cnt_newlines < #str do
                             local ch = str:sub(#str-cnt_newlines,#str-cnt_newlines)
                             if ch ~= "\n" and ch ~= " " then
@@ -1238,26 +1017,14 @@ do
                             end
                             cnt_newlines = cnt_newlines + 1
                         end
-                        --Очищаем строку от этого мусора
                         if cnt_newlines > 0 then
                             str = str:sub(1,#str-cnt_newlines)
                         end
-                        --print(#str,"clear")
-                        --Очищаем строку от промежуточного мусора
                         if string.find(str,"\n\n",1,true) ~= nil then
                             str = str:gsub("[\n]+","\n")
                         end
-                        --[[ --Теперь это не нужно, т.к. мы тупо добавляем 1 строку.
-                        if string.find(str,"\n",1,true) ~= nil then
-                            _,cnt_newlines = str:gsub("\n","\n") --Подсчитываем количество переходов внутри (если есть).
-                        else
-                            cnt_newlines = 0
-                        end
-                        --]]
-
-                        --Извлекаем данные из полученной упакованной строки.
                         str2 = UnpackData(str2,"\2")
-                        local arr2 = {} --Формируем массив данных в удобоваримом виде.
+                        local arr2 = {}
                         for i,v in ipairs(str2) do
                             if v ~= "" then
                                 local param_str = v:sub(2)
@@ -1270,8 +1037,6 @@ do
                             end
                         end
                         arr2.str2= str2
-                        --_G.rawset(_G,"arr2",arr2) --Для теста.
-                        --Формируем строку
                         str2=""
                         for i,v in ipairs(arr2) do
                             if v.data ~= nil and v.data.fn ~= nil then
@@ -1281,37 +1046,13 @@ do
                             end
                         end
 
-                        --_G.arr({inst=text.inst,hover=text.parent},5)
-                        --print("-----"..str.."-----")
-                        --local sss=""
-                        --for i=#str,#str-10,-1 do
-                        --	sss=sss..string.byte(str:sub(i,i))..", "
-                        --end
-                        --print("Chars: "..sss)
-                        --[[print(#str,"cut str")
-                        --В конце тоже убираем переход, если есть.
-                        if str:sub(#str,#str) == "\n" then
-                            str = str:sub(1,#str-1)
-                        end--]]
-                        --print(#str,"test cache")
-                        --print("count new cache")
-                        --print("newlines",#str2)
-
                         str = str .. "\n" .. str2
-
-                        --Заново считаем количество оставшихся переходов строк
-                        --cnt_newlines = cnt_newlines + #arr2 + 1 --Всего переходов строк.
-                        --cnt_newlines = math.floor((#arr2 + 1) * 0.5) --Увеличиваем, но не сильно.
                         cnt_newlines = 1
-                        --В конце добавляем переходы
-                        --Добавляем пустые строки в конец. TODO: Это надо только если предмет в инвентаре.
                         while cnt_newlines > 0 do
                             str = str .. "\n "
                             cnt_newlines = cnt_newlines - 1
                         end
                     end
-                    --print("Check User Hint: "..str2)
-                    --Если первый раз, то отправляем запрос.
                     if target ~= save_target or last_check_time + 1 < GetTime() then
                         save_target = target
                         last_check_time = GetTime()
@@ -1325,16 +1066,15 @@ do
         end)
     end
 
-    --Обработчик на сервере
     AddModRPCHandler("ShowMeHint", "Hint", function(player, guid, item)
         if player.player_classified == nil then
             print("ERROR: player_classified not found!")
             return
         end
         if item ~= nil and item.components ~= nil then
-            local s = GetTestString(item,player) --Формируем строку на сервере.
+            local s = GetTestString(item,player)
             if s ~= "" then
-                player.player_classified.net_showme_hint:set(guid..";"..s) --Пакуем в строку и отсылаем обратно тому же игроку.
+                player.player_classified.net_showme_hint:set(guid..";"..s)
             end
         end
     end)

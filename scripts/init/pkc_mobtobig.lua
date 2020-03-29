@@ -1,9 +1,7 @@
+--
 -- 生物变大
--- Created by IntelliJ IDEA.
--- User: RedPig
--- Date: 2017/3/17
--- Time: 19:45
--- To change this template use File | Settings | File Templates.
+-- Author: RedPig, 大猪猪
+-- Date: 2017/03/17
 --
 
 local initToBigTable = {

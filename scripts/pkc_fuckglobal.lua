@@ -1,7 +1,8 @@
---@name 草翻GOLBAL
---@description 原有全局变量和函数不用加GLOBAL前缀
---@author 大猪猪
---@date 2016-10-23
+--
+-- 去Global
+-- Author: 大猪猪
+-- Date: 2016/10/03
+--
 
 --local function FuckGlobalUsingMetatable()
 --	GLOBAL.setmetatable(env, {
@@ -13,4 +14,5 @@
 --	})
 --end
 --FuckGlobalUsingMetatable()
+
 GLOBAL.setmetatable(env,{__index=function(t,k) return GLOBAL.rawget(GLOBAL,k) end})

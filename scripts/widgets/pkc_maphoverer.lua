@@ -1,6 +1,8 @@
--- 地图图标显示提示（当鼠标移上去时）
+--
+-- 地图图标名字显示（当鼠标移上去时）
 -- Author: RedPig
--- Date: 2020/3/17
+-- Date: 2020/03/17
+--
 
 require("constants")
 local Text = require "widgets/text"

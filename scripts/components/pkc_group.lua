@@ -1,8 +1,8 @@
---@name pkc_group
---@description 玩家所属阵营组件
---@author redpig
---@date 2016-10-23
---@大猪猪 10-31
+--
+-- 队伍标识组件
+-- Author: RedPig, 大猪猪
+-- Date: 2016/10/31
+--
 
 local function onchooseGroup(self, v)
 	self._chooseGroup:set(v)

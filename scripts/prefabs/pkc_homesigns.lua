@@ -1,9 +1,7 @@
 --
--- Created by IntelliJ IDEA.
--- User: RedPig
--- Date: 2017/2/18
--- Time: 23:23
--- To change this template use File | Settings | File Templates.
+-- 重写路牌
+-- Author: RedPig
+-- Date: 2017/03/16
 --
 
 local assets =

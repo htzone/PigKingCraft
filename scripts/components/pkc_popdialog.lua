@@ -1,7 +1,8 @@
---@name pkc_popdialog
---@description 简单弹框组件
---@author redpig
---@date 2016-11-20
+--
+-- 弹框组件
+-- Author: RedPig
+-- Date: 2016/11/20
+--
 
 local json = require "json"
 local PopupDialogScreen = require("screens/popupdialog")

@@ -1,6 +1,6 @@
 --
 -- 商店系统
--- author: RedPig
+-- Author: RedPig
 -- Date: 2017/1/10
 --
 

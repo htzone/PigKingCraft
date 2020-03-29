@@ -1,7 +1,8 @@
---@name pkc_introduction_screen
---@description 玩法介绍弹框
---@author redpig
---@date 2016-10-23
+--
+-- 初始介绍弹框
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local Screen = require "widgets/screen"
 local Button = require "widgets/button"

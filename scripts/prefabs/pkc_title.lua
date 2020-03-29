@@ -1,7 +1,8 @@
---@name pkc_title
---@description 头部名字
---@author 大猪猪
---@date 2016-11-05
+--
+-- 头部标识
+-- Author: 大猪猪
+-- Date: 2016/11/01
+--
 
 local function fn()
 	local inst = CreateEntity()

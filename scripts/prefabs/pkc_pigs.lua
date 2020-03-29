@@ -1,3 +1,8 @@
+--
+-- 重写猪人
+-- Author: RedPig
+-- Date: 2016/11/01
+--
 
 local assets =
 {

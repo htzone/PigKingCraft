@@ -1,6 +1,8 @@
--- 自定义地图图标
+--
+-- 玩家地图图标
 -- Author: RedPig
--- Date: 2020/3/23
+-- Date: 2020/03/23
+--
 
 local Widget = require "widgets/widget"
 local PlayerBadge = require "widgets/playerbadge"

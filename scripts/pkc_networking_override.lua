@@ -1,6 +1,9 @@
+--
 -- 重写系统网络函数
 -- Author: RedPig
--- Date: 2020/3/13
+-- Date: 2020/03/13
+--
+
 local whisperTag = "[pkc_w]"
 function Networking_Say(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)
     if message ~= nil and message:utf8len() > MAX_CHAT_INPUT_LENGTH then

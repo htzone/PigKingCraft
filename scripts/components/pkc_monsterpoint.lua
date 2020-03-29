@@ -1,9 +1,7 @@
--- 怪物据点
--- Created by IntelliJ IDEA.
--- User: RedPig
--- Date: 2017/2/27
--- Time: 23:21
--- To change this template use File | Settings | File Templates.
+--
+-- 怪物据点组件
+-- Author: RedPig
+-- Date: 2017/02/27
 --
 
 local function spawnBearger()

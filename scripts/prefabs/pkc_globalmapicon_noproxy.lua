@@ -1,6 +1,8 @@
 --
+-- 地图图标
 -- Author: RedPig
--- Date: 2020/3/16
+-- Date: 2020/03/01
+--
 
 local function fn()
     local inst = Prefabs.globalmapicon.fn()

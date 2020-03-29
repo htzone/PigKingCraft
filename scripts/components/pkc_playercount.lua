@@ -1,7 +1,8 @@
---@name pkc_playercount
---@description 
---@author redpig
---@date 2016-11-20
+--
+-- 玩家自动检查组件
+-- Author: RedPig
+-- Date: 2016/11/20
+--
 
 local PKC_PLAYER_COUNT = Class(function(self, inst)
 	self.inst = inst

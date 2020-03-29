@@ -1,7 +1,8 @@
---@name pkc_prefabinit
---@description prefab初始化
---@author redpig
---@date 2016-10-23
+--
+-- 一些Prefab的初始化
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()

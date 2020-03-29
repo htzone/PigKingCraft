@@ -1,6 +1,6 @@
 --
 -- 角色平衡组件
--- author: RedPig
+-- Author: RedPig
 -- Date: 2017/2/23
 --
 

@@ -1,7 +1,8 @@
---@name pkc_worldinit
---@description 世界初始化
---@author 大猪猪，redpig
---@date 2016-10-23
+--
+-- 世界初始化
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local _G = _G or GLOBAL
 local TheNet = GLOBAL.TheNet

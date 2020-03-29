@@ -1,3 +1,9 @@
+--
+-- 领地范围显示
+-- Author: RedPig
+-- Date: 2016/11/01
+--
+
 local assets=
 {
 	Asset("ANIM", "anim/firefighter_range.zip")    

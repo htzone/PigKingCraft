@@ -1,7 +1,8 @@
---@name pkc_producebase
---@description 基地生成
---@author redpig
---@date 2016-10-23
+--
+-- 基地生成
+-- Author: RedPig
+-- Date: 2016/10/23
+--
 
 local TheNet = GLOBAL.TheNet
 local IsServer = TheNet:GetIsServer()

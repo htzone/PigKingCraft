@@ -1,15 +1,10 @@
 --
--- Created by IntelliJ IDEA.
--- User: hetao
--- Date: 2017/2/18
--- Time: 23:00
--- To change this template use File | Settings | File Templates.
+-- 分组传送
+-- Author: RedPig
+-- Date: 2016/10/23
 --
 
---local Ownership = GetModConfigData("Ownership")
---local Travel_Cost = GetModConfigData("Travel_Cost")
 local FTSignTag = 'fast_travel'
-
 local FT_Points = {
     "homesign",
     "pkc_homesign_big",

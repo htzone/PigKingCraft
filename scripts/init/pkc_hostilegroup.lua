@@ -1,7 +1,7 @@
 --
 -- 怪物阵营
--- author: RedPig
--- Date: 2017/1/06
+-- Author: RedPig
+-- Date: 2017/03/20
 --
 
 AddPrefabPostInit("world", function(inst)

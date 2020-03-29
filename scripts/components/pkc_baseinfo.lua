@@ -1,5 +1,8 @@
---记录基地位置的信息
---@大猪猪 10-31
+--
+-- 记录基地位置的信息
+-- Author: 大猪猪
+-- Date: 2016/10/31
+--
 
 local PKC_BASEINFO = Class(function(self, inst)
 	self.inst = inst

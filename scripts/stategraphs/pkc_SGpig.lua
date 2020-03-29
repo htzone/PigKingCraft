@@ -1,3 +1,9 @@
+--
+-- 重写猪人SG
+-- Author: RedPig
+-- Date: 2016/10/23
+--
+
 require("stategraphs/commonstates")
 
 local actionhandlers = 

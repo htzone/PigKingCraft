@@ -1,3 +1,9 @@
+--
+-- 木牌书写
+-- Author: RedPig
+-- Date: 2017/03/20
+--
+
 local SignGenerator = require"signgenerator"
 
 local writeables = {}

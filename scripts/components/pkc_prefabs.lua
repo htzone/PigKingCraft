@@ -1,7 +1,8 @@
---@name pkc_prefabs
---@description 模拟prefab行为组件
---@author redpig
---@date 2016-11-20
+--
+-- 模拟prefab行为组件
+-- Author: RedPig
+-- Date: 2016/11/20
+--
 
 local PKC_PREFABS = Class(function(self, inst)
 	self.inst = inst

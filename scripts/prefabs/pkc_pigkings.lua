@@ -1,7 +1,8 @@
---@name pkc_pigkings
---@description 猪王首领
---@author RedPig
---@date 2016-11-01
+--
+-- 重写猪王们
+-- Author: RedPig
+-- Date: 2016/11/01
+--
 
 local assets =
 {

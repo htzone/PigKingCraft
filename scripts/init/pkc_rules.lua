@@ -1,7 +1,8 @@
---@name pkc_rulesinit
---@description PVP规则约束
---@author redpig
---@date 2016-11-05
+--
+-- PVP的一些约束规则
+-- Author: RedPig
+-- Date: 2016/11/05
+--
 
 --GLOBAL.Recipe("homesign", {Ingredient("boards", 4)}, RECIPETABS.TOWN, TECH.SCIENCE_ONE, "homesign_placer")
 

@@ -1,9 +1,10 @@
---@name pkc_levelup
---@description 升级组件
---@author redpig
---@date 2016-12-20
-local _G = _G or GLOBAL
+--
+-- 升级组件
+-- Author: RedPig
+-- Date: 2016/12/20
+--
 
+local _G = _G or GLOBAL
 local function checkLevelUp(self, currentScore)
 	local needLevelUpScore = WIN_SCORE / self.level_num
 	local currentLevel = math.floor(currentScore / needLevelUpScore) + 1

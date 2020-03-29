@@ -1,9 +1,7 @@
 --
--- Created by IntelliJ IDEA.
--- User: hetao
--- Date: 2017/2/18
--- Time: 23:02
--- To change this template use File | Settings | File Templates.
+-- 队伍传送组件
+-- Author: RedPig
+-- Date: 2017/02/08
 --
 
 local default_dist_cost = 32
@@ -63,7 +61,9 @@ function PKC_GROUPTRAVEL:ListDestination(traveller)
     local dest = {}
 
     for k,v in pairs(dests) do
-        if v ~= self.inst and v.components.pkc_grouptravel and not (v.components.pkc_grouptravel.ownership and v:HasTag(ownershiptag) and traveller.userid ~= nil and not v:HasTag('uid_'..traveller.userid)) then
+        if v ~= self.inst and v.components.pkc_grouptravel
+                and not (v.components.pkc_grouptravel.ownership and v:HasTag(ownershiptag)
+                and traveller.userid ~= nil and not v:HasTag('uid_'..traveller.userid)) then
             table.insert(dest, v)
         end
     end
@@ -81,7 +81,8 @@ function PKC_GROUPTRAVEL:SelectDestination(traveller)
     local comment = self.inst.components.talker
     local talk = traveller.components.talker
 
-    if self.ownership and self.inst:HasTag(ownershiptag) and traveller.userid ~= nil and not self.inst:HasTag('uid_'..traveller.userid) then
+    if self.ownership and self.inst:HasTag(ownershiptag) and traveller.userid ~= nil
+            and not self.inst:HasTag('uid_'..traveller.userid) then
         if comment then comment:Say("这属于私人财产")
         elseif talk then talk:Say("这个属于私人财产") end
         return
@@ -186,7 +187,9 @@ function PKC_GROUPTRAVEL:SelectDestination(traveller)
             cost_sanity = cost_sanity * 0.75
         end
 
-        information = "To: "..description.." ("..string.format("%.0f", self.site).."/"..string.format("%.0f", self.totalsites)..")".."\n".."饥饿消耗: "..string.format("%.0f", cost_hunger).."\n".."精神消耗: "..string.format("%.1f", cost_sanity)
+        information = "To: "..description.." ("..string.format("%.0f", self.site).."/"
+                ..string.format("%.0f", self.totalsites)..")".."\n".."饥饿消耗: "..string.format("%.0f", cost_hunger)
+                .."\n".."精神消耗: "..string.format("%.1f", cost_sanity)
         if comment then
             comment:Say(string.format(information),3)
         elseif talk then
@@ -205,10 +208,12 @@ function PKC_GROUPTRAVEL:SelectDestination(traveller)
                 elseif IsNearDanger(who) then
                     if talk then talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH8)
                     elseif comment then comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH8) end
-                elseif destination.components.pkc_grouptravel.ownership and destination:HasTag(ownershiptag) and who.userid ~= nil and not destination:HasTag('uid_'..who.userid) then
+                elseif destination.components.pkc_grouptravel.ownership and destination:HasTag(ownershiptag)
+                        and who.userid ~= nil and not destination:HasTag('uid_'..who.userid) then
                     if comment then comment:Say("私人领地，不接受传送")
                     elseif talk then talk:Say("私人领地，不接受传送") end
-                elseif who.components.hunger and who.components.hunger.current >= cost_hunger and who.components.sanity and who.components.sanity.current >= cost_sanity then
+                elseif who.components.hunger and who.components.hunger.current >= cost_hunger
+                        and who.components.sanity and who.components.sanity.current >= cost_sanity then
                     who.components.hunger:DoDelta(-cost_hunger)
                     who.components.sanity:DoDelta(-cost_sanity)
                     if who.Physics ~= nil then
@@ -273,31 +278,40 @@ function PKC_GROUPTRAVEL:SelectDestination(traveller)
         self.traveltask10 = self.inst:DoTaskInTime(3, function() comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH12)
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask9 = self.inst:DoTaskInTime(4, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 9))
+        self.traveltask9 = self.inst:DoTaskInTime(4, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 9))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask8 = self.inst:DoTaskInTime(5, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 8))
+        self.traveltask8 = self.inst:DoTaskInTime(5, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 8))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask7 = self.inst:DoTaskInTime(6, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 7))
+        self.traveltask7 = self.inst:DoTaskInTime(6, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 7))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask6 = self.inst:DoTaskInTime(7, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 6))
+        self.traveltask6 = self.inst:DoTaskInTime(7, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 6))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask5 = self.inst:DoTaskInTime(8, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 5))
+        self.traveltask5 = self.inst:DoTaskInTime(8, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 5))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask4 = self.inst:DoTaskInTime(9, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 4))
+        self.traveltask4 = self.inst:DoTaskInTime(9, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 4))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask3 = self.inst:DoTaskInTime(10, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 3))
+        self.traveltask3 = self.inst:DoTaskInTime(10, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 3))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask2 = self.inst:DoTaskInTime(11, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 2))
+        self.traveltask2 = self.inst:DoTaskInTime(11, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 2))
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
-        self.traveltask1 = self.inst:DoTaskInTime(12, function() comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 1), 1)
+        self.traveltask1 = self.inst:DoTaskInTime(12, function()
+            comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH11, 1), 1)
             self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
         end)
 

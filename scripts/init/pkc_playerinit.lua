@@ -32,57 +32,45 @@ end
 
 --玩家初始化
 --@大猪猪 10-31
-AddPlayerPostInit(function(inst)
-	if inst then
+AddPlayerPostInit(function(player)
+	if player then
 		--添加分组组件
-		inst:AddComponent("pkc_group")
+		player:AddComponent("pkc_group")
 		--添加头部显示组件
-		inst:AddComponent("pkc_headshow")
+		player:AddComponent("pkc_headshow")
 		--玩家复活任务
-		inst:AddComponent("pkc_playerrevivetask")
-
-		if GLOBAL.TheWorld.ismastersim then
-			--角色平衡
-			inst:AddComponent("pkc_characterbalance")
-			--计时器
-			if not inst.components.timer then
-				inst:AddComponent("timer")
-			end
-			inst.runTag = true
+		player:AddComponent("pkc_playerrevivetask")
+		--角色平衡
+		player:AddComponent("pkc_characterbalance")
+		--计时器
+		if not player.components.timer then
+			player:AddComponent("timer")
 		end
+		player.runTag = true
 		--处理按键
 		if not GLOBAL.TheNet:IsDedicated() then
 			cKeyHandler = simpleKeyHandler()
 		end
-
---		if inst.prefab == "wilson" then
---			inst.components.pkc_group:setChooseGroup(GROUP_BIGPIG_ID)
---		end
---		if inst.prefab == "willow" then
---			inst.components.pkc_group:setChooseGroup(GROUP_REDPIG_ID)
---		end
-
 		--显示头部名字
-		inst:DoTaskInTime(0, function()
-			if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() ~= 0 then
-				inst.components.pkc_headshow:addHeadView()
+		player:DoTaskInTime(0, function()
+			if player and player.components.pkc_group and player.components.pkc_group:getChooseGroup() ~= 0 then
+				player.components.pkc_headshow:addHeadView()
 			end
 		end)
-		
 		if IsServer then
 			--出生提示属于哪个阵营（前提是已选择了阵营）
-			inst:DoTaskInTime(6, function()
+			player:DoTaskInTime(6, function()
 				for _,v in pairs(GLOBAL.PKC_GROUP_INFOS) do
-					if inst and inst.components.pkc_group and inst.components.pkc_group:getChooseGroup() == v.id then
-						if inst.components.talker then
-							inst.components.talker:Say(GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH1..v.name..GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH2)
+					if player and player.components.pkc_group and player.components.pkc_group:getChooseGroup() == v.id then
+						if player.components.talker then
+							player.components.talker:Say(GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH1..v.name..GLOBAL.PKC_SPEECH.BELONG_TIPS.SPEECH2)
 						end
 						break
 					end
 				end
 			end)
 			--监听被攻击
-			inst:ListenForEvent("attacked", onAttacked)
+			player:ListenForEvent("attacked", onAttacked)
 		end
 	end
 end)

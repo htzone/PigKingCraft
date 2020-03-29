@@ -1,12 +1,10 @@
--- 玩家信息保存
--- Created by IntelliJ IDEA.
--- User: RedPig
--- Date: 2017/2/19
--- Time: 20:08
--- To change this template use File | Settings | File Templates.
+--
+-- 玩家信息保存组件
+-- Author: RedPig
+-- Date: 2016/11/20
 --
 
---PKC_PLAYER_INFOS格式：
+--Example：
 --PKC_PLAYER_INFOS = {
 --    KU_2312323s1 = {
 --        GROUP_ID = 2,

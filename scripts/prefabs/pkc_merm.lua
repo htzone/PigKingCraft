@@ -1,3 +1,9 @@
+--
+-- 重写鱼人
+-- Author: RedPig
+-- Date: 2017/03/20
+--
+
 local assets =
 {
     Asset("ANIM", "anim/merm_build.zip"),

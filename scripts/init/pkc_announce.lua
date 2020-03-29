@@ -1,10 +1,9 @@
--- 自动公告
--- Created by IntelliJ IDEA.
--- User: RedPig
--- Date: 2017/3/4
--- Time: 9:28
--- To change this template use File | Settings | File Templates.
 --
+-- 自动公告
+-- Author: RedPig
+-- Date: 2017/03/04
+--
+
 local jsonUtil = require "json"
 
 local announce_speech = {

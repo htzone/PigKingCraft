@@ -1,7 +1,8 @@
---@name pkc_base
---@description 生成基地组件
---@author redpig
---@date 2016-10-23
+--
+-- 基地生成组件
+-- Author: 大猪猪，RedPig
+-- Date: 2016/10/23
+--
 
 local PKC_BASE = Class(function(self, inst)
 	self.inst = inst

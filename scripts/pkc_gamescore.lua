@@ -1,7 +1,8 @@
---@name pkc_getscore
---@description 分数设定
---@author redpig
---@date 2016-11-18
+--
+-- 分数设定
+-- Author: RedPig
+-- Date: 2016/11/18
+--
 
 --分数设定
 GLOBAL.GAME_SCORE = {

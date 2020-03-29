@@ -1,7 +1,8 @@
---@name pkc_playercheck
---@description 玩家自动检查组件
---@author redpig
---@date 2016-11-20
+--
+-- 玩家自动检查组件
+-- Author: RedPig
+-- Date: 2016/11/20
+--
 
 local function isMyGroupExist(groupId)
 	for k, v in pairs(CURRENT_EXIST_GROUPS) do 

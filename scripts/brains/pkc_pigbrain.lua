@@ -1,3 +1,9 @@
+--
+-- 重写猪脑子
+-- Author: RedPig
+-- Date: 2017/03/04
+--
+
 require "behaviours/wander"
 require "behaviours/follow"
 require "behaviours/faceentity"

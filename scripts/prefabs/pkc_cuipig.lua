@@ -1,7 +1,8 @@
---@name pkc_redpig
---@description 红猪首领
---@author RedPig
---@date 2016-11-01
+--
+-- 崔猪猪首领
+-- Author: RedPig, 老崔
+-- Date: 2016/11/01
+--
 
 local assets =
 {
@@ -25,7 +26,6 @@ local function ontradeforgold(inst, item)
         nug.Transform:SetPosition(pt:Get())
         local down = TheCamera:GetDownVec()
         local angle = math.atan2(down.z, down.x) + (math.random() * 60 - 30) * DEGREES
-        --local angle = (math.random() * 60 - 30 - TUNING.CAM_ROT - 90) / 180 * PI
         local sp = math.random() * 4 + 2
         nug.Physics:SetVel(sp * math.cos(angle), math.random() * 2 + 8, sp * math.sin(angle))
     end

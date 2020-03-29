@@ -1,6 +1,8 @@
+--
 -- 保存所有位置信息的组件（只在服务端执行）
 -- Author: RedPig
 -- Date: 2020/3/4
+--
 
 local GlobalPositions = Class(function(self, inst)
     self.inst = inst

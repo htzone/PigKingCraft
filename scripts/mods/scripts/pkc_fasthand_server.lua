@@ -1,9 +1,7 @@
 --
--- Created by IntelliJ IDEA.
--- User: hetao
--- Date: 2017/2/19
--- Time: 13:11
--- To change this template use File | Settings | File Templates.
+-- 快速采集（服务端）
+-- Author: 大猪猪
+-- Date: 2016/10/23
 --
 
 ----全局变量声明

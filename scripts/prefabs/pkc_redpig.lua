@@ -1,7 +1,8 @@
---@name pkc_redpig
---@description 红猪首领
---@author RedPig
---@date 2016-11-01
+--
+-- 红猪猪首领
+-- Author: RedPig, 老崔
+-- Date: 2016/11/01
+--
 
 local assets =
 {

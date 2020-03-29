@@ -1,7 +1,8 @@
---@name pkc_score
---@description 阵营分数
---@author redpig
---@date 2016-11-16
+--
+-- 队伍分数组件
+-- Author: RedPig, 大猪猪
+-- Date: 2016/10/31
+--
 
 --保存分数的全局变量
 local _GROUP_SCORE = GROUP_SCORE

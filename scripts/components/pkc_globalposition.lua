@@ -1,6 +1,8 @@
+--
 -- 位置组件
 -- Author: RedPig
--- Date: 2020/3/4
+-- Date: 2020/03/04
+--
 
 local function AddMapRevealer(inst)
     if not inst.components.maprevealer then
@@ -12,16 +14,12 @@ local function AddMapRevealer(inst)
 end
 
 local function AddGlobalIcon(inst, classified)
-    if not (PKC_POSITIONS_MAP_ICONS[inst.prefab] or inst.MiniMapEntity) then return end
+    if not inst.MiniMapEntity then return end
     classified.icon = SpawnPrefab("pkc_globalmapicon_noproxy")
     classified.icon.MiniMapEntity:SetPriority(10)
     classified.icon.MiniMapEntity:SetRestriction("player")
-    if inst.MiniMapEntity then
-        inst.MiniMapEntity:SetEnabled(false)
-        classified.icon.MiniMapEntity:CopyIcon(inst.MiniMapEntity)
-    else
-        classified.icon.MiniMapEntity:SetIcon(PKC_POSITIONS_MAP_ICONS[inst.prefab])
-    end
+    inst.MiniMapEntity:SetEnabled(false)
+    classified.icon.MiniMapEntity:CopyIcon(inst.MiniMapEntity)
     classified:AddChild(classified.icon)
 end
 

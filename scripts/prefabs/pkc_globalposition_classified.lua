@@ -1,6 +1,8 @@
 --
+-- 玩家位置保存实体
 -- Author: RedPig
--- Date: 2020/3/5
+-- Date: 2020/03/16
+--
 
 local function fn()
     local inst = CreateEntity()

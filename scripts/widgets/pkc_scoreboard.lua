@@ -1,3 +1,9 @@
+--
+-- 屏幕计分组件
+-- Author: 大猪猪
+-- Date: 2016/10/03
+--
+
 local Widget = require "widgets/widget"
 local ImageButton = require "widgets/imagebutton"
 

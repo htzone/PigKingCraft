@@ -1,7 +1,8 @@
---@name pkc_headshow
---@description 玩家头部显示名字组件
---@author redpig
---@date 2016-11-08
+--
+-- 玩家头部显示组件
+-- Author: RedPig, 大猪猪
+-- Date: 2016/11/08
+--
 
 local PKC_HEADSHOW = Class(function(self, inst)
     self.inst = inst

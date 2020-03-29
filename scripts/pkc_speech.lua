@@ -1,7 +1,8 @@
---@name pkc_speech
---@description 对话设定
---@author redpig
---@date 2016-11-20
+--
+-- 对话设定
+-- Author: RedPig
+-- Date: 2016/11/20
+--
 
 --游戏语言
 if GetModConfigData("language") == "chinese" then
