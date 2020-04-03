@@ -1,6 +1,5 @@
 --
 -- 保存所有玩家基本信息的组件（服务端客户端均可访问）
--- 只保存不易改变的信息，存放在全局变量PKC_PLAYER_INFOS中，避免频繁在进程间通信
 -- Author: RedPig
 -- Date: 2016/11/20
 --
@@ -11,7 +10,10 @@
 --        GROUP_COLOR = "",
 --        PLAYER_NAME = "redpig",
 --        PLAYER_PREFAB = "wilson",
---        PLAYER_COLOR = "7C6AD208",
+--        PLAYER_COLOR = "7C6AD207",
+--        PLAYER_SCORE = 100,
+--        PLAYER_KILLNUM = 2,
+--        PLAYER_CONTRIBUTION = 100,
 --    },
 --    KU_2312323s2 = {
 --        GROUP_ID = 2,
@@ -19,6 +21,9 @@
 --        PLAYER_NAME = "dazhuzhu",
 --        PLAYER_PREFAB = "wilson",
 --        PLAYER_COLOR = "7C6AD207",
+--        PLAYER_SCORE = 100,
+--        PLAYER_KILLNUM = 2,
+--        PLAYER_CONTRIBUTION = 100,
 --    },
 --    ...
 --}
@@ -40,32 +45,61 @@ local function onCompletedChooseGroup(self, data)
     self:SetPlayerInfo(data.chooser)
 end
 
-local function onPlayerInfoDirty(inst)
+local function onPlayerInfosDirty(inst)
     local self = inst.components.pkc_playerinfos
     PKC_PLAYER_INFOS = json.decode(self._playerinfos:value())
 end
 
+local function onPlayerInfoDirty(inst)
+    local self = inst.components.pkc_playerinfos
+    local playerinfo = json.decode(self._playerinfo:value())
+    PKC_PLAYER_INFOS[playerinfo.USERID] = playerinfo
+end
+
+local function onScoreInfoDirty(inst)
+    local self = inst.components.pkc_playerinfos
+    local info = json.decode(self._scoreinfo:value())
+    if PKC_PLAYER_INFOS[info.USERID] then
+        PKC_PLAYER_INFOS[info.USERID].PLAYER_SCORE = info.PLAYER_SCORE
+    end
+end
+
+local function onKillNumInfoDirty(inst)
+    local self = inst.components.pkc_playerinfos
+    local info = json.decode(self._killnuminfo:value())
+    if PKC_PLAYER_INFOS[info.USERID] then
+        PKC_PLAYER_INFOS[info.USERID].PLAYER_KILLNUM = info.PLAYER_KILLNUM
+    end
+end
+
 local PKC_PLAYERINFOS = Class(function(self, inst)
     self.inst = inst
-    self._playerinfos = net_string(self.inst.GUID, "pkc_playerinfo._playerinfos", "_playerinfoDirty")
+    self._playerinfos = net_string(self.inst.GUID, "pkc_playerinfo._playerinfos", "_playerinfosDirty")
+    self._playerinfo = net_string(self.inst.GUID, "pkc_playerinfo._playerinfo", "_playerinfoDirty")
+    self._scoreinfo = net_string(self.inst.GUID, "pkc_playerinfo._scoreinfo", "_scoreinfoDirty")
+    self._killnuminfo = net_string(self.inst.GUID, "pkc_playerinfo._killnuminfo", "_killnuminfoDirty")
+
     if TheNet:GetIsServer() then
         --监听队伍选择完成
         self.inst:ListenForEvent("pkc_completedChooseGroup", function(world, data)
             onCompletedChooseGroup(self, data) end,
             TheWorld)
-    else
-        --客户端监听事件
-        self.inst:ListenForEvent("_playerinfoDirty", onPlayerInfoDirty)
     end
+
+    self.inst:ListenForEvent("_playerinfosDirty", onPlayerInfosDirty)
+    self.inst:ListenForEvent("_playerinfoDirty", onPlayerInfoDirty)
+    self.inst:ListenForEvent("_scoreinfoDirty", onScoreInfoDirty)
+    self.inst:ListenForEvent("_killnuminfoDirty", onKillNumInfoDirty)
 end, nil, {})
 
---设置队伍选择信息
+-- 设置玩家信息
 function PKC_PLAYERINFOS:SetPlayerInfo(player)
     local playerInfo = {}
     if player then
+        playerInfo.USERID = player.userid
         if player.components.pkc_group then
             playerInfo.GROUP_ID = player.pkc_groupid
-            playerInfo.GROUP_COLOR = getGroupColorByGroupId(playerInfo.GROUP_ID)
+            playerInfo.GROUP_COLOR = getGroupColorByGroupId(player.pkc_groupid)
         end
         playerInfo.PLAYER_NAME = player.name
         playerInfo.PLAYER_PREFAB = player.prefab
@@ -75,35 +109,29 @@ function PKC_PLAYERINFOS:SetPlayerInfo(player)
         print("[pkc]--playerName:"..tostring(playerInfo.PLAYER_NAME))
         print("[pkc]--playerPrefab:"..tostring(playerInfo.PLAYER_PREFAB))
         print("[pkc]--playerColor:"..tostring(playerInfo.PLAYER_COLOR))
-        PKC_PLAYER_INFOS[player.userid] = playerInfo
-        self._playerinfos:set(json.encode(PKC_PLAYER_INFOS))
+        self._playerinfo:set(json.encode(playerInfo))
     end
-
 end
 
---增加玩家分数
+-- 增加玩家分数
 function PKC_PLAYERINFOS:addPlayerScore(player, score)
     if player and PKC_PLAYER_INFOS[player.userid] then
-        if PKC_PLAYER_INFOS[player.userid].SCORE == nil then
-            PKC_PLAYER_INFOS[player.userid].SCORE = 0
-        end
-        PKC_PLAYER_INFOS[player.userid].SCORE = PKC_PLAYER_INFOS[player.userid].SCORE + score
-        self._playerinfos:set(json.encode(PKC_PLAYER_INFOS))
+        local newScore = (PKC_PLAYER_INFOS[player.userid].PLAYER_SCORE or 0) + (score or 1)
+        local scoreinfo = {}
+        scoreinfo.USERID = player.userid
+        scoreinfo.PLAYER_SCORE = newScore
+        self._scoreinfo:set(json.encode(scoreinfo))
     end
 end
 
---增加玩家击杀个数(具体指击杀玩家的个数)
+-- 增加玩家击杀个数
 function PKC_PLAYERINFOS:addPlayerKillNum(player, num)
     if player and PKC_PLAYER_INFOS[player.userid] then
-        if PKC_PLAYER_INFOS[player.userid].KILLNUM == nil then
-            PKC_PLAYER_INFOS[player.userid].KILLNUM = 0
-        end
-        if num == nil then
-            PKC_PLAYER_INFOS[player.userid].KILLNUM = PKC_PLAYER_INFOS[player.userid].KILLNUM + 1
-        else
-            PKC_PLAYER_INFOS[player.userid].KILLNUM = PKC_PLAYER_INFOS[player.userid].KILLNUM + num
-        end
-        self._playerinfos:set(json.encode(PKC_PLAYER_INFOS))
+        local newKillNum = (PKC_PLAYER_INFOS[player.userid].PLAYER_KILLNUM or 0) + (num or 1)
+        local info = {}
+        info.USERID = player.userid
+        info.PLAYER_KILLNUM = newKillNum
+        self._killnuminfo:set(json.encode(info))
     end
 end
 

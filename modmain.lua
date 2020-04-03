@@ -1,7 +1,6 @@
 --
 -- 猪王争霸（PigKingCraft）
 -- Author: RedPig, 大猪猪, 龙飞, 老崔
--- Description: 一款关于相爱相杀的饥荒MOD
 -- Date: 2016/10/01
 --
 --[[
@@ -57,9 +56,10 @@ PrefabFiles = {
     "pkc_range",
     "pkc_globalposition_classified",
     "pkc_globalmapicon_noproxy",
+    "pkc_travelable_classified"
 }
 
-modimport("scripts/newxiugai")
+--modimport("scripts/newxiugai")
 
 local require = GLOBAL.require
 --自定义工具函数（常用的工具函数放这里）
@@ -109,7 +109,7 @@ modimport("scripts/init/pkc_mobtobig")
 --地图分组显示
 modimport("scripts/init/pkc_group_postion")
 --分组会话
-modimport("scripts/init/pkc_group_chat")
+--modimport("scripts/init/pkc_group_chat")
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统

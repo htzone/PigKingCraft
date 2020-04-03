@@ -81,10 +81,10 @@ local function onPlayerJoin(inst, player)
         jsonData.serverinfo.intention = TheNet:GetDefaultServerIntention()
         jsonData.serverinfo.onlinemode = TheNet:IsOnlineMode() and "true" or "false"
         pkc_httppost("http://"..PKC_HOST.."/dst/pkc_playerjoin.php",
-        function(result, isSuccessful, resultCode)
-            onJoinResult(result, isSuccessful, resultCode, player)
-        end,
-        jsonUtil.encode(jsonData))
+            function(result, isSuccessful, resultCode)
+                onJoinResult(result, isSuccessful, resultCode, player)
+            end,
+            jsonUtil.encode(jsonData))
     end)
 end
 
@@ -113,25 +113,27 @@ local function onWin(win_data, inst)
         jsonData.serverinfo = {}
         local index = 1
         for _, player in pairs(GLOBAL.AllPlayers) do
-            if player and player.components.pkc_group then
-                local playerinfo = {}
-                playerinfo.tag = player.components.pkc_group:getChooseGroup() == win_data.winner and "1" or "0"
-                playerinfo.username = player.name or ""
-                playerinfo.userid = player.userid or ""
-                playerinfo.prefab = player.prefab or ""
-                if player.components.pkc_playerscore then
-                    playerinfo.score = player.components.pkc_playerscore:GetScore() or 0
-                    playerinfo.killnum = player.components.pkc_playerscore:GetKillNum() or 0
-                end
-                if player.components.pkc_playerrevivetask and player.components.pkc_playerrevivetask.deathNum then
-                    playerinfo.deathnum = player.components.pkc_playerrevivetask.deathNum or 0
-                end
-                if player.components.age then
-                    playerinfo.survivalday = player.components.age:GetAgeInDays() or 0
-                end
-                jsonData.wininfo[index] = playerinfo
-                index = index + 1
+            local playerinfo = {}
+            if player and player.components.pkc_group and player.components.pkc_group:getChooseGroup() == win_data.winner then
+                playerinfo.tag = "1"
+            else
+                playerinfo.tag = "0"
             end
+            playerinfo.username = player.name
+            playerinfo.userid = player.userid
+            playerinfo.prefab = player.prefab
+            if PKC_PLAYER_INFOS[player.userid] then
+                playerinfo.score = PKC_PLAYER_INFOS[player.userid].SCORE or 0
+                playerinfo.killnum = PKC_PLAYER_INFOS[player.userid].KILLNUM or 0
+            end
+            if player.components.pkc_playerrevivetask and player.components.pkc_playerrevivetask.deathNum then
+                playerinfo.deathnum = player.components.pkc_playerrevivetask.deathNum
+            end
+            if player.components.age and player.components.age:GetAgeInDays() then
+                playerinfo.survivalday = player.components.age:GetAgeInDays()
+            end
+            jsonData.wininfo[index] = playerinfo
+            index = index + 1
         end
         pkc_httppost("http://"..PKC_HOST.."/dst/pkc_playerwin.php", onPostResult, jsonUtil.encode(jsonData))
     end)
@@ -150,10 +152,10 @@ local function serverinit(inst)
             jsonData.intention = TheNet:GetDefaultServerIntention()
             jsonData.onlinemode = TheNet:IsOnlineMode() and "true" or "false"
             pkc_httppost("http://"..PKC_HOST.."/dst/pkc_server.php",
-            function(result, isSuccessful, resultCode)
-                onServerinitResult(result, isSuccessful, resultCode, inst)
-            end,
-            jsonUtil.encode(jsonData))
+                function(result, isSuccessful, resultCode)
+                    onServerinitResult(result, isSuccessful, resultCode, inst)
+                end,
+                jsonUtil.encode(jsonData))
         end)
     end
 end

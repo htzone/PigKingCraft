@@ -14,7 +14,7 @@ local PlayerMapIcon = Class(Widget, function(self, prefab, colour)
     self.prefabName = prefab or ""
     self.colour = colour or DEFAULT_PLAYER_COLOUR
     self.icon = self:AddChild(PlayerBadge(self.prefabName, self.colour, false, 0))
-    self.icon:SetScale(.3)
+    self.icon:SetScale(.64)
 end)
 
 function PlayerMapIcon:Scale(scale)

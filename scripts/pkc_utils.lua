@@ -538,5 +538,14 @@ function startWith(str, start)
 	return false
 end
 
+--function isSameGroup(inst1, inst2)
+--	return inst1.components.pkc_group and inst2.inst.components.pkc_group
+--			and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
+--end
+--
+--function isSameGroupByUserId(curUserid, userid)
+--	return PKC_PLAYER_INFOS[curUserid] and PKC_PLAYER_INFOS[userid]
+--			and PKC_PLAYER_INFOS[curUserid].GROUP_ID == PKC_PLAYER_INFOS[userid].GROUP_ID
+--end
 
 

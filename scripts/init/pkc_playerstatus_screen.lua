@@ -27,11 +27,11 @@ local PERF_CLIENT_LEVELS =
 }
 
 local function getPlayerKillNum(userid)
-    return PKC_PLAYER_SCORES[userid] and PKC_PLAYER_SCORES[userid].KILL_PLAYER_NUM or 0
+    return PKC_PLAYER_INFOS[userid] and PKC_PLAYER_INFOS[userid].PLAYER_KILLNUM or 0
 end
 
 local function getPlayerScore(userid)
-    return PKC_PLAYER_SCORES[userid] and PKC_PLAYER_SCORES[userid].SCORE or 0
+    return PKC_PLAYER_INFOS[userid] and PKC_PLAYER_INFOS[userid].PLAYER_SCORE or 0
 end
 
 local function getGroupColor(userid)
@@ -40,7 +40,6 @@ local function getGroupColor(userid)
     end
     return 1, 1, 1
 end
-
 
 --根据得分对玩家进行排序
 local function sortClient(clientObjs)
@@ -138,10 +137,12 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
                 playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
                 = getGroupColor(playerListing.userid)
                 --设置击杀数和颜色
+                playerListing.killNum:Show()
                 playerListing.killNum:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH1
                         .. tostring(getPlayerKillNum(playerListing.userid)))
                 playerListing.killNum:SetColour(playerListing.pkc_colour)
                 --设置得分数和颜色
+                playerListing.score:Show()
                 playerListing.score:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH2
                         .. tostring(getPlayerScore(playerListing.userid)))
                 playerListing.score:SetColour(playerListing.pkc_colour)
@@ -212,7 +213,7 @@ function PlayerStatusScreen:OnUpdate(dt)
 
                             playerListing.pkc_colour = playerListing.pkc_colour or { 1, 1, 1, 1 }
                             playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                            = getGroupColor(playerListing.userid)
+                            = getGroupColor(client.userid)
                             playerListing.characterBadge:Set(
                                 client.prefab or "",
                                 playerListing.pkc_colour,

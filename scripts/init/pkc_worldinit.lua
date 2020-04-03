@@ -40,12 +40,12 @@ end
 local function startingInventory(inst, player)
 	local startInventory = {}
 	--配置初始物品
-	giveItemToPlayer(startInventory, 5, "cutgrass") 
-	giveItemToPlayer(startInventory, 5, "twigs") 
-	giveItemToPlayer(startInventory, 5, "log") 
-	giveItemToPlayer(startInventory, 5, "flint") 
-	giveItemToPlayer(startInventory, 5, "rocks") 
-	giveItemToPlayer(startInventory, 2, "meat") 
+	giveItemToPlayer(startInventory, 5, "cutgrass")
+	giveItemToPlayer(startInventory, 5, "twigs")
+	giveItemToPlayer(startInventory, 5, "log")
+	giveItemToPlayer(startInventory, 5, "flint")
+	giveItemToPlayer(startInventory, 5, "rocks")
+	giveItemToPlayer(startInventory, 2, "meat")
 	--如果初始点在洞穴
 	if GLOBAL.TheWorld:HasTag("cave") then
 		giveItemToPlayer(startInventory, 1, "minerhat") --矿工帽
@@ -79,7 +79,7 @@ local function checkIsGroupMemberFn(attacker, target)
 		if attacker.components.pkc_group and target.components.pkc_group and target.components.pkc_group:getChooseGroup() ~= 0 then
 			if attacker.components.pkc_group:getChooseGroup() == target.components.pkc_group:getChooseGroup() then
 				return true
-			end 
+			end
 			if target:HasTag("pig") and target.components.follower and target.components.follower.leader ~= nil then
 				return false
 			end
@@ -135,53 +135,41 @@ end
 
 --监听死亡
 local function onEntityDied(data, inst)
-	local killer = data.afflicter
-	local dead = data.inst
-	if data and dead and killer and not dead.pkc_hasBeKilled then
-		dead.pkc_hasBeKilled = true
+	if data and data.inst and data.afflicter and not data.inst.pkc_hasKilled then
+		data.inst.pkc_hasKilled = true
 		--击杀者必须有队伍才能得分
-		if killer.components.pkc_group then
-			local killer_group_id = killer.components.pkc_group:getChooseGroup()
+		if data.afflicter.components.pkc_group then
+			local killer_group_id = data.afflicter.components.pkc_group:getChooseGroup()
 			if killer_group_id ~= nil and killer_group_id > 0 then
-				if dead.components.pkc_group then --被击杀者有队伍
-					if dead.components.pkc_group:getChooseGroup() ~= killer.components.pkc_group:getChooseGroup() then --击杀的是其他队伍的成员
-						if dead:HasTag("player") then --击杀的是玩家
+				if data.inst.components.pkc_group then --被击杀者有队伍
+					if data.inst.components.pkc_group:getChooseGroup() ~= data.afflicter.components.pkc_group:getChooseGroup() then --击杀的是其他队伍的成员
+						if data.inst:HasTag("player") then --击杀的是玩家
 							inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL.PLAYER)
-							if killer.components.pkc_playerscore then
-								killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL.PLAYER)
-								killer.components.pkc_playerscore:AddKillPlayerNum()
-							end
---							inst.components.pkc_playerinfos:addPlayerKillNum(killer)
---							inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL.PLAYER)
-						elseif dead:HasTag("king") then --敌对首领
+							inst.components.pkc_playerinfos:addPlayerKillNum(data.afflicter)
+							inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL.PLAYER)
+						elseif data.inst:HasTag("king") then --敌对首领
 							inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL.KING)
-							setGravestoneForKing(dead, killer_group_id) --设置墓碑
-							GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = dead.components.pkc_group:getChooseGroup(), killer = killer})
+							setGravestoneForKing(data.inst, killer_group_id) --设置墓碑
+							GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = data.inst.components.pkc_group:getChooseGroup(), killer = data.afflicter})
 						else --其他成员
-							if dead.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[dead.prefab] ~= nil then
-								inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[dead.prefab])
-								if killer.components.pkc_playerscore then
-									killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL[dead.prefab])
-								end
---								inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL[dead.prefab])
+							if data.inst.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[data.inst.prefab] ~= nil then
+								inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
+								inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
 							end
 						end
 					end
 				else --被击杀者没有队伍
-					bossKilledAnnounce(dead, killer) --boss击杀公告
-					if dead.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[dead.prefab] ~= nil then
-						inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[dead.prefab])
---						inst.components.pkc_playerinfos:addPlayerScore(killer, GLOBAL.GAME_SCORE.KILL[dead.prefab])
-						if killer.components.pkc_playerscore then
-							killer.components.pkc_playerscore:AddScore(GLOBAL.GAME_SCORE.KILL[dead.prefab])
-						end
+					bossKilledAnnounce(data.inst, data.afflicter) --boss击杀公告
+					if data.inst.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[data.inst.prefab] ~= nil then
+						inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
+						inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
 					end
 				end
 			end
 		else
-			if dead.components.pkc_group and dead:HasTag("king") then
-				setGravestoneForKing(dead) --设置墓碑
-				GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = dead.components.pkc_group:getChooseGroup(), killer = killer})
+			if data.inst.components.pkc_group and data.inst:HasTag("king") then
+				setGravestoneForKing(data.inst) --设置墓碑
+				GLOBAL.TheWorld:PushEvent("pkc_kingbekilled", {killed_group_id  = data.inst.components.pkc_group:getChooseGroup(), killer = data.afflicter})
 			end
 		end
 	end
@@ -192,10 +180,7 @@ local function onGiveScoreItem(data, inst)
 	if data then
 		if data.giver and data.getter and data.addScore and data.giver.components.pkc_group and data.getter.components.pkc_group then
 			inst.components.pkc_groupscore:addGroupScore(data.getter.components.pkc_group:getChooseGroup(), data.addScore)
-			if data.giver.components.pkc_playerscore then
-				data.giver.components.pkc_playerscore:AddScore(data.addScore)
-			end
---			inst.components.pkc_playerinfos:addPlayerScore(data.giver, data.addScore)
+			inst.components.pkc_playerinfos:addPlayerScore(data.giver, data.addScore)
 		end
 	end
 end
@@ -241,12 +226,12 @@ local function onWin(win_data, inst)
 		end
 	end
 end
- 
+
 --转移财产（善后）（赢得一方占领）
 local function transferProperty(killedId, killerId)
 	local ents = GLOBAL.TheSim:FindEntities(0, 0, 0, 1000,{"pkc_group"..killedId})
 	for _, obj in pairs(ents) do
-		 if obj and not obj:HasTag("player") then
+		if obj and not obj:HasTag("player") then
 			if obj:HasTag("pkc_defences") and not obj:HasTag("burnt") and obj.Transform then
 				obj:DoTaskInTime(math.random(3), function()
 					local currentscale = obj.Transform:GetScale()
@@ -286,9 +271,9 @@ local  function dissolvePlayers(killedId)
 			end
 			player:DoTaskInTime(6, function()
 				if player ~= nil and player:IsValid() then
-				  if GLOBAL.TheWorld.ismastersim then
-					GLOBAL.TheWorld:PushEvent("ms_playerdespawnanddelete", player)
-				  end
+					if GLOBAL.TheWorld.ismastersim then
+						GLOBAL.TheWorld:PushEvent("ms_playerdespawnanddelete", player)
+					end
 				end
 			end)
 		end
@@ -323,19 +308,19 @@ local function onKingbekilled(data, inst)
 		GLOBAL.SpawnPrefab("lightning")
 		GLOBAL.pkc_announce(GLOBAL.getNamebyGroupId(data.killed_group_id)..GLOBAL.PKC_SPEECH.KINGBEKILLED_ANNOUNCE.SPEECH1..data.killer.name..GLOBAL.PKC_SPEECH.KINGBEKILLED_ANNOUNCE.SPEECH2)
 		--标记被消灭
-		inst.components.pkc_groupscore:setGroupScore(data.killed_group_id, -9999) 
+		inst.components.pkc_groupscore:setGroupScore(data.killed_group_id, -9999)
 		--如果击杀者为其他队伍，则转移财产
 		if data.killer and data.killer.components.pkc_group then --善后
-			transferProperty(data.killed_group_id, data.killer.components.pkc_group:getChooseGroup()) 
+			transferProperty(data.killed_group_id, data.killer.components.pkc_group:getChooseGroup())
 		else
 			transferProperty(data.killed_group_id)
 		end
 		--解散成员
-		dissolvePlayers(data.killed_group_id) 
+		dissolvePlayers(data.killed_group_id)
 		--移除阵营
-		removeGroup(inst, data.killed_group_id) 
+		removeGroup(inst, data.killed_group_id)
 		--检查是否胜利了
-		checkWin(data.killer) 
+		checkWin(data.killer)
 		--阵营被消灭提示
 		inst:DoTaskInTime(10, function()
 			if data.killer then
@@ -352,27 +337,27 @@ end
 
 --测试用
 local function TransToOtherBase(inst)
-	
+
 	if GLOBAL.TheWorld.state.cycles % 4 == 1 then
 		local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_BIGPIG_POS_x"]
 		local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_BIGPIG_POS_z"]
-		for _,player in pairs(GLOBAL.AllPlayers) do 
+		for _,player in pairs(GLOBAL.AllPlayers) do
 			player.Transform:SetPosition(x, 0, z)
 		end
 	end
-	
+
 	if GLOBAL.TheWorld.state.cycles % 4 == 2 then
 		local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_LONGPIG_POS_x"]
 		local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_LONGPIG_POS_z"]
-		for _,player in pairs(GLOBAL.AllPlayers) do 
+		for _,player in pairs(GLOBAL.AllPlayers) do
 			player.Transform:SetPosition(x, 0, z)
 		end
 	end
-	
+
 	if GLOBAL.TheWorld.state.cycles % 4 == 3 then
 		local x = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_CUIPIG_POS_x"]
 		local z = GLOBAL.TheWorld.components.pkc_baseinfo["GROUP_CUIPIG_POS_z"]
-		for _,player in pairs(GLOBAL.AllPlayers) do 
+		for _,player in pairs(GLOBAL.AllPlayers) do
 			player.Transform:SetPosition(x, 0, z)
 		end
 	end
@@ -388,11 +373,11 @@ AddPrefabPostInit("world", function(inst)
 		inst.components.pkc_checkattack:isGroupMember(checkIsGroupMemberFn)
 		--添加记录阵营位置组件
 		if IsServer then
-			inst:AddComponent("pkc_baseinfo")	
+			inst:AddComponent("pkc_baseinfo")
 			--传送到其他基地（测试用）
 			--inst:ListenForEvent("ms_cyclecomplete", function() TransToOtherBase(inst) end)
 			--给初始物品
-			if GLOBAL.GIVE_START_ITEM then 
+			if GLOBAL.GIVE_START_ITEM then
 				inst:ListenForEvent("ms_playerspawn", startingInventory, inst)
 			end
 		end
@@ -411,7 +396,7 @@ end
 
 local function network(inst)
 	--添加队伍得分机制
-    inst:AddComponent("pkc_groupscore")
+	inst:AddComponent("pkc_groupscore")
 	--初始化存在队伍
 	inst:AddComponent("pkc_existgroup")
 	--简单弹框
@@ -446,7 +431,7 @@ AddPrefabPostInit("cave_network", network)
 AddClassPostConstruct("widgets/controls", function(wdt)
 	wdt.inst:DoTaskInTime(0, function()
 		local pkc_scoreboard = require "widgets/pkc_scoreboard"
-		
+
 		if GLOBAL.GROUP_NUM >= 2 then
 			wdt.pvp_widget1 = wdt.top_root:AddChild(pkc_scoreboard())
 			wdt.pvp_widget2 = wdt.top_root:AddChild(pkc_scoreboard())
@@ -457,48 +442,48 @@ AddClassPostConstruct("widgets/controls", function(wdt)
 		if GLOBAL.GROUP_NUM >= 4 then
 			wdt.pvp_widget4 = wdt.top_root:AddChild(pkc_scoreboard())
 		end
-		
+
 		wdt.d_colour1,wdt.d_colour2,wdt.d_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.BIGPIG.score_color)
 		wdt.r_colour1,wdt.r_colour2,wdt.r_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.REDPIG.score_color)
 		wdt.l_colour1,wdt.l_colour2,wdt.l_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.LONGPIG.score_color)
 		wdt.c_colour1,wdt.c_colour2,wdt.c_colour3 = GLOBAL.HexToPercentColor(GLOBAL.PKC_GROUP_INFOS.CUIPIG.score_color)
-		
+
 		local old_OnUpdate = wdt.OnUpdate
 		wdt.OnUpdate = function(self, dt)
-		
+
 			old_OnUpdate(self, dt)
 			wdt.pvp_widget1.button:SetText(GLOBAL.SHORT_NAME.BIGPIG..":"..(_G.GROUP_SCORE.GROUP1_SCORE >=0 and _G.GROUP_SCORE.GROUP1_SCORE or GLOBAL.PKC_SPEECH.GROUP_BEKILLED))
 			wdt.pvp_widget1.button:SetTextColour(wdt.d_colour1, wdt.d_colour2, wdt.d_colour3, 1)
 			wdt.pvp_widget1.button:SetTextSize(48)
-			
+
 			wdt.pvp_widget2.button:SetText(GLOBAL.SHORT_NAME.REDPIG..":"..(_G.GROUP_SCORE.GROUP2_SCORE >=0 and _G.GROUP_SCORE.GROUP2_SCORE or GLOBAL.PKC_SPEECH.GROUP_BEKILLED))
 			wdt.pvp_widget2.button:SetTextColour(wdt.r_colour1, wdt.r_colour2, wdt.r_colour3, 1)
 			wdt.pvp_widget2.button:SetTextSize(48)
-			
+
 			if GLOBAL.GROUP_NUM >= 2 then
 				wdt.pvp_widget1:SetPosition(-75,-15,0)
 				wdt.pvp_widget2:SetPosition(75,-15,0)
 			end
-			
+
 			if GLOBAL.GROUP_NUM >= 3 then
 				wdt.pvp_widget3.button:SetText(GLOBAL.SHORT_NAME.LONGPIG..":"..(_G.GROUP_SCORE.GROUP3_SCORE >=0 and _G.GROUP_SCORE.GROUP3_SCORE or GLOBAL.PKC_SPEECH.GROUP_BEKILLED))
 				wdt.pvp_widget3.button:SetTextColour(wdt.l_colour1, wdt.l_colour2, wdt.l_colour3, 1)
 				wdt.pvp_widget3.button:SetTextSize(48)
-				
+
 				wdt.pvp_widget1:SetPosition(-150,-15,0)
 				wdt.pvp_widget2:SetPosition(0,-15,0)
 				wdt.pvp_widget3:SetPosition(150,-15,0)
 			end
-			
+
 			if GLOBAL.GROUP_NUM >= 4 then
 				wdt.pvp_widget4.button:SetText(GLOBAL.SHORT_NAME.CUIPIG..":"..(_G.GROUP_SCORE.GROUP4_SCORE >=0 and _G.GROUP_SCORE.GROUP4_SCORE or GLOBAL.PKC_SPEECH.GROUP_BEKILLED))
 				wdt.pvp_widget4.button:SetTextColour(wdt.c_colour1, wdt.c_colour2, wdt.c_colour3, 1)
 				wdt.pvp_widget4.button:SetTextSize(48)
-				
+
 				wdt.pvp_widget1:SetPosition(-225,-15,0)
 				wdt.pvp_widget2:SetPosition(-75,-15,0)
 				wdt.pvp_widget3:SetPosition(75,-15,0)
-				wdt.pvp_widget4:SetPosition(225,-15,0)	
+				wdt.pvp_widget4:SetPosition(225,-15,0)
 			end
 		end
 	end)

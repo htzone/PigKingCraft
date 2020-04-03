@@ -34,27 +34,37 @@ local function isSameGroup(curUserid, userid)
             and GLOBAL.PKC_PLAYER_INFOS[curUserid].GROUP_ID == GLOBAL.PKC_PLAYER_INFOS[userid].GROUP_ID
 end
 
-local DEFAULT_PLAYER_COLOUR = { 1, 1, 1, 1 }
-local function showMapIcon(self, userid, x, y, z)
-    local iconPos = Vector3(self:WorldPosToMapScreenPos(x, y, z))
-    if not self.mapIcons[userid] then
-        self.mapIcons[userid] = require("widgets/pkc_player_mapicon")()
-    end
-    self.mapIcons[userid]:Set("", DEFAULT_PLAYER_COLOUR)
-    self.mapIcons[userid]:SetPosition(iconPos:Get())
-    self.mapIcons[userid]:ShowIcon()
+local function getPlayerPrefab(userid)
+    return PKC_PLAYER_INFOS[userid] and PKC_PLAYER_INFOS[userid].PLAYER_PREFAB or ""
+end
+
+local function getPlayerGroupColor(userid)
+    local color = {1, 1, 1, 1 }
+    color[1], color[2], color[3] = HexToPercentColor(PKC_PLAYER_INFOS[userid].GROUP_COLOR)
+    return PKC_PLAYER_INFOS[userid] and color or {1, 1, 1, 1}
 end
 
 local function scaleMapIcon(self, zoom)
     for _, v in pairs(self.mapIcons) do
         if v and v.shown then
-            local scale = 0.2 + 0.15 * ((20 - math.min(zoom, 20)) / 20)
-            print("zoom:"..tostring(zoom).."---scale:"..tostring(scale))
+            local scale = ((20 - (zoom or 0)) / 20) * 0.4 + 0.3
             v:Scale(scale)
         end
     end
 end
 
+local playerMapIcon = require("widgets/pkc_player_mapicon")
+local function showMapIcon(self, userid, x, y, z)
+    local iconPos = Vector3(self:WorldPosToMapScreenPos(x, y, z))
+    if not self.mapIcons[userid] then
+        self.mapIcons[userid] = playerMapIcon()
+    end
+    self.mapIcons[userid]:Set(getPlayerPrefab(userid), getPlayerGroupColor(userid))
+    self.mapIcons[userid]:SetPosition(iconPos:Get())
+    self.mapIcons[userid]:ShowIcon()
+    local zoom = self.minimap:GetZoom()
+    scaleMapIcon(self, zoom)
+end
 
 AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
     MapWidget.offset = GLOBAL.Vector3(0, 0, 0)
