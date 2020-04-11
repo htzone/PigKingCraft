@@ -30,7 +30,7 @@
 
 local json = require "json"
 
-local function getPlayerColor(userid)
+local function getPlayerColorByUserId(userid)
     local clientObjs = GetPlayerClientTable()
     for _, v in pairs(clientObjs) do
         if v and v.userid == userid then
@@ -103,7 +103,7 @@ function PKC_PLAYERINFOS:SetPlayerInfo(player)
         end
         playerInfo.PLAYER_NAME = player.name
         playerInfo.PLAYER_PREFAB = player.prefab
-        playerInfo.PLAYER_COLOR = getPlayerColor(player.userid)
+        playerInfo.PLAYER_COLOR = getPlayerColorByUserId(player.userid)
         print("[pkc]--groupId:"..tostring(playerInfo.GROUP_ID))
         print("[pkc]--groupColor:"..tostring(playerInfo.GROUP_COLOR))
         print("[pkc]--playerName:"..tostring(playerInfo.PLAYER_NAME))

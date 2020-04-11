@@ -538,6 +538,15 @@ function startWith(str, start)
 	return false
 end
 
+function getPlayerColorByUserId(userid)
+	local clientObjs = GetPlayerClientTable()
+	for _, v in pairs(clientObjs) do
+		if v and v.userid == userid then
+			return v.colour
+		end
+	end
+	return DEFAULT_PLAYER_COLOUR
+end
 --function isSameGroup(inst1, inst2)
 --	return inst1.components.pkc_group and inst2.inst.components.pkc_group
 --			and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()

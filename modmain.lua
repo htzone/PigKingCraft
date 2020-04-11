@@ -67,7 +67,7 @@ require "pkc_utils"
 --覆写网络函数
 require "pkc_networking_override"
 --木牌传送
-modimport("scripts/mods/pkc_fasttravel")
+modimport("scripts/mods/pkc_fasttravel1")
 --属性显示
 modimport("scripts/mods/pkc_showme")
 --快速采集

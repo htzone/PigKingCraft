@@ -44,6 +44,8 @@ AddPlayerPostInit(function(player)
 		player:AddComponent("pkc_playerrevivetask")
 		--角色平衡
 		player:AddComponent("pkc_characterbalance")
+		--玩家可传送
+		player:AddTag("pkc_travelable")
 		--计时器
 		if not player.components.timer then
 			player:AddComponent("timer")

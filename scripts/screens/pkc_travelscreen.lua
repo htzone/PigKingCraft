@@ -237,7 +237,7 @@ function TravelScreen:DestListItem()
             dest.name:SetString(info.name)
             dest.name:SetColour(1, 1, 1, 1)
         else
-            dest.name:SetString("Unknow")
+            dest.name:SetString("未知")
             dest.name:SetColour(1, 1, 0, 0.6)
         end
 

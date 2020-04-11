@@ -632,7 +632,7 @@ end
 local function canBuilHomeSign(act)
 	local pt = act:GetActionPoint()
 	local groupId = act.doer.components.pkc_group:getChooseGroup()
-	local homeSigns = GLOBAL.TheSim:FindEntities(pt.x, pt.y, pt.z, 1000, {"fast_travel", "pkc_group"..groupId})
+	local homeSigns = GLOBAL.TheSim:FindEntities(pt.x, pt.y, pt.z, 1000, {"pkc_travelable", "pkc_group"..groupId})
 	if homeSigns ~= nil and #homeSigns > (GLOBAL.PKC_GROUPHOMESIGN_NUM - 1) then
 		return false
 	end
@@ -680,19 +680,19 @@ GLOBAL.ACTIONS.BUILD.fn = function(act)
 		return old_BUILD(act)
 	end
 
-	if act.recipe == "homesign" then --建造路牌
-		if not canBuilHomeSign(act) then
-			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_GROUPHOMESIGN_NUM))
-			return false
-		end
-	end
-
-	if act.recipe == "pighouse" then --建造猪房
-		if not canBuildPigHouse(act) then
-			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_MAX_PIGHOUSE_NUM))
-			return false
-		end
-	end
+--	if act.recipe == "homesign" then --建造路牌
+--		if not canBuilHomeSign(act) then
+--			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_GROUPHOMESIGN_NUM))
+--			return false
+--		end
+--	end
+--
+--	if act.recipe == "pighouse" then --建造猪房
+--		if not canBuildPigHouse(act) then
+--			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_MAX_PIGHOUSE_NUM))
+--			return false
+--		end
+--	end
 
 	local x, y, z = act.doer.Transform:GetWorldPosition()
 	local ents = GLOBAL.TheSim:FindEntities(x, y, z, 8)

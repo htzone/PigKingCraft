@@ -1,4 +1,10 @@
---pkc todo
+--TODO
+--1.玩家木牌颜色
+--2.调整当前站点颜色，未知颜色
+--2.延时调整，普通木牌10秒，玩家15秒
+--3.被传送玩家附近有其他敌对玩家时不能传送
+--4.删掉之前的木牌代码
+--5.把删除的建造限制代码恢复
 
 local function ontraveller(self, traveller)
 	self.inst.replica.pkc_travelable:SetTraveller(traveller)
@@ -71,30 +77,24 @@ local function IsNearDanger(traveller)
 end
 
 function Travelable:ListDestination(traveller)
+	if not traveller.components.pkc_group then return end
+	local groupId = traveller.components.pkc_group:getChooseGroup()
+
 	local x, y, z = self.inst.Transform:GetWorldPosition()
-	local dests = TheSim:FindEntities(x, y, z, find_dist, "pkc_travelable")
+	local dests = TheSim:FindEntities(x, y, z, find_dist, {"pkc_travelable", "pkc_group"..groupId})
 	self.destinations = {}
 
 	for k, v in pairs(dests) do
-		if v.components.pkc_travelable and not (v.components.pkc_travelable.ownership and v:HasTag(ownershiptag) and traveller.userid ~= nil and not v:HasTag("uid_" .. traveller.userid)) then
+		if v and v.components.pkc_travelable and not (v.components.pkc_travelable.ownership
+				and v:HasTag(ownershiptag)
+				and traveller.userid ~= nil and not v:HasTag("uid_" .. traveller.userid)) then
+			table.insert(self.destinations, v)
+		elseif v and v:HasTag("player") and v ~= traveller
+				and v.components.pkc_group and traveller.components.pkc_group
+				and v.components.pkc_group:getChooseGroup() == traveller.components.pkc_group:getChooseGroup() then
 			table.insert(self.destinations, v)
 		end
 	end
-
-	table.sort(
-		self.destinations,
-		function(destA, destB)
-			local writeA = destA.components.writeable
-			local writeB = destB.components.writeable
-			if writeA == nil or writeA:GetText() == nil or writeA:GetText() == "" then
-				return false
-			end
-			if writeB == nil or writeB:GetText() == nil or writeB:GetText() == "" then
-				return true
-			end
-			return string.lower(writeA:GetText()) < string.lower(writeB:GetText())
-		end
-	)
 
 	self.totalsites = #self.destinations
 	self.site = self.totalsites
@@ -102,6 +102,7 @@ end
 
 function Travelable:BeginTravel(traveller)
 	local comment = self.inst.components.talker
+
 	if not traveller then
 		if comment then
 			comment:Say("谁摸了我？")
@@ -110,7 +111,14 @@ function Travelable:BeginTravel(traveller)
 	end
 	local talk = traveller.components.talker
 
-	if self.ownership and self.inst:HasTag(ownershiptag) and traveller.userid ~= nil and not self.inst:HasTag("uid_" .. traveller.userid) then
+	if traveller.components.pkc_group and self.inst.pkc_group_id
+			and traveller.components.pkc_group:getChooseGroup() ~= self.inst.pkc_group_id then
+		if talk then talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH3) end
+		return
+	end
+
+	if self.ownership and self.inst:HasTag(ownershiptag)
+			and traveller.userid ~= nil and not self.inst:HasTag("uid_" .. traveller.userid) then
 		if comment then
 			comment:Say("私人财产.")
 		elseif talk then
@@ -164,7 +172,14 @@ end
 function Travelable:MakeInfos()
 	local infos = ""
 	for i, destination in ipairs(self.destinations) do
-		local name = destination.components.writeable and destination.components.writeable:GetText() or "~nil"
+		local name = nil
+		if destination:HasTag("player") then
+			name = destination.name
+			print("player name:"..tostring(destination.name))
+			print("player color:"..tostring(getPlayerColorByUserId(destination.userid)))
+		else
+			name = destination.components.writeable and destination.components.writeable:GetText() or "~nil"
+		end
 		local cost_hunger = min_hunger_cost
 		local cost_sanity = 0
 		local xi, yi, zi = self.inst.Transform:GetWorldPosition()
@@ -197,8 +212,13 @@ function Travelable:Travel(traveller, index)
 		local talk = traveller.components.talker
 
 		-- Site information
-		local desc = destination and destination.components.writeable and destination.components.writeable:GetText()
-		local description = desc and string.format('"%s"', desc) or "Unknown Destination"
+		local desc
+		if destination:HasTag("player") then
+			desc = destination and destination.name or "无名"
+		else
+			desc = destination and destination.components.writeable and destination.components.writeable:GetText()
+		end
+		local description = desc and string.format('"%s"', desc) or "未知目的地"
 		local information = ""
 		local cost_hunger = min_hunger_cost
 		local cost_sanity = 0
@@ -206,7 +226,7 @@ function Travelable:Travel(traveller, index)
 		local xf, yf, zf = destination.Transform:GetWorldPosition()
 		local dist = math.sqrt((xi - xf) ^ 2 + (zi - zf) ^ 2)
 
-		if destination and destination.components.pkc_travelable then
+		if destination and destination:HasTag("pkc_travelable") then
 			table.insert(self.travellers, traveller)
 
 			cost_hunger = cost_hunger + math.ceil(dist / self.dist_cost)
@@ -217,7 +237,9 @@ function Travelable:Travel(traveller, index)
 				cost_sanity = cost_sanity * 0.75
 			end
 
-			information = "去: " .. description .. " (" .. string.format("%.0f", self.site) .. "/" .. string.format("%.0f", self.totalsites) .. ")" .. "\n" .. "饥饿: " .. string.format("%.0f", cost_hunger) .. "\n" .. "理智: " .. string.format("%.1f", cost_sanity)
+			information = "去: " .. description .. " (" .. string.format("%.0f", self.site) .. "/"
+					.. string.format("%.0f", self.totalsites) .. ")" .. "\n" .. "饥饿: "
+					.. string.format("%.0f", cost_hunger) .. "\n" .. "理智: " .. string.format("%.1f", cost_sanity)
 			if comment then
 				comment:Say(string.format(information), 3)
 			elseif talk then
@@ -247,13 +269,15 @@ function Travelable:Travel(traveller, index)
 							elseif comment then
 								comment:Say("现在旅行不安全.")
 							end
-						elseif destination.components.pkc_travelable.ownership and destination:HasTag(ownershiptag) and who.userid ~= nil and not destination:HasTag("uid_" .. who.userid) then
+						elseif destination.components.pkc_travelable and destination.components.pkc_travelable.ownership
+								and destination:HasTag(ownershiptag) and who.userid ~= nil and not destination:HasTag("uid_" .. who.userid) then
 							if comment then
 								comment:Say("那是别人的地盘.")
 							elseif talk then
 								talk:Say("那是别人的地盘.")
 							end
-						elseif who.components.hunger and who.components.hunger.current >= cost_hunger and who.components.sanity and who.components.sanity.current >= cost_sanity then
+						elseif who.components.hunger and who.components.hunger.current >= cost_hunger
+								and who.components.sanity and who.components.sanity.current >= cost_sanity then
 							-- /follow
 							who.components.hunger:DoDelta(-cost_hunger)
 							who.components.sanity:DoDelta(-cost_sanity)

@@ -148,7 +148,6 @@ local function fn()
 
     inst:AddTag("king")
 	inst:AddTag("cuipig")
-	inst:AddTag("pkc_group4")
 	inst:AddTag("pig")
 	inst:AddTag("character")
     inst.AnimState:SetBank("Pig_King")

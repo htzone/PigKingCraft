@@ -19,7 +19,7 @@ nil,
 function PKC_GROUP:setChooseGroup(chooseGroup)
 	self._chooseGroup:set(chooseGroup)
 	self.inst.pkc_groupid = chooseGroup
-	self.inst:AddTag("pkc_group_"..chooseGroup)
+	self.inst:AddTag("pkc_group"..chooseGroup)
 end
 
 function PKC_GROUP:getChooseGroup()
@@ -47,7 +47,7 @@ function PKC_GROUP:OnLoad(data)
 		if data.chooseGroup ~= nil then
 			self._chooseGroup:set(data.chooseGroup)
 			self.inst.pkc_groupid = data.chooseGroup
-			self.inst:AddTag("pkc_group_"..data.chooseGroup)
+			self.inst:AddTag("pkc_group"..data.chooseGroup)
 		end
 		if data.basePos ~= nil then
 			self.basePos = data.basePos
