@@ -1,6 +1,6 @@
 --
 -- 猪王争霸（PigKingCraft）
--- Author: RedPig, 大猪猪, 龙飞, 老崔
+-- Author: RedPig
 -- Date: 2016/10/01
 --
 --[[
@@ -40,7 +40,7 @@
                 , , ,,,:,,::::::::iiiiiiiiii:,:,:::::::::iiir;ri7vL77rrirri::
                  :,, , ::::::::i:::i:::i:i::,,,,,:,::i:i:::iir;@Secbone.ii:::
                           A single dog（pig） is looking at you...
-                          仅此纪念一起搞饥荒的美好时光，朋友们...
+                          仅此纪念一起玩饥荒的美好时光，朋友们...
 
 
 ]]--
@@ -67,7 +67,7 @@ require "pkc_utils"
 --覆写网络函数
 require "pkc_networking_override"
 --木牌传送
-modimport("scripts/mods/pkc_fasttravel1")
+modimport("scripts/mods/pkc_fasttravel")
 --属性显示
 modimport("scripts/mods/pkc_showme")
 --快速采集

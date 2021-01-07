@@ -57,12 +57,25 @@ function pkc_talk(player, content)
 end
 
 --传送物体
-function pkc_teleport(inst, pos)
+function pkc_teleportToPoint(inst, pos)
 	if inst and pos then
 		if inst.Physics ~= nil then
 			inst.Physics:Teleport(pos:Get())
 		else
 			inst.Transform:SetPosition(pos:Get())
+		end
+	end
+end
+
+--传送物体
+function pkc_teleport(inst, destination, offset)
+	local mOffset = offset or 0
+	if inst and destination and destination.Transform then
+		local x, y, z = destination.Transform:GetWorldPosition()
+		if inst.Physics ~= nil then
+			inst.Physics:Teleport(x + mOffset, 0, z)
+		else
+			inst.Transform:SetPosition(x + mOffset, 0, z)
 		end
 	end
 end
@@ -556,5 +569,4 @@ end
 --	return PKC_PLAYER_INFOS[curUserid] and PKC_PLAYER_INFOS[userid]
 --			and PKC_PLAYER_INFOS[curUserid].GROUP_ID == PKC_PLAYER_INFOS[userid].GROUP_ID
 --end
-
 

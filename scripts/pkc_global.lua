@@ -48,6 +48,10 @@
 	GLOBAL.PKC_REVIVE_INVINCIBLE_TIME = 20
 	--玩家死亡初始自动复活时间（秒）
 	GLOBAL.PLAYER_REVIVE_TIME = 10
+	--玩家传送所需时间（秒）
+	GLOBAL.PLAYER_TELEPORT_TIME = 10
+	--木牌传送所需时间（秒）
+	GLOBAL.SIGN_TELEPORT_TIME = 5
 	--猪王财产最大保护范围（码）
 	GLOBAL.PIGKING_RANGE = 50
 	--冲刺冷却时间
