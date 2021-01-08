@@ -31,9 +31,6 @@
 	GLOBAL.PKC_PIGHOUSE_NUM = GetModConfigData("init_pighouse_num")
 	--防止玩家恶意破坏开关
 	GLOBAL.PKC_PREVENT_BAD_BOY = GetModConfigData("prevent_bad_boy")
-
-	--基地间的距离
-	GLOBAL.GROUP_DISTANCE = (GLOBAL.GROUP_NUM > 2 and 350 or 400)
 	--物品自动清理超过时间(秒)
 	GLOBAL.PKC_AUTO_DELETE_TIME = 60
 	--世界自动清理间隔时间(天)
@@ -49,7 +46,7 @@
 	--玩家死亡初始自动复活时间（秒）
 	GLOBAL.PLAYER_REVIVE_TIME = 10
 	--玩家传送所需时间（秒）
-	GLOBAL.PLAYER_TELEPORT_TIME = 10
+	GLOBAL.PLAYER_TELEPORT_TIME = 20
 	--木牌传送所需时间（秒）
 	GLOBAL.SIGN_TELEPORT_TIME = 5
 	--猪王财产最大保护范围（码）
@@ -73,6 +70,7 @@
 
 	--介绍弹框STRING
 	if GLOBAL.GAME_LANGUAGE == "chinese" then
+		GLOBAL.STRINGS.UI.PKC_CLOSE = "关闭"
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "猪王争霸",
 			SUBTITLE = "【和平期】: "..GLOBAL.PEACE_TIME.."天   【总分】: "..GLOBAL.WIN_SCORE.."分  【猪王可杀】: "..(GLOBAL.PIGKING_HEALTH == -1 and "否" or "是"),
@@ -131,6 +129,7 @@
 			CUIPIG = "紫队",
 		}
 	else
+		GLOBAL.STRINGS.UI.PKC_CLOSE = "close"
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "PigKingCraft",
 			SUBTITLE = "TotalScore: "..GLOBAL.WIN_SCORE.."   PeacefulDays: "..GLOBAL.PEACE_TIME.." days".."   PigKingCanBeKilled: "..(GLOBAL.PIGKING_HEALTH == -1 and "No" or "Yes"),

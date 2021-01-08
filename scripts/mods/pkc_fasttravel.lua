@@ -45,14 +45,11 @@ AddModRPCHandler(
 )
 
 -- PlayerHud UI -------------------------
-
 AddClassPostConstruct(
     "screens/playerhud",
     function(self, anim, owner)
         self.ShowTravelScreen = function(_, attach)
-            if attach == nil then
-                return
-            else
+            if attach then
                 self.travelscreen = TravelScreen(self.owner, attach)
                 self:OpenScreenUnderPause(self.travelscreen)
                 return self.travelscreen

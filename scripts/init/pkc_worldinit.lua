@@ -363,9 +363,7 @@ local function TransToOtherBase(inst)
 	end
 end
 
-
 --世界初始化
---@大猪猪 10-31
 AddPrefabPostInit("world", function(inst)
 	if inst then
 		--添加防止队友相互攻击组件

@@ -12,12 +12,9 @@ local TravelScreen =
     Screen,
     function(self, owner, attach)
         Screen._ctor(self, "TravelSelector")
-
         self.owner = owner
         self.attach = attach
-
         self.isopen = false
-
         self._scrnw, self._scrnh = TheSim:GetScreenSize()
 
         self:SetScaleMode(SCALEMODE_PROPORTIONAL)
@@ -28,7 +25,6 @@ local TravelScreen =
 
         self.scalingroot = self:AddChild(Widget("travelablewidgetscalingroot"))
         self.scalingroot:SetScale(TheFrontEnd:GetHUDScale())
-
         self.inst:ListenForEvent(
             "continuefrompause",
             function()
@@ -78,7 +74,7 @@ local TravelScreen =
                 function()
                     self:OnCancel()
                 end,
-                "关闭",
+                STRINGS.UI.PKC_CLOSE,
                 {120, 40}
             )
         )

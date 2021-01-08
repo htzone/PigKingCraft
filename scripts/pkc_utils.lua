@@ -139,10 +139,22 @@ end
 --@param comp 组件名
 --@param fn_name 组件函数名
 --@param fn 要注入的函数实现
+--function pkc_inject(comp, fn_name, fn)
+--	comp["Old"..fn_name] = comp[fn_name]
+--	comp[fn_name] = function(self,...)
+--		return fn(self,...)
+--	end
+--end
+
+--函数注入
+--@param comp 组件名
+--@param fn_name 组件函数名
+--@param fn 要注入的函数实现
 function pkc_inject(comp, fn_name, fn)
-	comp["Old"..fn_name] = comp[fn_name]
+	local old = comp[fn_name]
 	comp[fn_name] = function(self,...)
-		return fn(self,...)
+		old(self,...)
+		fn(self,...)
 	end
 end
 
@@ -271,7 +283,6 @@ function pkc_getRandomStrByWeight(weight_table)
 end
 
 --定义网络变量
---@大猪猪 10-31
 --@param inst 要添加网络变量的对象
 --@param nettab 要添加网络变量的列表,例如{ GROUP_BIGPIG_POS_x = {"net_float", 0}, }
 function pkc_setNetvar(inst,nettab)
@@ -300,7 +311,6 @@ function pkc_setNetvar(inst,nettab)
 end
 
 --生成物体
---@大猪猪 11-05
 --@param inst 生成新物体的参照物
 --@param prefname 如果是string则是单一的新物体,如果是table，则为按照权重的单一物体,例如{bat=1,butterfly=2}那么蝙蝠概率1/3，蝴蝶概率2/3
 --@param offset	新物体相对于参照物inst的位置比如{0,3,0}就是在上方3单位高度(看具体模式mode决定)
@@ -560,11 +570,13 @@ function getPlayerColorByUserId(userid)
 	end
 	return DEFAULT_PLAYER_COLOUR
 end
---function isSameGroup(inst1, inst2)
---	return inst1.components.pkc_group and inst2.inst.components.pkc_group
---			and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
---end
---
+
+function isSameGroup(inst1, inst2)
+	return inst1 and inst2
+			and inst1.components.pkc_group and inst2.inst.components.pkc_group
+			and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
+end
+
 --function isSameGroupByUserId(curUserid, userid)
 --	return PKC_PLAYER_INFOS[curUserid] and PKC_PLAYER_INFOS[userid]
 --			and PKC_PLAYER_INFOS[curUserid].GROUP_ID == PKC_PLAYER_INFOS[userid].GROUP_ID

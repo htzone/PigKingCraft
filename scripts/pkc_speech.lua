@@ -23,6 +23,9 @@ if GetModConfigData("language") == "chinese" then
 	"害怕",
 	}
 
+	--常用词汇
+	GLOBAL.CLOSE = "关闭"
+
 	--玩家话语
 	GLOBAL.PKC_SPEECH = {
 		COMMA = "，",
@@ -136,6 +139,9 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH11 = "%s秒后开始传送",
 			SPEECH12 = "靠近，保持姿势！",
 			SPEECH13 = "选择目的地",
+			SPEECH14 = "说摸了我？",
+			SPEECH15 = "还没轮到你.",
+			SPEECH16 = "现在旅行不安全.",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \n猪王附近已有猪房数量为：",
@@ -201,9 +207,14 @@ else
 		minotaur = {NAME = "Minotaur"},
 		malbatross = {NAME = "Malbatross"},
 	}
+
 	GLOBAL.MODAL_WORDS = {
 	"Unbelievable",
 	}
+
+	--常用词汇
+	GLOBAL.CLOSE = "close"
+
 	--玩家话语
 	GLOBAL.PKC_SPEECH = {
 		COMMA = ",",
@@ -318,6 +329,9 @@ else
 			SPEECH11 = "Teleport in %s sec",
 			SPEECH12 = "Keep close!",
 			SPEECH13 = "Select destination",
+			SPEECH14 = "Who touch me？",
+			SPEECH15 = "It's not your turn yet",
+			SPEECH16 = "It's not safe to travel now",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \nThe number of Pighouse is：",
