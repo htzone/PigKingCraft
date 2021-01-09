@@ -637,7 +637,8 @@ local function canBuilHomeSign(act)
 		return false
 	end
 	if homeSigns ~= nil and #homeSigns ~= 0 then
-		GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH1..(#homeSigns + 1))
+		GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH1,
+				#homeSigns + 1, GLOBAL.PKC_GROUPHOMESIGN_NUM))
 	end
 	return true
 end

@@ -48,7 +48,7 @@
 	--玩家传送所需时间（秒）
 	GLOBAL.PLAYER_TELEPORT_TIME = 20
 	--木牌传送所需时间（秒）
-	GLOBAL.SIGN_TELEPORT_TIME = 5
+	GLOBAL.SIGN_TELEPORT_TIME = 10
 	--猪王财产最大保护范围（码）
 	GLOBAL.PIGKING_RANGE = 50
 	--冲刺冷却时间
@@ -71,6 +71,11 @@
 	--介绍弹框STRING
 	if GLOBAL.GAME_LANGUAGE == "chinese" then
 		GLOBAL.STRINGS.UI.PKC_CLOSE = "关闭"
+		GLOBAL.STRINGS.UI.PKC_PLAYER_PRE = "玩家："
+		GLOBAL.STRINGS.UI.PKC_UNKNOWN = "未知"
+		GLOBAL.STRINGS.UI.PKC_HUNGER = "饥饿消耗："
+		GLOBAL.STRINGS.UI.PKC_SANITY = "理智消耗："
+		GLOBAL.STRINGS.UI.PKC_CURRENT = "当前"
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "猪王争霸",
 			SUBTITLE = "【和平期】: "..GLOBAL.PEACE_TIME.."天   【总分】: "..GLOBAL.WIN_SCORE.."分  【猪王可杀】: "..(GLOBAL.PIGKING_HEALTH == -1 and "否" or "是"),
@@ -130,6 +135,11 @@
 		}
 	else
 		GLOBAL.STRINGS.UI.PKC_CLOSE = "close"
+		GLOBAL.STRINGS.UI.PKC_PLAYER_PRE = "Player:"
+		GLOBAL.STRINGS.UI.PKC_UNKNOWN = "UnKnown"
+		GLOBAL.STRINGS.UI.PKC_HUNGER = "Hunger cost："
+		GLOBAL.STRINGS.UI.PKC_SANITY = "Sanity cost:"
+		GLOBAL.STRINGS.UI.PKC_CURRENT = "Current"
 		GLOBAL.STRINGS.UI.INTRO = {
 			TITLE = "PigKingCraft",
 			SUBTITLE = "TotalScore: "..GLOBAL.WIN_SCORE.."   PeacefulDays: "..GLOBAL.PEACE_TIME.." days".."   PigKingCanBeKilled: "..(GLOBAL.PIGKING_HEALTH == -1 and "No" or "Yes"),

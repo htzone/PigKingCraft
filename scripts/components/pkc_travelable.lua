@@ -1,10 +1,3 @@
---TODO
---1.玩家木牌颜色
---2.调整当前站点颜色，未知颜色
---2.延时调整，普通木牌10秒，玩家15秒
---3.被传送玩家附近有其他敌对玩家时不能传送
---4.删掉之前的木牌代码
---5.把删除的建造限制代码恢复
 
 local function ontraveller(self, traveller)
 	self.inst.replica.pkc_travelable:SetTraveller(traveller)
@@ -52,28 +45,40 @@ local function IsNearDanger(traveller)
 	if burnable ~= nil and (burnable:IsBurning() or burnable:IsSmoldering()) then
 		return true
 	end
-	if traveller:HasTag("spiderwhisperer") then
-		return FindEntity(
-			traveller,
-			10,
-			function(target)
-				return (target.components.combat ~= nil and target.components.combat.target == traveller)
-						or (not (target:HasTag("player") or target:HasTag("spider"))
-						and (target:HasTag("monster") or target:HasTag("pig")))
-			end,
-			nil,
-			nil,
-			{"monster", "pig", "_combat"}
-		) ~= nil
-	end
+	--if traveller:HasTag("spiderwhisperer") then
+	--	return FindEntity(
+	--		traveller,
+	--		10,
+	--		function(target)
+	--			return (target.components.combat ~= nil and target.components.combat.target == traveller)
+	--					or (not (target:HasTag("player") or target:HasTag("spider"))
+	--					and (target:HasTag("monster") or target:HasTag("pig")))
+	--		end,
+	--		nil,
+	--		nil,
+	--		{"monster", "pig", "_combat"}
+	--	) ~= nil
+	--end
+	--local entity = FindEntity(
+	--	traveller,
+	--	10,
+	--	function(target)
+	--		return (target.components.combat ~= nil and target.components.combat.target == traveller)
+	--				or (target:HasTag("monster") and not target:HasTag("player"))
+	--				or (not target:HasTag("playerghost")
+	--				and target.components.pkc_group and traveller.components.pkc_group
+	--				and not traveller.components.pkc_group:isSameGroup(target))
+	--	end,
+	--	nil,
+	--	nil,
+	--	{"monster", "_combat"})
+
 	local entity = FindEntity(
 		traveller,
 		10,
 		function(target)
 			return (target.components.combat ~= nil and target.components.combat.target == traveller)
-					or (target:HasTag("monster") and not target:HasTag("player"))
-					or (not target:HasTag("playerghost")
-					and target.components.pkc_group and traveller.components.pkc_group
+					or (target.components.pkc_group and traveller.components.pkc_group
 					and not traveller.components.pkc_group:isSameGroup(target))
 		end,
 		nil,
@@ -196,7 +201,11 @@ function Travelable:MakeInfos()
 			cost_sanity = 0
 		end
 
-		infos = infos .. (infos == "" and "" or "\n") .. i .. "\t" .. name .. "\t" .. cost_hunger .. "\t" .. cost_sanity
+		local isPlayer = destination:HasTag("player")
+		infos = infos .. (infos == "" and "" or "\n") .. i .. "\t" .. name
+				.. "\t" .. cost_hunger
+				.. "\t" .. cost_sanity
+				.. "\t" .. tostring(isPlayer)
 	end
 	self.inst.replica.pkc_travelable:SetDestInfos(infos)
 end
@@ -205,7 +214,7 @@ local function getPlayersToTravel(self, operator)
 	local players = {}
 	local x, y, z = self.inst.Transform:GetWorldPosition()
 	local nearPlayers = TheSim:FindEntities(x, y, z, 5)
-	for i, v in ipairs(nearPlayers) do
+	for _, v in ipairs(nearPlayers) do
 		if v and v:HasTag("player") and not v:HasTag("playerghost")
 				and operator.components.pkc_group and v.components.pkc_group
 				and operator.components.pkc_group:isSameGroup(v) then
@@ -233,9 +242,9 @@ local function canTeleport(destination, comment, talk)
 			if destination:HasTag("playerghost") then
 				canTeleport = false
 				if comment then
-					comment:Say("不能传送鬼魂.")
+					comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
 				elseif talk then
-					talk:Say("不能传送鬼魂.")
+					talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
 				end
 			else
 				canTeleport = true
@@ -253,12 +262,12 @@ local function travelTask(self, traveller, destination, comment, talk, cost_hung
 			if self.inst.teleportCoolDown > 1 then
 				self.inst.teleportCoolDown = self.inst.teleportCoolDown - 1
 				if comment then
-					comment:Say(tostring(self.inst.teleportCoolDown).."秒后开始传送.")
+					comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH20, self.inst.teleportCoolDown))
 					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
 				end
 				if math.random(10) / 10 >= 0.9 and destination and destination:HasTag("player")
 						and destination.components.talker then
-					destination.components.talker:Say("我正在被传送！")
+					destination.components.talker:Say(PKC_SPEECH.GROUP_SIGN.SPEECH21)
 				end
 				travelTask(self, traveller, destination, comment, talk, cost_hunger, cost_sanity)
 			else
@@ -267,31 +276,23 @@ local function travelTask(self, traveller, destination, comment, talk, cost_hung
 					for _, who in pairs(travellers) do
 						if destination == nil or not destination:IsValid() then
 							if comment then
-								comment:Say("目的地不再可达.")
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH22)
 							elseif talk then
-								talk:Say("目的地不再可达.")
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH22)
 							end
 						elseif who == nil or (who.components.health and who.components.health:IsDead()) then
 							if comment then
-								comment:Say("我们不运送尸体.")
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
 							end
 						elseif not who:IsNear(self.inst, 10) then
 							if comment then
-								comment:Say("离我太远了，请靠近我.")
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH24)
 							end
 						elseif IsNearDanger(who) then
 							if talk then
-								talk:Say("现在旅行不安全.")
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH25)
 							elseif comment then
-								comment:Say("现在旅行不安全.")
-							end
-						elseif destination.components.pkc_travelable and destination.components.pkc_travelable.ownership
-								and destination:HasTag(ownershiptag) and who.userid ~= nil
-								and not destination:HasTag("uid_" .. who.userid) then
-							if comment then
-								comment:Say("那是别人的地盘.")
-							elseif talk then
-								talk:Say("那是别人的地盘.")
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH25)
 							end
 						elseif who.components.hunger and who.components.hunger.current >= cost_hunger
 								and who.components.sanity and who.components.sanity.current >= cost_sanity then
@@ -329,9 +330,9 @@ local function travelTask(self, traveller, destination, comment, talk, cost_hung
 							end
 						else
 							if talk then
-								talk:Say("我不会成功.")
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH19)
 							elseif comment then
-								comment:Say("你不会成功的.")
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH19)
 							end
 						end
 					end
@@ -350,7 +351,7 @@ local function teleportToTarget(self, traveller, destination, cost_hunger, cost_
 		self.inst.teleportCoolDown = getCoolDownTime(self, destination)
 		self.inst:DoTaskInTime(0, function()
 			if comment then
-				comment:Say("请靠近此处.")
+				comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH18)
 				self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
 			end
 		end)
@@ -372,7 +373,7 @@ function Travelable:Travel(traveller, index)
 		else
 			desc = destination and destination.components.writeable and destination.components.writeable:GetText()
 		end
-		local description = desc and string.format('"%s"', desc) or "未知目的地"
+		local description = desc and string.format('"%s"', desc) or PKC_SPEECH.GROUP_SIGN.SPEECH17
 		local information = ""
 		local cost_hunger = min_hunger_cost
 		local cost_sanity = 0
@@ -393,7 +394,8 @@ function Travelable:Travel(traveller, index)
 
 			information = "去: " .. description .. " (" .. string.format("%.0f", self.site) .. "/"
 					.. string.format("%.0f", self.totalsites) .. ")" .. "\n" .. "饥饿: "
-					.. string.format("%.0f", cost_hunger) .. "\n" .. "理智: " .. string.format("%.1f", cost_sanity)
+					.. string.format("%.0f", cost_hunger) .. "\n" .. "理智: "
+					.. string.format("%.1f", cost_sanity)
 			if comment then
 				comment:Say(string.format(information), 3)
 			elseif talk then

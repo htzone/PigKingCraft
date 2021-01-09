@@ -115,12 +115,12 @@ local giftsTable = {
 --扔礼物
 local function throwGifts(inst)
 	inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingThrowGold")
-    local gift_num = math.random(1, 3)
+    local gift_num = 2
 	local gift_name = nil
     for k = 1, gift_num do
 		gift_name = pkc_weightedChoose(giftsTable)
         local nug = SpawnPrefab(gift_name)
-        local pt = Vector3(inst.Transform:GetWorldPosition()) + Vector3(0, 4.5, 0)
+        local pt = Vector3(inst.Transform:GetWorldPosition()) + Vector3(0, 5.5, 0)
         
         nug.Transform:SetPosition(pt:Get())
         local down = TheCamera:GetDownVec()
@@ -229,13 +229,6 @@ local function death_fn(inst)
 --	end
 end
 
-local PigKingSpeechTable = {
-"猪王的保护范围！",
-"我们需要升级猪王获得更多的土地！",
-"我们需要升级猪王获得更强的猪人战士！",
-"获得足够的分数可以升级猪王！",
-}
-
 --显示猪王保护范围
 local function showRangeIndicator(inst, scale)
 	inst:DoTaskInTime(.5, function ()	
@@ -254,16 +247,6 @@ local function showRangeIndicator(inst, scale)
 			inst.rangeIndicator.Transform:SetPosition(pos.x, pos.y, pos.z)
 		end
 	end)
-end
-
---点击猪王时调用
-local function ongetstatus(inst, viewer)
-	viewer:DoTaskInTime(0, function ()	
-		if viewer and viewer.components.talker then
-			viewer.components.talker:Say(PigKingSpeechTable[math.random(#PigKingSpeechTable)])
-		end
-	end)
-    return nil
 end
 
 --删除猪王时调用
@@ -356,6 +339,25 @@ local function mapinit(inst)
 		inst.icon:TrackEntity(inst)
 	end
 end
+
+--local PigKingSpeechTable = {
+--	"猪王的保护范围！",
+--	"我们需要升级猪王获得更多的土地！",
+--	"我们需要升级猪王获得更强的猪人战士！",
+--	"获得足够的分数可以升级猪王！",
+--}
+--
+----点击猪王时调用
+--local function onGetStatus(self, viewer)
+--	local pigking = self.inst
+--	pigking:DoTaskInTime(0, function ()
+--		print("pkc_hastagking:"..pigking:HasTag("king"))
+--		if pigking and pigking.components.talker then
+--			pigking.components.talker:Say(PigKingSpeechTable[math.random(#PigKingSpeechTable)])
+--		end
+--	end)
+--	return nil
+--end
 
 local function fn(group_id, build, name)
     local inst = CreateEntity()
@@ -450,7 +452,6 @@ local function fn(group_id, build, name)
 	
 	--名字
 	inst:AddComponent("inspectable")
-	--inst.components.inspectable.getstatus = ongetstatus
 	inst:AddComponent("named")
 	inst.components.named:SetName(name)
 	

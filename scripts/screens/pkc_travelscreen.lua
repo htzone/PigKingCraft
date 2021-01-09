@@ -100,6 +100,7 @@ function TravelScreen:LoadDests()
             end
             info.cost_hunger = tonumber(elements[3]) or -1
             info.cost_sanity = tonumber(elements[4]) or -1
+            info.isPlayer = tostring(elements[5])
             table.insert(self.dest_infos, info)
         else
             print("data error:\n", info_pack)
@@ -229,20 +230,23 @@ function TravelScreen:DestListItem()
     dest.status:SetRegionSize(100, 30)
 
     dest.SetInfo = function(_, info)
+        local isPlayer = info.isPlayer == "true"
+        local prefix = isPlayer and STRINGS.UI.PKC_PLAYER_PRE or ""
         if info.name and info.name ~= "" then
-            dest.name:SetString(info.name)
-            dest.name:SetColour(1, 1, 1, 1)
+            dest.name:SetString(prefix..info.name)
+            local color = isPlayer and {0, 1, 0, 1} or {1, 1, 1, 1}
+            dest.name:SetColour(color[1], color[2], color[3], color[4])
         else
-            dest.name:SetString("未知")
+            dest.name:SetString(prefix..STRINGS.UI.PKC_UNKNOWN)
             dest.name:SetColour(1, 1, 0, 0.6)
         end
 
         dest.cost_hunger:Show()
-        dest.cost_hunger:SetString("饥饿: " .. math.ceil(info.cost_hunger))
+        dest.cost_hunger:SetString(STRINGS.UI.PKC_HUNGER .. math.ceil(info.cost_hunger))
         dest.cost_hunger:SetColour(1, 1, 1, 0.8)
 
         dest.cost_sanity:Show()
-        dest.cost_sanity:SetString("理智: " .. math.ceil(info.cost_sanity))
+        dest.cost_sanity:SetString(STRINGS.UI.PKC_SANITY .. math.ceil(info.cost_sanity))
         dest.cost_sanity:SetColour(1, 1, 1, 0.8)
 
         if info.cost_hunger <= 0 or info.cost_sanity <= 0 then
@@ -252,9 +256,9 @@ function TravelScreen:DestListItem()
                 dest.cost_hunger:SetColour(1, 0, 0, 0.4)
                 dest.cost_sanity:SetColour(1, 0, 0, 0.4)
             else
-                dest.name:SetColour(0, 1, 0, 0.6)
-                dest.cost_hunger:SetString("当前")
-                dest.cost_hunger:SetColour(0, 1, 0, 0.4)
+                dest.name:SetColour(1, 1, 1, 0.6)
+                dest.cost_hunger:SetString(STRINGS.UI.PKC_CURRENT)
+                dest.cost_hunger:SetColour(1, 1, 1, 0.6)
                 dest.cost_sanity:Hide()
 
                 if info.name and info.name ~= "" then

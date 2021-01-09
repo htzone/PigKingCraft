@@ -76,7 +76,8 @@ end
 --检查是不是同盟关系。
 local function checkIsGroupMemberFn(attacker, target)
 	if attacker and target then
-		if attacker.components.pkc_group and target.components.pkc_group and target.components.pkc_group:getChooseGroup() ~= 0 then
+		if attacker.components.pkc_group and target.components.pkc_group
+				and target.components.pkc_group:getChooseGroup() ~= 0 then
 			if attacker.components.pkc_group:getChooseGroup() == target.components.pkc_group:getChooseGroup() then
 				return true
 			end

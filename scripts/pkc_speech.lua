@@ -126,7 +126,7 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH7 = "按C键可以回城哦！！！",
 		},
 		GROUP_SIGN = {
-			SPEECH1 = " \n \n \n本队已有传送牌数量为：",
+			SPEECH1 = " \n \n \n本队已有传送牌数量为：%d，最多为%d",
 			SPEECH2 = "本队传送牌数量已达到限制\n最多数量为：",
 			SPEECH3 = "这是敌方队伍的传送牌！",
 			SPEECH4 = "没有可传送的目的地",
@@ -142,6 +142,15 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH14 = "说摸了我？",
 			SPEECH15 = "还没轮到你.",
 			SPEECH16 = "现在旅行不安全.",
+			SPEECH17 = "未知目的地.",
+			SPEECH18 = "请靠近此处",
+			SPEECH19 = "我状态不好，不能传送",
+			SPEECH20 = "%d秒后开始传送",
+			SPEECH21 = "我正在被传送！",
+			SPEECH22 = "目的地不再可达",
+			SPEECH23 = "我们不运送尸体",
+			SPEECH24 = "离我太远了，请靠近我",
+			SPEECH25 = "现在旅行不安全.",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \n猪王附近已有猪房数量为：",
@@ -159,6 +168,7 @@ if GetModConfigData("language") == "chinese" then
 		SCORE_KILL_NUM = {
 			SPEECH1 = "击杀:",
 			SPEECH2 = "分数:",
+			SPEECH3 = "第%d名",
 		},
 		COUNT_POINTS = {
 			SPEECH1 = "请勿离开房间，猪王正在拼命地统计分数...",
@@ -316,7 +326,7 @@ else
 			SPEECH7 = "Press the 'B' key or 'C' key to teleport Home!!!",
 		},
 		GROUP_SIGN = {
-			SPEECH1 = " \n \n \nThe number of Our Team's Signs is: ",
+			SPEECH1 = " \n \n \nThe number of Our Team's Signs is: %d, Max num is:%d",
 			SPEECH2 = "The number of Signs has reached the maximum: ",
 			SPEECH3 = "This is the enemy's Teleport Sign",
 			SPEECH4 = "No destination",
@@ -332,6 +342,15 @@ else
 			SPEECH14 = "Who touch me？",
 			SPEECH15 = "It's not your turn yet",
 			SPEECH16 = "It's not safe to travel now",
+			SPEECH17 = "Unknown destination",
+			SPEECH18 = "Please come closer",
+			SPEECH19 = "I'm in poor condition",
+			SPEECH20 = "Transmission starts in %d seconds",
+			SPEECH21 = "Someone is teleporting to me!",
+			SPEECH22 = "Destination no longer accessible!",
+			SPEECH23 = "Ghosts cannot be teleported",
+			SPEECH24 = "It's too far from me. Please come near me",
+			SPEECH25 = "It's not safe to travel now",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \nThe number of Pighouse is：",
@@ -349,6 +368,7 @@ else
 		SCORE_KILL_NUM = {
 			SPEECH1 = "Kill:",
 			SPEECH2 = "Points:",
+			SPEECH3 = "No.%d",
 		},
 		COUNT_POINTS = {
 			SPEECH1 = "Please dont leave the game, Pigking is counting your points...",

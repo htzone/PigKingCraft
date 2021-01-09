@@ -33,7 +33,7 @@ function pkc_spawnFx(fxName, inst, scale)
 	if scale ~= nil then
 		fxScale = scale
 	end
-	if fx then
+	if fx and fx.Transform and inst and inst.Transform then
 		fx.Transform:SetScale(fxScale, fxScale, fxScale)
 		fx.Transform:SetPosition(Vector3(inst.Transform:GetWorldPosition()):Get())
 	end
@@ -71,12 +71,17 @@ end
 function pkc_teleport(inst, destination, offset)
 	local mOffset = offset or 0
 	if inst and destination and destination.Transform then
-		local x, y, z = destination.Transform:GetWorldPosition()
+		local x, _, z = destination.Transform:GetWorldPosition()
 		if inst.Physics ~= nil then
 			inst.Physics:Teleport(x + mOffset, 0, z)
 		else
 			inst.Transform:SetPosition(x + mOffset, 0, z)
 		end
+		inst:DoTaskInTime(.2, function ()
+			if inst then
+				pkc_spawnFx("lucy_ground_transform_fx", inst, 1.4)
+			end
+		end)
 	end
 end
 
@@ -139,24 +144,24 @@ end
 --@param comp 组件名
 --@param fn_name 组件函数名
 --@param fn 要注入的函数实现
---function pkc_inject(comp, fn_name, fn)
---	comp["Old"..fn_name] = comp[fn_name]
---	comp[fn_name] = function(self,...)
---		return fn(self,...)
---	end
---end
+function pkc_inject(comp, fn_name, fn)
+	comp["Old"..fn_name] = comp[fn_name]
+	comp[fn_name] = function(self,...)
+		return fn(self,...)
+	end
+end
 
 --函数注入
 --@param comp 组件名
 --@param fn_name 组件函数名
 --@param fn 要注入的函数实现
-function pkc_inject(comp, fn_name, fn)
-	local old = comp[fn_name]
-	comp[fn_name] = function(self,...)
-		old(self,...)
-		fn(self,...)
-	end
-end
+--function pkc_inject(comp, fn_name, fn)
+--	local old = comp[fn_name]
+--	comp[fn_name] = function(self,...)
+--		old(self,...)
+--		fn(self,...)
+--	end
+--end
 
 --属性注入
 function pkc_propinject(comp, prop_name, prop)
@@ -478,7 +483,7 @@ end
 function pkc_weightedChoose(choices)
     local function weighted_total(choices)
         local total = 0
-        for choice, weight in pairs(choices) do
+        for _, weight in pairs(choices) do
             total = total + weight
         end
         return total

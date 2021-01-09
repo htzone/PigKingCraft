@@ -67,14 +67,16 @@ end
 --显示数字
 local function showSortNum(playerListing, i)
     if isDedicated then
-        playerListing.number:SetString(i-1)
+        playerListing.number:SetPosition(-400,0,0)
+        playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i-1))
         if i > 1 then
             playerListing.number:Show()
         else
             playerListing.number:Hide()
         end
     else
-        playerListing.number:SetString(i)
+        playerListing.number:SetPosition(-400,0,0)
+        playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i))
         playerListing.number:Show()
     end
 end
