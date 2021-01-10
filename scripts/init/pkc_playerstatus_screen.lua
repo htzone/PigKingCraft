@@ -67,7 +67,7 @@ end
 --显示数字
 local function showSortNum(playerListing, i)
     if isDedicated then
-        playerListing.number:SetPosition(-400,0,0)
+        playerListing.number:SetPosition(-430,0,0)
         playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i-1))
         if i > 1 then
             playerListing.number:Show()
@@ -75,7 +75,7 @@ local function showSortNum(playerListing, i)
             playerListing.number:Hide()
         end
     else
-        playerListing.number:SetPosition(-400,0,0)
+        playerListing.number:SetPosition(-430,0,0)
         playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i))
         playerListing.number:Show()
     end

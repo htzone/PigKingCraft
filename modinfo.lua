@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = " 111猪王争霸III(开发版)"
+name = "111猪王争霸(开发版)III"
 description = [[
 版本(V3.0.0) 请确保版本最新
 
@@ -19,7 +19,7 @@ description = [[
 
 ]]
 
-author = "RedPig, 大猪猪, LongFei, 老崔"
+author = "RedPig, 大猪猪"
 version = "3.0.0"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
@@ -67,7 +67,7 @@ configuration_options =
             {description = "否(No)", data = false, hover = "no" },
             {description = "是(Yes)", data = true, hover = "yes"},
         },
-        default = true,
+        default = false,
     },
 	{
         name = "language",
@@ -185,7 +185,7 @@ configuration_options =
 			{description = "5", data = 5, hover = "EyeTurretNumNearPigking"},
 			{description = "6", data = 6, hover = "EyeTurretNumNearPigking"},
         },
-        default = 6,
+        default = 4,
     },
 	{
         name = "init_pighouse_num",

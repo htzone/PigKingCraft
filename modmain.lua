@@ -56,9 +56,13 @@ PrefabFiles = {
     "pkc_range",
     "pkc_globalposition_classified",
     "pkc_globalmapicon_noproxy",
-    "pkc_travelable_classified"
+    "pkc_travelable_classified",
+    "spartahelmut",
 }
 
+Assets = {
+    Asset("ATLAS", "images/inventoryimages/spartahelmut1.xml"),
+}
 --modimport("scripts/newxiugai")
 
 local require = GLOBAL.require
@@ -76,6 +80,8 @@ modimport("scripts/mods/pkc_fasthand")
 modimport("scripts/pkc_fuckglobal")
 --全局变量
 modimport("scripts/pkc_global")
+--物品制作
+modimport("recipes.lua")
 --全局常量
 modimport("scripts/pkc_constant")
 --对话设定
@@ -115,3 +121,22 @@ modimport("scripts/init/pkc_group_chat")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
 --人物修改部分
+
+--ewecushat 骑士头盔
+--summerbandana 风帽
+--spartaswurd 刀
+--spartahelmut 红头盔
+--birchnuthat 果头盔
+
+--local woodenrecipe = MakeRecipe("woodenmace",
+--        {Ingredient("log", 2), Ingredient("twigs", 2)},
+--        RECIPETABS.WAR,
+--        TECH.NONE,
+--        nil,
+--        nil,
+--        nil,
+--        nil,
+--        nil,
+--        "images/inventoryimages/woodenmace.xml",
+--        "woodenmace.tex")
+--woodenrecipe.sortkey = -10

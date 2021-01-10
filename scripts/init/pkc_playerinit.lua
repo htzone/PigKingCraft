@@ -31,7 +31,6 @@ local function onAttacked(inst, data)
 end
 
 --玩家初始化
---@大猪猪 10-31
 AddPlayerPostInit(function(player)
 	if player then
 		--添加分组组件
@@ -83,14 +82,14 @@ simpleKeyHandler = Class(function(self, inst)
 	self.handler = TheInput:AddKeyHandler(function(key, down) self:OnRawKey(key, down, inst) end )
 end)
 
---Press key B
+--Press key
 function simpleKeyHandler:OnRawKey(key, down, inst)
 	local screen = TheFrontEnd:GetActiveScreen()
 	local isHUDActive = screen and screen.name == "HUD"
 	if isHUDActive then
 		if (key == GLOBAL.KEY_B or key == GLOBAL.KEY_C) and down then
 			SendModRPCToServer(MOD_RPC["pkc_keydown"]["goHome"])
-		elseif (key == GLOBAL.KEY_LSHIFT and down) then
+		elseif ((key == GLOBAL.KEY_LSHIFT or key == GLOBAL.KEY_ALT) and down) then
 			SendModRPCToServer(MOD_RPC["pkc_keydown"]["startRunning"])
 		end
 	end

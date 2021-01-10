@@ -163,7 +163,7 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH1 = "冲啊！",
 			SPEECH2 = "充气完毕！",
 			SPEECH3 = "太饿了，冲不了！",
-			SPEECH4 = "按Shift键还可以冲刺的！！！",
+			SPEECH4 = "按Shift键可以冲刺！！！",
 		},
 		SCORE_KILL_NUM = {
 			SPEECH1 = "击杀:",
@@ -176,6 +176,10 @@ if GetModConfigData("language") == "chinese" then
 		MONSTER_POINT = {
 			SPEECH1 = "不好了，巨熊降临，世界的平衡即将被打破啦！！！",
 		},
+		CHAT_QUEUE = {
+			SPEECH1 = "对所有人说",
+			SPEECH2 = "对队伍内说",
+		}
 	}
 	
 	GLOBAL.STRINGS.NAMES.PKC_PIGMAN_BIG = "大猪猪战士" 
@@ -376,6 +380,10 @@ else
 		MONSTER_POINT = {
 			SPEECH1 = "Be careful! The bearger has come to this world...",
 		},
+		CHAT_QUEUE = {
+			SPEECH1 = "To Every One",
+			SPEECH2 = "To Group",
+		}
 	}
 	
 	GLOBAL.STRINGS.NAMES.PKC_PIGMAN_BIG = "(BLU)Pig Man"

@@ -24,7 +24,7 @@ end
 
 --平衡小丑
 local function balancewWes(self)
-    setRunSpeed(self.inst, 7.3)
+    setRunSpeed(self.inst, 7.5)
     if not self.inst.components.sanityaura then
         self.inst:AddComponent("sanityaura")
     end

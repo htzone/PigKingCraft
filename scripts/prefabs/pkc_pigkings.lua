@@ -24,7 +24,7 @@ local function ontradeforgold(inst, item)
     
     for k = 1, item.components.tradable.goldvalue do
         local nug = SpawnPrefab("goldnugget")
-        local pt = Vector3(inst.Transform:GetWorldPosition()) + Vector3(0, 4.5, 0)
+        local pt = Vector3(inst.Transform:GetWorldPosition()) + Vector3(0, 5.5, 0)
         
         nug.Transform:SetPosition(pt:Get())
         local down = TheCamera:GetDownVec()
