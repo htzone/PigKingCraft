@@ -53,6 +53,6 @@
 	GLOBAL.PKC_EYETURRET_HEALTH = 1000
 	--每队允许传送牌的数量
 	GLOBAL.PKC_GROUPHOMESIGN_NUM = 20
-	--最大猪房数量
+	--猪王附近最大猪房数量
 	GLOBAL.PKC_MAX_PIGHOUSE_NUM = 50
 	GLOBAL.PKC_HOST = "www.redpig666.com"

@@ -1,24 +1,20 @@
 -- This information tells other players more about the mod
-name = "111猪王争霸(开发版)III"
+name = "猪王争霸(PigKingCraft)III"
 description = [[
-版本(V3.0.0) 请确保版本最新
+版本(V3.0.0) 请确保使用最新版本/Please make sure to use the latest version.
 
-"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你。" 猪王如是说...
+<饥荒分组生存与对抗> / <Group survival and PvP>
+允许你和你的小伙伴们一起对抗其他组的成员，最多可分四组，保护你的猪王，并通过生存和对抗得分赢得这场比赛的胜利.
+Survival and protect your pig king, 4 teams at most.
 
-饥荒分组对抗与生存
-允许你和你的小伙伴们一起对抗其他组的成员，最多可分四组
-保护你的猪王，并通过生存和对抗得分赢得这场比赛的胜利
-具体玩法请自行探索
-
-游戏模式
-建议在无尽和PVP模式下开启该模组
-比赛结束后会自动重置世界，如果想关闭该功能可在配置界面进行配置
-
-
-		  				点击下方的“配置模组”可设置更多选项
+<重要> / <Important>
+需在无尽和PVP模式下开启该模组.
+比赛结束后会自动重置世界，如果想关闭该功能可在模组配置界面进行配置.
+You need to run this module in endless and PvP mode.The world will be reset automatically after winning,you can configure it in the module configuration page.
+点击右下方的“配置模组”可设置更多选项 /Click "Configuration Module" to set more options                                                        ↓↓↓
 
 ]]
-
+--"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你." 猪王如是说...
 author = "RedPig, 大猪猪"
 version = "3.0.0"
 
@@ -61,7 +57,7 @@ configuration_options =
 {
     {
         name = "is_test",
-        label = "是否测试模式(test)",
+        label = "是否测试模式(Test)",
         options =
         {
             {description = "否(No)", data = false, hover = "no" },
@@ -92,23 +88,23 @@ configuration_options =
             {description = "10000分", data = 10000, hover = "竞赛" },
 			{description = "50000分", data = 50000, hover = "50000" },
 			{description = "100000分", data = 100000, hover = "持久战" },
-			{description = "无尽", data = 999999, hover = "Endless" },
+			{description = "无尽(Endless)", data = 999999, hover = "Endless" },
         },
         default = 10000,
     },
 	{
         name = "random_group",
-        label = "队伍选择(ChooseGroup)",
+        label = "队伍选择(Team Selection)",
         options =
         {
-			{description = "随机队伍(RandomGroup)", data = true, hover = "随机队伍(RandomGroup)" },
-            {description = "指定队伍(SpecifyGroup)", data = false, hover = "指定队伍(SpecifyGroup)"},
+			{description = "随机队伍(RandomTeam)", data = true, hover = "随机队伍(RandomGroup)" },
+            {description = "指定队伍(SpecifyTeam)", data = false, hover = "指定队伍(SpecifyGroup)"},
         },
         default = false,
     },
 	{
         name = "group_num",
-        label = "分组数(GroupNum)",
+        label = "分组数(TeamNum)",
         options =
         {
             {description = "2组", data = 2, hover = "2"},
@@ -122,14 +118,16 @@ configuration_options =
         label = "和平时期(PeacefulDays)",
         options =
         {
-			{description = "无", data = 0, hover = "none" },
+			{description = "无(None)", data = 0, hover = "none" },
 			{description = "5天", data = 5, hover = "5days" },
             {description = "7天", data = 7, hover = "7days"},
 			{description = "10天", data = 10, hover = "10days"},
 			{description = "15天", data = 15, hover = "15days"},
 			{description = "20天", data = 20, hover = "20days"},
 			{description = "30天", data = 30, hover = "30days"},
-            {description = "永远和平", data = 99999, hover = "forever"},
+            {description = "50天", data = 50, hover = "50days"},
+            {description = "100天", data = 100, hover = "100days"},
+            {description = "永远和平(Forever)", data = 99999, hover = "forever"},
         },
         default = 0,
     },
@@ -149,26 +147,26 @@ configuration_options =
 			{description = "30000", data = 30000, hover = "30000血" },
 			{description = "40000", data = 40000, hover = "40000血" },
 			{description = "50000", data = 50000, hover = "50000血" },
-			{description = "不可杀(CantBeKilled)", data = -1, hover = "CantBeKilled" },
+			{description = "不可杀(CanNotBeKilled)", data = -1, hover = "Can not be killed" },
         },
         default = 5000,
     },
 	{
         name = "give_start_item",
-        label = "初始物品(StartItems)",
+        label = "初始物品(HaveStartItems)",
         options =
         {
-            {description = "无(No)", data = false, hover = "不要与其他初始物品MOD一起开"},
-            {description = "有(Yes)", data = true, hover = "不要与其他初始物品MOD一起开" },
+            {description = "无(No)", data = false, hover = "不要与其他初始物品MOD一起开/Don't turn on with other initial items mod"},
+            {description = "有(Yes)", data = true, hover = "不要与其他初始物品MOD一起开/Don't turn on with other initial items mod" },
         },
         default = true,
     },
 	{
         name = "auto_reset_world",
-        label = "结束自动重置世界(AutoReset)",
+        label = "结束自动重置世界(AutoResetAfterWin)",
         options =
         {
-			{description = "否(No)", data = false, hover = "IfAutoRegenerateworldAfterWin" },
+			{description = "否(No)", data = false, hover = "If auto regenerate world after win" },
             {description = "是(Yes)", data = true, hover = "赢取胜利后自动重置世界"},
         },
         default = true,
@@ -206,8 +204,8 @@ configuration_options =
         label = "防止队友恶意破坏(PreventBadBoy)",
         options =
         {
-            {description = "开启", data = true, hover = "防止队友恶意破坏开启"},
-            {description = "关闭", data = false, hover = "防止队友恶意破坏关闭"},
+            {description = "开启(Yes)", data = true, hover = "防止队友恶意破坏开启"},
+            {description = "关闭(No)", data = false, hover = "防止队友恶意破坏关闭"},
         },
         default = true,
     },
