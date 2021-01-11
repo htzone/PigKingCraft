@@ -283,8 +283,8 @@ local function SetNormalPig(inst)
     inst.components.sleeper:SetWakeTest(DefaultWakeTest)
 
     inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 1)
-    --inst.components.lootdropper:AddRandomLoot("pigskin", 1)
+    inst.components.lootdropper:AddRandomLoot("meat", 2)
+    inst.components.lootdropper:AddRandomLoot("pigskin", 1)
     inst.components.lootdropper.numrandomloot = 1
 
     inst.components.health:SetMaxHealth(PKC_PIGMAN_HEALTH)

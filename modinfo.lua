@@ -27,6 +27,7 @@ forumthread = ""
 
 -- This lets other players know if your mod is out of date, update it to match the current version in the game
 api_version = 10
+api_version_dst = 10
 
 priority = -9999
 

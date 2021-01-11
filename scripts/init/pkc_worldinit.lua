@@ -46,6 +46,28 @@ local function startingInventory(inst, player)
 	giveItemToPlayer(startInventory, 5, "flint")
 	giveItemToPlayer(startInventory, 5, "rocks")
 	giveItemToPlayer(startInventory, 2, "meat")
+	--如果是冬天
+	if GLOBAL.TheWorld.state.iswinter
+			or (GLOBAL.TheWorld.state.isautumn and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 5, "cutgrass")
+		giveItemToPlayer(startInventory, 5, "twigs")
+		giveItemToPlayer(startInventory, 5, "log")
+		giveItemToPlayer(startInventory, 1, "heatrock")
+		giveItemToPlayer(startInventory, 1, "winterhat")
+	end
+	--如果是春天
+	if GLOBAL.TheWorld.state.isspring
+			or (GLOBAL.TheWorld.state.iswinter and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 1, "umbrella")
+	end
+	--如果是夏天
+	if GLOBAL.TheWorld.state.issummer
+			or (GLOBAL.TheWorld.state.isspring and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 6, "nitre")
+		giveItemToPlayer(startInventory, 6, "ice")
+		giveItemToPlayer(startInventory, 1, "heatrock")
+		giveItemToPlayer(startInventory, 1, "strawhat")
+	end
 	--如果初始点在洞穴
 	if GLOBAL.TheWorld:HasTag("cave") then
 		giveItemToPlayer(startInventory, 1, "minerhat") --矿工帽
