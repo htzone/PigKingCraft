@@ -770,9 +770,22 @@ local function nightpig(groupId)
     return inst
 end
 
+
+local function wearHat(inst, hatName)
+    if inst then
+        inst.AnimState:OverrideSymbol("swap_hat", hatName, "swap_hat")
+        inst.AnimState:Show("HAT")
+        inst.AnimState:Show("HAT_HAIR")
+        inst.AnimState:Hide("HAIR_NOHAT")
+        inst.AnimState:Hide("HAIR")
+    end
+end
+
 return 
 Prefab("pkc_pigman_big", function()
 	local inst = normal(GROUP_BIGPIG_ID)
+    --戴帽子
+    wearHat(inst, "ewecushat_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.BIGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -782,6 +795,8 @@ Prefab("pkc_pigman_big", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_red", function()
 	local inst = normal(GROUP_REDPIG_ID)
+    --戴帽子
+    wearHat(inst, "spartahelmut_swap2")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.REDPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -791,6 +806,8 @@ Prefab("pkc_pigman_red", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_cui", function()
 	local inst = normal(GROUP_CUIPIG_ID)
+    --戴帽子
+    wearHat(inst, "summerbandana_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -800,6 +817,8 @@ Prefab("pkc_pigman_cui", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_long", function()
 	local inst = normal(GROUP_LONGPIG_ID)
+    --戴帽子
+    wearHat(inst, "birchnuthat_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.LONGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)

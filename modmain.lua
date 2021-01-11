@@ -57,11 +57,17 @@ PrefabFiles = {
     "pkc_globalposition_classified",
     "pkc_globalmapicon_noproxy",
     "pkc_travelable_classified",
-    "spartahelmut",
+    "pkc_spartahelmut",
+    "pkc_ewecushat",
+    "pkc_summerbandana",
+    "pkc_birchnuthat",
 }
 
 Assets = {
-    Asset("ATLAS", "images/inventoryimages/spartahelmut1.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_spartahelmut1.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_ewecushat.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_summerbandana.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_birchnuthat.xml"),
 }
 --modimport("scripts/newxiugai")
 
@@ -81,7 +87,7 @@ modimport("scripts/pkc_fuckglobal")
 --全局变量
 modimport("scripts/pkc_global")
 --物品制作
-modimport("recipes.lua")
+modimport("pkc_recipes.lua")
 --全局常量
 modimport("scripts/pkc_constant")
 --对话设定

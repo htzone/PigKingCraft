@@ -1,10 +1,10 @@
 local assets =
 { 
-    Asset("ANIM", "anim/spartahelmut1.zip"),
-    Asset("ANIM", "anim/spartahelmut_swap2.zip"), 
+    Asset("ANIM", "anim/pkc_ewecushat.zip"),
+    Asset("ANIM", "anim/ewecushat_swap.zip"), 
 
-    Asset("ATLAS", "images/inventoryimages/spartahelmut1.xml"),
-    Asset("IMAGE", "images/inventoryimages/spartahelmut.tex"),
+    Asset("ATLAS", "images/inventoryimages/pkc_ewecushat.xml"),
+    Asset("IMAGE", "images/inventoryimages/pkc_ewecushat.tex"),
 }
 
 local prefabs = 
@@ -12,7 +12,7 @@ local prefabs =
 }
 
 local function OnEquip(inst, owner) 
-    owner.AnimState:OverrideSymbol("swap_hat", "spartahelmut_swap2", "swap_hat")
+    owner.AnimState:OverrideSymbol("swap_hat", "ewecushat_swap", "swap_hat")
 	
     owner.AnimState:Show("HAT")
     owner.AnimState:Show("HAT_HAIR")
@@ -27,10 +27,6 @@ local function OnEquip(inst, owner)
 			owner.AnimState:Show("HEAD_HAIR")
 		end
     end
-	
-	if owner and not owner:HasTag("spartan") then
-		owner:AddTag("spartan")
-	end
 end
 
 local function OnUnequip(inst, owner) 
@@ -48,9 +44,6 @@ local function OnUnequip(inst, owner)
 			owner.AnimState:Hide("HEAD_HAIR")
 		end
     end
-	if owner and owner:HasTag("spartan") then
-		owner:RemoveTag("spartan")
-	end
 end
 
 local function fn()
@@ -59,15 +52,15 @@ local function fn()
     
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
-	inst.entity:AddSoundEmitter()
+    inst.entity:AddSoundEmitter()
 
     MakeInventoryPhysics(inst)
 
-    inst.AnimState:SetBank("spartahelmut")
-    inst.AnimState:SetBuild("spartahelmut1")
+    inst.AnimState:SetBank("pkc_ewecushat")
+    inst.AnimState:SetBuild("pkc_ewecushat")
     inst.AnimState:PlayAnimation("idle")
 
-    inst:AddTag("spartahat")
+    inst:AddTag("hat")
 
 	if TheSim:GetGameID()=="DST" then
 		inst.entity:AddNetwork()
@@ -75,23 +68,24 @@ local function fn()
 		if not TheWorld.ismastersim then
 			return inst
 		end
-		
+
 		inst.entity:SetPristine()
 		
 		MakeHauntableLaunch(inst)
 	end
 	
 	inst:AddComponent("armor")
-	inst.components.armor:InitCondition(450, 0.7)
-	
-	inst:AddComponent("tradable")
+	inst.components.armor:InitCondition(1000, 0.9)
 	
     inst:AddComponent("inspectable")
 
+    inst:AddComponent("tradable")
+
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "spartahelmut"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/spartahelmut1.xml"
-		
+    inst.components.inventoryitem.imagename = "pkc_ewecushat"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/pkc_ewecushat.xml"
+    
+	
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(OnEquip)
@@ -101,8 +95,9 @@ local function fn()
 		inst:AddComponent("waterproofer")
 		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
 	end
-
+	
     return inst
 end
 
-return  Prefab("common/inventory/spartahelmut", fn, assets, prefabs)
+
+return  Prefab("common/inventory/pkc_ewecushat", fn, assets, prefabs)
