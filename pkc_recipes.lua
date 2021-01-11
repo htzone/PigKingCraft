@@ -8,7 +8,7 @@ local RECIPETABS = GLOBAL.RECIPETABS
 local TECH = GLOBAL.TECH
 
 local recipe_ewecushat = AddRecipe("pkc_ewecushat",
-        { Ingredient("goldnugget", 25), Ingredient("hammer", 1), Ingredient("feather_crow", 2) },
+        { Ingredient("goldnugget", 25), Ingredient("hammer", 4), Ingredient("feather_crow", 2) },
         RECIPETABS.WAR,
         TECH.SCIENCE_TWO,
         nil,
@@ -21,7 +21,7 @@ local recipe_ewecushat = AddRecipe("pkc_ewecushat",
 recipe_ewecushat.sortkey = -20
 
 local recipe_spartahelmut = AddRecipe("pkc_spartahelmut",
-        { Ingredient("goldnugget", 25), Ingredient("cutstone", 1), Ingredient("feather_robin", 2) },
+        { Ingredient("goldnugget", 25), Ingredient("goldenpickaxe", 2), Ingredient("feather_robin", 2) },
         RECIPETABS.WAR,
         TECH.SCIENCE_TWO,
         nil,
@@ -34,7 +34,7 @@ local recipe_spartahelmut = AddRecipe("pkc_spartahelmut",
 recipe_spartahelmut.sortkey = -20
 
 local recipe_birchnuthat = AddRecipe("pkc_birchnuthat",
-        { Ingredient("goldnugget", 25), Ingredient("acorn", 8), Ingredient("rope", 1) },
+        { Ingredient("goldnugget", 25), Ingredient("acorn", 8), Ingredient("rope", 2) },
         RECIPETABS.WAR,
         TECH.SCIENCE_TWO,
         nil,
@@ -47,7 +47,7 @@ local recipe_birchnuthat = AddRecipe("pkc_birchnuthat",
 recipe_birchnuthat.sortkey = -20
 
 local recipe_summerbandana = AddRecipe("pkc_summerbandana",
-        { Ingredient("goldnugget", 25), Ingredient("hammer", 1), Ingredient("papyrus", 2) },
+        { Ingredient("goldnugget", 25), Ingredient("goldenaxe", 2), Ingredient("papyrus", 2) },
         RECIPETABS.WAR,
         TECH.SCIENCE_TWO,
         nil,

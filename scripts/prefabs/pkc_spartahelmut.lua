@@ -82,7 +82,7 @@ local function fn()
 	end
 	
 	inst:AddComponent("armor")
-	inst.components.armor:InitCondition(450, 0.7)
+	inst.components.armor:InitCondition(TUNING.ARMORWOOD, 0.85)
 	
 	inst:AddComponent("tradable")
 	
@@ -96,10 +96,11 @@ local function fn()
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
+    inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED
 	
 	if TheSim:GetGameID()=="DST" or IsDLCEnabled(REIGN_OF_GIANTS) then
 		inst:AddComponent("waterproofer")
-		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
+		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_MED)
 	end
 
     return inst

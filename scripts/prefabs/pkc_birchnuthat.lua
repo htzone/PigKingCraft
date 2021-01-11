@@ -95,7 +95,7 @@ local function fn()
 	end
 	
 	inst:AddComponent("armor")
-	inst.components.armor:InitCondition(225, 0.5)
+	inst.components.armor:InitCondition(TUNING.ARMORWOOD, 0.85)
 	
     inst:AddComponent("inspectable")
 
@@ -104,16 +104,22 @@ local function fn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "pkc_birchnuthat"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/pkc_birchnuthat.xml"
-    
+
+    if TheSim:GetGameID()=="DST" or IsDLCEnabled(REIGN_OF_GIANTS) then
+        inst:AddComponent("insulator")
+        inst.components.insulator:SetInsulation(TUNING.INSULATION_LARGE)
+        inst.components.insulator:SetSummer()
+    end
 	
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
+    inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED
 	
 	--if TheSim:GetGameID()=="DST" or IsDLCEnabled(REIGN_OF_GIANTS) then
-		inst:AddComponent("waterproofer")
-		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
+	--	inst:AddComponent("waterproofer")
+	--	inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
 	--end
 
     return inst

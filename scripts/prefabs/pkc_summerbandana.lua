@@ -95,7 +95,10 @@ local function fn()
     inst.components.fuel.fuelvalue = TUNING.MED_LARGE_FUEL
 	MakeSmallBurnable(inst)
 	MakeSmallPropagator(inst)
-	
+
+	inst:AddComponent("armor")
+	inst.components.armor:InitCondition(TUNING.ARMORWOOD, 0.7)
+
     inst:AddComponent("inspectable")
 
     inst:AddComponent("tradable")
@@ -107,13 +110,13 @@ local function fn()
 	if TheSim:GetGameID()=="DST" or IsDLCEnabled(REIGN_OF_GIANTS) then
 		inst:AddComponent("insulator")
 		inst.components.insulator:SetInsulation(TUNING.INSULATION_MED)
-		inst.components.insulator:SetSummer()
 	end
 	
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(SummerBandana_OnEquip)
     inst.components.equippable:SetOnUnequip(SummerBandana_OnUnequip)
+	inst.components.equippable.dapperness = TUNING.DAPPERNESS_LARGE
 
     return inst
 end
