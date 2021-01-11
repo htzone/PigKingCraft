@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = "猪王争霸(PigKingCraft)III"
+name = "111猪王争霸(PigKingCraft)开发版III"
 description = [[
 版本(V3.0.0) 请确保使用最新版本/Please make sure to use the latest version.
 
@@ -16,7 +16,7 @@ You need to run this module in endless and PvP mode.The world will be reset auto
 ]]
 --"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你." 猪王如是说...
 author = "RedPig, 大猪猪"
-version = "3.0.0"
+version = "3.0.1"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -100,7 +100,7 @@ configuration_options =
 			{description = "随机队伍(RandomTeam)", data = true, hover = "随机队伍(RandomGroup)" },
             {description = "指定队伍(SpecifyTeam)", data = false, hover = "指定队伍(SpecifyGroup)"},
         },
-        default = false,
+        default = true,
     },
 	{
         name = "group_num",

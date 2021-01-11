@@ -143,9 +143,9 @@ local function produceSingleBase(previousPos, groupId)
 	clearPigkingNear(pigking)
 	
 	--安置建筑
-	pkc_roundSpawn(pigking, pighousePrefab, 10, PKC_PIGHOUSE_NUM) --猪人房
+	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM) --猪人房
 	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM) --眼球塔
-	pkc_roundSpawn(pigking, homesignPrefab, 7, 1) --传送牌
+	pkc_roundSpawnForWriteable(pigking, homesignPrefab, 8, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26) --传送牌
 	
 	return pos
 end

@@ -151,6 +151,7 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH23 = "我们不运送尸体",
 			SPEECH24 = "离我太远了，请靠近我",
 			SPEECH25 = "现在旅行不安全.",
+			SPEECH26 = "家",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \n猪王附近已有猪房数量为：",
@@ -355,6 +356,7 @@ else
 			SPEECH23 = "Ghosts cannot be teleported",
 			SPEECH24 = "It's too far from me. Please come near me",
 			SPEECH25 = "It's not safe to travel now",
+			SPEECH26 = "Home",
 		},
 		GROUP_PIGHOUSE = {
 			SPEECH1 = " \n \n \nThe number of Pighouse is：",

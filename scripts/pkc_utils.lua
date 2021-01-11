@@ -385,7 +385,7 @@ end
 --@param prefab_name prefab名称
 --@param radius	半径
 --@param mode 需要安置的数量
-function pkc_roundSpawn(target, prefab_name, radius, num)
+function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
 	local pos = Vector3(target.Transform:GetWorldPosition())
 	local attempt_angle = (2*PI)/num
 	local tmp_angles = {}
@@ -407,6 +407,9 @@ function pkc_roundSpawn(target, prefab_name, radius, num)
 		if canSpawn then
 			local mob = SpawnPrefab(prefab_name)
 			if mob then
+				if mob.components.writeable then
+					mob.components.writeable:SetText(text)
+				end
 				mob.Transform:SetPosition(tmp_pos:Get())
 				if mob:HasTag("pkc_defences") then
 					mob.ownername = "RedPig"
@@ -415,6 +418,10 @@ function pkc_roundSpawn(target, prefab_name, radius, num)
 			end
 		end
 	end
+end
+
+function pkc_roundSpawn(target, prefab_name, radius, num)
+	pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "")
 end
 
 --判断在一定范围内有没有海
