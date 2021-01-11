@@ -143,5 +143,32 @@ for _, v in pairs(seasonBoss) do
 	AddPrefabPostInit(v, changeForSeasonBoss)
 end
 
+--让阿比盖尔不要攻击同盟
+local function changeAbigailTarget(inst)
+	if inst then
+		if inst.components.combat and inst.components.aura and inst.auratest then
+			local old_auratest = inst.auratest
+			if not old_auratest then
+				print("pkc: old_auratest is nil.")
+				return
+			end
+			local function new_auratest(inst, target)
+				local leader = inst.components.follower and inst.components.follower.leader or nil
+				if target and leader
+						and target.components.pkc_group and leader.components.pkc_group
+						and target.components.pkc_group:getChooseGroup() == leader.components.pkc_group:getChooseGroup()
+				then
+					return false
+				end
+				return old_auratest(inst, target)
+			end
+
+			inst.components.combat:SetKeepTargetFunction(new_auratest)
+			inst.components.aura.auratestfn = new_auratest
+		end
+	end
+end
+AddPrefabPostInit("abigail", changeAbigailTarget)
+
 
 

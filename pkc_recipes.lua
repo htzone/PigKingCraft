@@ -7,6 +7,11 @@
 local RECIPETABS = GLOBAL.RECIPETABS
 local TECH = GLOBAL.TECH
 
+local armor_bramble =  GLOBAL.AllRecipes["armor_bramble"]
+if armor_bramble  then
+    armor_bramble.ingredients = {Ingredient("livinglog", 6), Ingredient("boneshard", 6)}
+end
+
 local recipe_ewecushat = AddRecipe("pkc_ewecushat",
         { Ingredient("goldnugget", 25), Ingredient("hammer", 4), Ingredient("feather_crow", 2) },
         RECIPETABS.WAR,
