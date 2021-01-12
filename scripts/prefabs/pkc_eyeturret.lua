@@ -83,13 +83,21 @@ local function retargetfn(inst)
 	]]--
     return FindEntity(inst, 20,
         function(guy)
-            return inst.components.combat:CanTarget(guy)
-				and not guy:HasTag("werepig") 
+            if guy == nil or not inst.components.combat:CanTarget(guy) then
+                return false
+            end
+            --以敌对成员的随从为目标
+            if guy.components.follower then
+                local leader = guy.components.follower.leader
+                if leader and leader.components.pkc_group and inst and inst.components.pkc_group
+                        and leader.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup() then
+                    return true
+                end
+            end
+            --以不是疯猪的敌对成员为目标
+            return not guy:HasTag("werepig") --为了防止刷疯猪
 				and guy.components.pkc_group
 				and not (guy.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup())
-                --and (playertargets[guy] 
-				--or (guy.components.combat.target ~= nil and guy.components.combat.target.components.pkc_group and guy.components.combat.target.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()) 
-				--or (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
         end,
         { "_combat" }, --see entityreplica.lua
         { "INLIMBO", "eyeturret" }
