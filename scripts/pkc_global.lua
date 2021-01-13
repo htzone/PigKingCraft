@@ -82,6 +82,7 @@
 		local desc_gre = "那是绿色军团的头盔！"
 		local desc_pur = "那是紫色军团的头盔！"
 
+		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "我来帮你们收拾烂摊子！", "捡起来放箱子吧！", "发现可疑物！" }
 		GLOBAL.STRINGS.NAMES.PKC_SPARTAHELMUT = "红色军团头盔"
 		GLOBAL.STRINGS.RECIPE_DESC.PKC_SPARTAHELMUT = "高贵身份的象征，能让猪人跟随你."
 		GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.PKC_SPARTAHELMUT = desc_red
@@ -203,6 +204,7 @@
 		local desc_gre = "That's the green group helmet!"
 		local desc_pur = "That's the purple group helmet!"
 
+		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "我来帮你们收拾烂摊子！", "捡起来放箱子吧！", "发现可疑物！" }
 		GLOBAL.STRINGS.NAMES.PKC_SPARTAHELMUT = "Red Group Helmet"
 		GLOBAL.STRINGS.RECIPE_DESC.PKC_SPARTAHELMUT = "The symbol of noble, can let pig man follow you."
 		GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.PKC_SPARTAHELMUT = desc_red

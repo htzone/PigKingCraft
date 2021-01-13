@@ -19,15 +19,15 @@ require "behaviours/leash"
 local BrainCommon = require "brains/braincommon"
 
 local MIN_FOLLOW_DIST = 2
-local TARGET_FOLLOW_DIST = 5
-local MAX_FOLLOW_DIST = 9
+local TARGET_FOLLOW_DIST = 4
+local MAX_FOLLOW_DIST = 7
 local MAX_WANDER_DIST = 15
 
 local LEASH_RETURN_DIST = 10
 local LEASH_MAX_DIST = 15
 
-local START_RUN_DIST = 3
-local STOP_RUN_DIST = 4
+local START_RUN_DIST = 2
+local STOP_RUN_DIST = 3
 local MAX_CHASE_TIME = 6
 local MAX_CHASE_DIST = 12
 local SEE_LIGHT_DIST = 20
@@ -44,6 +44,13 @@ local KEEP_CHOPPING_DIST = 10
 
 local RUN_AWAY_DIST = 5
 local STOP_RUN_AWAY_DIST = 8
+
+--猪人能看到箱子的最大距离
+local SEE_CHEST_DIST = 30
+--猪人能看到地上物品的最大距离
+local SEE_GROUND_ITEM_DIST = 6
+--猪人采集的最大距离
+local SEE_HARVEST_ITEM_DIST = 15
 
 local function ShouldRunAway(inst, target)
     return not inst.components.trader:IsTryingToTradeWithMe(target)
@@ -136,6 +143,13 @@ local function StartChoppingCondition(inst)
         or FindDeciduousTreeMonster(inst) ~= nil
 end
 
+local function StartPikUpCondition(inst)
+    return inst.components.follower.leader ~= nil and
+            inst.components.follower.leader.sg ~= nil and
+            inst.components.follower.leader.sg:HasStateTag("chopping")
+            or FindDeciduousTreeMonster(inst) ~= nil
+end
+
 local function FindTreeToChopAction(inst)
     local target = FindEntity(inst, SEE_TREE_DIST, nil, { "CHOP_workable" })
     if target ~= nil then
@@ -223,46 +237,178 @@ local function IsHomeOnFire(inst)
         and inst:GetDistanceSqToInst(inst.components.homeseeker.home) < SEE_BURNING_HOME_DIST_SQ
 end
 
+--找附近的箱子
+local function findChest(inst)
+    local chestTarget = FindEntity(inst, SEE_CHEST_DIST, function(item)
+        return item and item:HasTag("chest") and item:HasTag("structure")
+                and item.components.container and not item.components.container:IsFull()
+                and item.pkc_group_id == inst.components.pkc_group:getChooseGroup()
+    end)
+    return chestTarget
+end
+
+--捡扔地上的东西
+local function FindGroundItemAction(inst)
+    if not inst or inst.sg:HasStateTag("busy") or not inst.components.pkc_group then
+        return
+    end
+    --找附近有没有不是满的容器或箱子(本队的)
+    local chestTarget = findChest(inst)
+    --没有箱子则不执行捡东西的操作
+    if not chestTarget then
+        return
+    end
+    --附近有箱子才捡地上的东西
+    local itemTarget = FindEntity(inst, SEE_GROUND_ITEM_DIST, function(item)
+        if not item:IsOnValidGround() then
+            return false
+        end
+        --找物品栏能装下的东西
+        local inventoryItem = item.components.inventoryitem
+        if inventoryItem then
+            --且不能是小切
+            if item.prefab == "chester_eyebone" then
+                return false
+            end
+            --且不能是有容器的
+            if inventoryItem:GetContainer() ~= nil then
+                return false
+            end
+            --且不能是活的会动的
+            if item.components.health ~= nil or item.components.locomotor ~= nil then
+                return false
+            end
+            --且不能是可以吃的
+            if inst and inst.components.eater and inst.components.eater:CanEat(item) then
+                return false
+            end
+            --且不能搬重物
+            if item:HasTag("heavy") then
+                return false
+            end
+            return true
+        end
+    end)
+    --目标不能是着火的
+    if itemTarget and not itemTarget:HasTag("fire") and not itemTarget:HasTag("burnt") then
+        local act = BufferedAction(inst, itemTarget, ACTIONS.PICKUP)
+        return act
+    end
+end
+
+--物品栏不为空
+local function isInventoryNotEmpty(inventory)
+    for k = 1, inventory.maxslots do
+        if inventory.itemslots[k] then
+            return true
+        end
+    end
+    return false
+end
+
+--找箱子把东西放进去
+local function FindContainerAction(inst)
+    if inst.sg:HasStateTag("busy") then
+        return
+    end
+    local inventory = inst.components.inventory
+    if not inventory then
+        return
+    end
+    --物品栏不为空则把东西放箱子里
+    if isInventoryNotEmpty(inventory) then
+        local target = findChest(inst)
+        if target and not target:HasTag("fire") and not target:HasTag("burnt") then
+            inst.give_chest_target = target
+            local act = BufferedAction(inst, target, ACTIONS.GIVE)
+            if act then
+                act:AddSuccessAction(function()
+                end)
+                act:AddFailAction(function()
+                end)
+            end
+            return act
+        end
+    end
+end
+
+--找采集的东西
+local function FindThingsToHarvestAction(inst)
+    if inst.sg:HasStateTag("busy") then
+        return
+    end
+
+    local target = FindEntity(inst, SEE_HARVEST_ITEM_DIST, function(item)
+        return item.components.pickable and item.components.pickable:CanBePicked()
+                and item:HasTag("plant") and item:HasTag("renewable")
+    end)
+
+    if target and target.components.pickable then
+        inst.pkc_harvest_target = target
+        local act = BufferedAction(inst, target, ACTIONS.PICKUP)
+        return act
+    end
+end
+
 local PigBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
 end)
 
 function PigBrain:OnStart()
     --print(self.inst, "PigBrain:OnStart")
+    --白天的行为树
     local day = WhileNode( function() return not TheWorld.state.isnight end, "IsDay",
         PriorityNode{
-            ChattyNode(self.inst, "PIG_TALK_FIND_MEAT",
-                DoAction(self.inst, FindFoodAction )),
-            IfNode(function() return StartChoppingCondition(self.inst) end, "chop", 
+            --找食物
+            ChattyNode(self.inst, "PIG_TALK_FIND_MEAT", DoAction(self.inst, FindFoodAction )),
+            --帮忙砍树
+            IfNode(function() return StartChoppingCondition(self.inst) end, "chop",
                 WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
                     LoopNode{ 
-                        ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD",
-                            DoAction(self.inst, FindTreeToChopAction ))})),
+                        ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindTreeToChopAction ))})),
+            --帮忙采集
+            --ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindThingsToHarvestAction )),
+            --IfNode(function() return StartChoppingCondition(self.inst) end, "chop",
+            --        WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
+            --                LoopNode{
+            --                    ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindTreeToChopAction ))})),
+            --跟随主人
             ChattyNode(self.inst, "PIG_TALK_FOLLOWWILSON",
                 Follow(self.inst, GetLeader, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
+            --面朝主人
             IfNode(function() return GetLeader(self.inst) end, "has leader",
                 ChattyNode(self.inst, "PIG_TALK_FOLLOWWILSON",
                     FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
-
+            --在家附近徘徊
             Leash(self.inst, GetNoLeaderHomePos, LEASH_MAX_DIST, LEASH_RETURN_DIST),
-
+            --把身上的东西放箱子里
+            ChattyNode(self.inst, "PIG_TALK_FIND_GROUND_ITEM", DoAction(self.inst, FindContainerAction )),
+            --找掉地上的东西
+            ChattyNode(self.inst, "PIG_TALK_FIND_GROUND_ITEM", DoAction(self.inst, FindGroundItemAction )),
+            --与玩家保持距离
             ChattyNode(self.inst, "PIG_TALK_RUNAWAY_WILSON",
                 RunAway(self.inst, "player", START_RUN_DIST, STOP_RUN_DIST)),
+            --面朝玩家
             ChattyNode(self.inst, "PIG_TALK_LOOKATWILSON",
                 FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn)),
+            --发呆
             Wander(self.inst, GetNoLeaderHomePos, MAX_WANDER_DIST)
         }, .5)
 
+    --晚上的行为树
     local night = WhileNode( function() return TheWorld.state.isnight end, "IsNight",
         PriorityNode{
-            ChattyNode(self.inst, "PIG_TALK_RUN_FROM_SPIDER",
-                RunAway(self.inst, "spider", 4, 8)),
-            ChattyNode(self.inst, "PIG_TALK_FIND_MEAT",
-                DoAction(self.inst, FindFoodAction )),
+            --逃离蜘蛛
+            ChattyNode(self.inst, "PIG_TALK_RUN_FROM_SPIDER", RunAway(self.inst, "spider", 4, 8)),
+            --找食物
+            ChattyNode(self.inst, "PIG_TALK_FIND_MEAT", DoAction(self.inst, FindFoodAction )),
+            --与玩家保持距离，除非玩家给自己东西
             RunAway(self.inst, "player", START_RUN_DIST, STOP_RUN_DIST, function(target) return ShouldRunAway(self.inst, target) end ),
+            --回家
             ChattyNode(self.inst, "PIG_TALK_GO_HOME",
                 WhileNode( function() return not TheWorld.state.iscaveday or not self.inst.LightWatcher:IsInLight() end, "Cave nightness",
                     DoAction(self.inst, GoHomeAction, "go home", true ))),
+            --当光线足够亮时站着发呆
             WhileNode(function() return TheWorld.state.isnight and self.inst.LightWatcher:GetLightValue() > COMFORT_LIGHT_LEVEL end, "IsInLight", -- wants slightly brighter light for this
                 Wander(self.inst, GetNearestLightPos, GetNearestLightRadius, {
                     minwalktime = 0.6,
@@ -271,39 +417,50 @@ function PigBrain:OnStart()
                     randwaittime = 5
                 })
             ),
+            --寻找光源
             ChattyNode(self.inst, "PIG_TALK_FIND_LIGHT",
                 FindLight(self.inst, SEE_LIGHT_DIST, SafeLightDist)),
+            --受到攻击时
             ChattyNode(self.inst, "PIG_TALK_PANIC",
                 Panic(self.inst)),
         }, 1)
 
+    --公共的行为
     local root =
         PriorityNode(
         {
             BrainCommon.PanicWhenScared(self.inst, .25, "PIG_TALK_PANICBOSS"),
+            --被作祟
             WhileNode( function() return self.inst.components.hauntable and self.inst.components.hauntable.panic end, "PanicHaunted",
                 ChattyNode(self.inst, "PIG_TALK_PANICHAUNT",
                     Panic(self.inst))),
+            --着火
             WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire",
                 ChattyNode(self.inst, "PIG_TALK_PANICFIRE",
                     Panic(self.inst))),
+            --追打
             ChattyNode(self.inst, "PIG_TALK_FIGHT",
                 WhileNode( function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
                     ChaseAndAttack(self.inst, MAX_CHASE_TIME, MAX_CHASE_DIST) )),
+            --解救主人
             ChattyNode(self.inst, "PIG_TALK_RESCUE",
                 WhileNode( function() return GetLeader(self.inst) and GetLeader(self.inst).components.pinnable and GetLeader(self.inst).components.pinnable:IsStuck() end, "Leader Phlegmed",
                     DoAction(self.inst, RescueLeaderAction, "Rescue Leader", true) )),
+            --闪避
             ChattyNode(self.inst, "PIG_TALK_FIGHT",
                 WhileNode( function() return self.inst.components.combat.target and self.inst.components.combat:InCooldown() end, "Dodge",
                     RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST) )),
+            --家着火
             WhileNode(function() return IsHomeOnFire(self.inst) end, "OnFire",
                 ChattyNode(self.inst, "PIG_TALK_PANICHOUSEFIRE",
                     Panic(self.inst))),
+            --逃跑
             RunAway(self.inst, function(guy) return guy:HasTag("pig") and guy.components.combat and guy.components.combat.target == self.inst end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST ),
+            --玩家给东西时
             ChattyNode(self.inst, "PIG_TALK_ATTEMPT_TRADE",
                 FaceEntity(self.inst, GetTraderFn, KeepTraderFn)),
-            day,
-            night,
+            day, --白天的行为
+            night, --晚上的行为
         }, .5)
 
     self.bt = BT(self.inst, root)

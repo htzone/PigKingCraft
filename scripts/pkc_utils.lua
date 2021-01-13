@@ -387,24 +387,27 @@ end
 --@param mode 需要安置的数量
 function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
 	local pos = Vector3(target.Transform:GetWorldPosition())
-	local attempt_angle = (2*PI)/num
+	local attempt_angle = (2 * PI) / num
 	local tmp_angles = {}
-	for i=0, num-1 do
-		local a = i*attempt_angle
+	for i = 0, num - 1 do
+		local a = i * attempt_angle
 		if a > PI then
-			a = a-(2*PI)
+			a = a - (2 * PI)
 		end
 		table.insert(tmp_angles, a)
 	end
 	local theta = math.random() * 2 * PI
-	for i, attempt in ipairs(tmp_angles) do
+	for _, attempt in ipairs(tmp_angles) do
 		local check_angle = theta + attempt
-		if check_angle > 2*PI then check_angle = check_angle - 2*PI end
+		if check_angle > 2 * PI then
+			check_angle = check_angle - 2 * PI
+		end
 		local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
 		local tmp_pos = pos + offset
-		local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
-		local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255) 
-		if canSpawn then
+		local valid_tile = TheWorld.Map:IsAboveGroundAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z, false)
+		--local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
+		--local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
+		if valid_tile then
 			local mob = SpawnPrefab(prefab_name)
 			if mob then
 				if mob.components.writeable then
@@ -464,9 +467,10 @@ function pkc_isNoOceanRange(center_pos, radius)
 		if check_angle > 2*PI then check_angle = check_angle - 2*PI end
 		local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
 		local tmp_pos = center_pos + offset
-		local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
-		local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
-		if not canSpawn then
+		local valid_tile = TheWorld.Map:IsAboveGroundAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z, false)
+		--local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
+		--local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
+		if not valid_tile then
 			isNearOcean = true
 			break
 		end

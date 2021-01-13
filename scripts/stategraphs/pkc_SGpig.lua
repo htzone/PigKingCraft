@@ -11,11 +11,12 @@ local actionhandlers =
     ActionHandler(ACTIONS.GOHOME, "gohome"),
     ActionHandler(ACTIONS.EAT, "eat"),
     ActionHandler(ACTIONS.CHOP, "chop"),
-    ActionHandler(ACTIONS.PICKUP, "pickup"),
+    ActionHandler(ACTIONS.PICKUP, "harvest"),
     ActionHandler(ACTIONS.EQUIP, "pickup"),
     ActionHandler(ACTIONS.ADDFUEL, "pickup"),
     ActionHandler(ACTIONS.TAKEITEM, "pickup"),
     ActionHandler(ACTIONS.UNPIN, "pickup"),
+    ActionHandler(ACTIONS.GIVE, "givetochest"),
 }
 
 --重写被攻击状态（减少硬直）
@@ -236,7 +237,76 @@ local states=
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end ),
         },        
-    },    
+    },
+    State{
+        name = "harvest",
+        tags = {"busy"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+        end,
+
+        timeline=
+        {
+            TimeEvent(5*FRAMES, function(inst)
+                inst:PerformBufferedAction()
+                if inst and inst.pkc_harvest_target then
+                    if inst.pkc_harvest_target.components.pickable then
+                        inst.pkc_harvest_target.components.pickable:Pick(inst)
+                        inst.pkc_harvest_target = nil
+                    end
+                end
+            end),
+            TimeEvent(5*FRAMES, function(inst)
+                inst:PerformBufferedAction()
+            end)
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState("idle")
+            end ),
+        },
+    },
+    State{
+        name = "givetochest",
+        tags = {"busy"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+            local target = inst.give_chest_target
+            if target and target.components.container then
+                target.components.container:Open(inst)
+            end
+        end,
+
+        timeline=
+        {
+            TimeEvent(10*FRAMES, function(inst) inst:PerformBufferedAction() end),
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst)
+                --动画结束后将物品栏里的东西放到箱子里面
+                local target = inst.give_chest_target
+                if inst and target then
+                    local receive_container = target.components.container
+                    local inventory = inst.components.inventory
+                    if inventory and receive_container and inventory.itemslots and not receive_container:IsFull() then
+                        for k, _ in pairs(inventory.itemslots) do
+                            target.components.container:GiveItem(inventory:RemoveItemBySlot(k))
+                            inst.give_chest_target = nil
+                        end
+                    end
+                end
+                inst.sg:GoToState("idle")
+            end),
+        },
+    },
 }
 
 CommonStates.AddWalkStates(states,
