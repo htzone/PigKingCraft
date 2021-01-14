@@ -53,6 +53,16 @@ local function OnUnequip(inst, owner)
 	end
 end
 
+--local function spellFn(inst, target, pos)
+--    local owner = inst.components.inventoryitem.owner
+--    if owner then
+--        print("pkc owner:"..tostring(owner.prefab))
+--    end
+--    if target then
+--        print("pkc target:"..tostring(target.prefab))
+--    end
+--end
+
 local function fn()
 
     local inst = CreateEntity()
@@ -102,6 +112,13 @@ local function fn()
 		inst:AddComponent("waterproofer")
 		inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_MED)
 	end
+
+    --inst:AddComponent("spellcaster")
+    --inst.components.spellcaster.canuseontargets = true
+    --inst.components.spellcaster.canonlyuseonworkable = true
+    --inst.components.spellcaster.canonlyuseoncombat = true
+    --inst.components.spellcaster.quickcast = true
+    --inst.components.spellcaster:SetSpellFn(spellFn)
 
     return inst
 end

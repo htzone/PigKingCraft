@@ -240,7 +240,7 @@ local states=
     },
     State{
         name = "harvest",
-        tags = {"busy"},
+        tags = {"picking"},
 
         onenter = function(inst)
             inst.Physics:Stop()
@@ -277,7 +277,7 @@ local states=
         onenter = function(inst)
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("pig_pickup")
-            local target = inst.give_chest_target
+            local target = inst.give_chest_target or inst.give_icebox_target
             if target and target.components.container then
                 target.components.container:Open(inst)
             end
@@ -292,16 +292,36 @@ local states=
         {
             EventHandler("animover", function(inst)
                 --动画结束后将物品栏里的东西放到箱子里面
-                local target = inst.give_chest_target
-                if inst and target then
-                    local receive_container = target.components.container
-                    local inventory = inst.components.inventory
-                    if inventory and receive_container and inventory.itemslots and not receive_container:IsFull() then
-                        for k, _ in pairs(inventory.itemslots) do
-                            target.components.container:GiveItem(inventory:RemoveItemBySlot(k))
-                            inst.give_chest_target = nil
+                local chest_target = inst.give_chest_target
+                local icebox_target = inst.give_icebox_target
+                if inst then
+                    if chest_target then
+                        local receive_container = chest_target.components.container
+                        local inventory = inst.components.inventory
+                        if inventory and receive_container and inventory.itemslots
+                                and not receive_container:IsFull() then
+                            for k, _ in pairs(inventory.itemslots) do
+                                local item = inventory.itemslots[k]
+                                if not (item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item)) then
+                                    receive_container:GiveItem(inventory:RemoveItemBySlot(k))
+                                end
+                            end
+                        end
+                    elseif icebox_target then
+                        local receive_container = icebox_target.components.container
+                        local inventory = inst.components.inventory
+                        if inventory and receive_container and inventory.itemslots
+                                and not receive_container:IsFull() then
+                            for k, _ in pairs(inventory.itemslots) do
+                                local item = inventory.itemslots[k]
+                                if item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item) then
+                                    receive_container:GiveItem(inventory:RemoveItemBySlot(k))
+                                end
+                            end
                         end
                     end
+                    inst.give_chest_target = nil
+                    inst.give_icebox_target = nil
                 end
                 inst.sg:GoToState("idle")
             end),

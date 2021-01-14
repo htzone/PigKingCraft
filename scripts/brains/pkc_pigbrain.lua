@@ -41,12 +41,13 @@ local SEE_BURNING_HOME_DIST_SQ = 20*20
 local COMFORT_LIGHT_LEVEL = 0.3
 
 local KEEP_CHOPPING_DIST = 10
+local KEEP_HARVEST_DIST = 10
 
 local RUN_AWAY_DIST = 5
 local STOP_RUN_AWAY_DIST = 8
 
 --猪人能看到箱子的最大距离
-local SEE_CHEST_DIST = 30
+local SEE_CHEST_DIST = 23
 --猪人能看到地上物品的最大距离
 local SEE_GROUND_ITEM_DIST = 6
 --猪人采集的最大距离
@@ -77,18 +78,25 @@ local function FindFoodAction(inst)
         return
     end
 
+    --吃物品栏里的肉
     if inst.components.inventory and inst.components.eater then
-        target = inst.components.inventory:FindItem(function(item) return inst.components.eater:CanEat(item) end)
+        target = inst.components.inventory:FindItem(function(item) return inst.components.eater:CanEat(item)
+                and item.components.edible and item.components.edible.foodtype == FOODTYPE.MEAT end)
     end
 
     local time_since_eat = inst.components.eater:TimeSinceLastEating()
-    local noveggie = time_since_eat and time_since_eat < TUNING.PIG_MIN_POOP_PERIOD*4
+    --local noveggie = time_since_eat and time_since_eat < TUNING.PIG_MIN_POOP_PERIOD*4
 
     if not target and (not time_since_eat or time_since_eat > TUNING.PIG_MIN_POOP_PERIOD*2) then
+        --找附近掉在地上的肉和种子吃
         target = FindEntity(inst, SEE_FOOD_DIST, function(item) 
                 if item:GetTimeAlive() < 8 then return false end
                 if item.prefab == "mandrake" then return false end
-                if noveggie and item.components.edible and item.components.edible.foodtype ~= FOODTYPE.MEAT then
+                --if noveggie and item.components.edible and item.components.edible.foodtype ~= FOODTYPE.MEAT then
+                --    return false
+                --end
+                if item.components.edible and item.components.edible.foodtype ~= FOODTYPE.MEAT
+                        and item.prefab ~= "seeds" then
                     return false
                 end
                 if not item:IsOnValidGround() then
@@ -101,23 +109,24 @@ local function FindFoodAction(inst)
         return BufferedAction(inst, target, ACTIONS.EAT)
     end
 
-    if not target and (not time_since_eat or time_since_eat > TUNING.PIG_MIN_POOP_PERIOD*2) then
-        target = FindEntity(inst, SEE_FOOD_DIST, function(item) 
-                if not item.components.shelf then return false end
-                if not item.components.shelf.itemonshelf or not item.components.shelf.cantakeitem then return false end
-                if noveggie and item.components.shelf.itemonshelf.components.edible and item.components.shelf.itemonshelf.components.edible.foodtype ~= FOODTYPE.MEAT then
-                    return false
-                end
-                if not item:IsOnValidGround() then
-                    return false
-                end
-                return inst.components.eater:CanEat(item.components.shelf.itemonshelf) 
-            end)
-    end
-
-    if target then
-        return BufferedAction(inst, target, ACTIONS.TAKEITEM)
-    end
+    --摘架子上的东西
+    --if not target and (not time_since_eat or time_since_eat > TUNING.PIG_MIN_POOP_PERIOD*2) then
+    --    target = FindEntity(inst, SEE_FOOD_DIST, function(item)
+    --            if not item.components.shelf then return false end
+    --            if not item.components.shelf.itemonshelf or not item.components.shelf.cantakeitem then return false end
+    --            if noveggie and item.components.shelf.itemonshelf.components.edible and item.components.shelf.itemonshelf.components.edible.foodtype ~= FOODTYPE.MEAT then
+    --                return false
+    --            end
+    --            if not item:IsOnValidGround() then
+    --                return false
+    --            end
+    --            return inst.components.eater:CanEat(item.components.shelf.itemonshelf)
+    --        end)
+    --end
+    --
+    --if target then
+    --    return BufferedAction(inst, target, ACTIONS.TAKEITEM)
+    --end
 end
 
 local function IsDeciduousTreeMonster(guy)
@@ -126,41 +135,6 @@ end
 
 local function FindDeciduousTreeMonster(inst)
     return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, { "CHOP_workable" })
-end
-
-local function KeepChoppingAction(inst)
-    return inst.tree_target ~= nil
-        or (inst.components.follower.leader ~= nil and
-            inst:IsNear(inst.components.follower.leader, KEEP_CHOPPING_DIST))
-        or FindDeciduousTreeMonster(inst) ~= nil
-end
-
-local function StartChoppingCondition(inst)
-    return inst.tree_target ~= nil
-        or (inst.components.follower.leader ~= nil and
-            inst.components.follower.leader.sg ~= nil and
-            inst.components.follower.leader.sg:HasStateTag("chopping"))
-        or FindDeciduousTreeMonster(inst) ~= nil
-end
-
-local function StartPikUpCondition(inst)
-    return inst.components.follower.leader ~= nil and
-            inst.components.follower.leader.sg ~= nil and
-            inst.components.follower.leader.sg:HasStateTag("chopping")
-            or FindDeciduousTreeMonster(inst) ~= nil
-end
-
-local function FindTreeToChopAction(inst)
-    local target = FindEntity(inst, SEE_TREE_DIST, nil, { "CHOP_workable" })
-    if target ~= nil then
-        if inst.tree_target ~= nil then
-            target = inst.tree_target
-            inst.tree_target = nil
-        else
-            target = FindDeciduousTreeMonster(inst) or target
-        end
-        return BufferedAction(inst, target, ACTIONS.CHOP)
-    end
 end
 
 local function HasValidHome(inst)
@@ -247,52 +221,79 @@ local function findChest(inst)
     return chestTarget
 end
 
+--找附近的冰箱
+local function findIceBox(inst)
+    local chestTarget = FindEntity(inst, SEE_CHEST_DIST, function(item)
+        return item and item:HasTag("fridge") and item:HasTag("structure")
+                and item.components.container and not item.components.container:IsFull()
+                and item.pkc_group_id == inst.components.pkc_group:getChooseGroup()
+    end)
+    return chestTarget
+end
+
 --捡扔地上的东西
 local function FindGroundItemAction(inst)
     if not inst or inst.sg:HasStateTag("busy") or not inst.components.pkc_group then
         return
     end
-    --找附近有没有不是满的容器或箱子(本队的)
+    --找附近有没有不是满的箱子或冰箱(本队的)
     local chestTarget = findChest(inst)
-    --没有箱子则不执行捡东西的操作
-    if not chestTarget then
-        return
-    end
     --附近有箱子才捡地上的东西
-    local itemTarget = FindEntity(inst, SEE_GROUND_ITEM_DIST, function(item)
-        if not item:IsOnValidGround() then
-            return false
+    if chestTarget then
+        local itemTarget = FindEntity(inst, SEE_GROUND_ITEM_DIST, function(item)
+            if not item:IsOnValidGround() then
+                return false
+            end
+            --找物品栏能装下的东西
+            local inventoryItem = item.components.inventoryitem
+            if inventoryItem then
+                --且不能是小切
+                if item.prefab == "chester_eyebone" then
+                    return false
+                end
+                --且不能是有容器的
+                if inventoryItem:GetContainer() ~= nil then
+                    return false
+                end
+                --且不能是活的会动的
+                if item.components.health ~= nil or item.components.locomotor ~= nil then
+                    return false
+                end
+                --且不能是可以吃的
+                if inst and inst.components.eater and inst.components.eater:CanEat(item) then
+                    return false
+                end
+                --且不能搬重物
+                if item:HasTag("heavy") then
+                    return false
+                end
+                return true
+            end
+        end)
+
+        --目标不能是着火的
+        if itemTarget and not itemTarget:HasTag("fire") and not itemTarget:HasTag("burnt") then
+            local act = BufferedAction(inst, itemTarget, ACTIONS.PICKUP)
+            return act
         end
-        --找物品栏能装下的东西
-        local inventoryItem = item.components.inventoryitem
-        if inventoryItem then
-            --且不能是小切
-            if item.prefab == "chester_eyebone" then
+    end
+
+    local iceBoxTarget = findIceBox(inst)
+    if iceBoxTarget then
+        local itemTarget = FindEntity(inst, SEE_GROUND_ITEM_DIST, function(item)
+            if not item:IsOnValidGround() then
                 return false
             end
-            --且不能是有容器的
-            if inventoryItem:GetContainer() ~= nil then
-                return false
-            end
-            --且不能是活的会动的
-            if item.components.health ~= nil or item.components.locomotor ~= nil then
-                return false
-            end
-            --且不能是可以吃的
-            if inst and inst.components.eater and inst.components.eater:CanEat(item) then
-                return false
-            end
-            --且不能搬重物
-            if item:HasTag("heavy") then
-                return false
-            end
-            return true
+            --找物品栏能装下的食物
+            return item.components.inventoryitem and item.components.edible
+                    and inst.components.eater and inst.components.eater:CanEat(item)
+        end)
+
+        --目标不能是着火的
+        if itemTarget and not itemTarget:HasTag("fire") and not itemTarget:HasTag("burnt") then
+            local act = BufferedAction(inst, itemTarget, ACTIONS.PICKUP)
+            return act
         end
-    end)
-    --目标不能是着火的
-    if itemTarget and not itemTarget:HasTag("fire") and not itemTarget:HasTag("burnt") then
-        local act = BufferedAction(inst, itemTarget, ACTIONS.PICKUP)
-        return act
     end
 end
 
@@ -300,6 +301,34 @@ end
 local function isInventoryNotEmpty(inventory)
     for k = 1, inventory.maxslots do
         if inventory.itemslots[k] then
+            return true
+        end
+    end
+    return false
+end
+
+--物品栏中是否有不是食物的物品
+local function isHasNotFoodItem(inst, inventory)
+    if not inventory.itemslots then
+        return false
+    end
+    for k, _ in pairs(inventory.itemslots) do
+        local item = inventory.itemslots[k]
+        if (item and inst.components.eater and not inst.components.eater:CanEat(item)) or item:HasTag("show_spoiled") then
+            return true
+        end
+    end
+    return false
+end
+
+--物品栏中是否有食物
+local function isHasFoodItem(inst, inventory)
+    if not inventory.itemslots then
+        return false
+    end
+    for k, _ in pairs(inventory.itemslots) do
+        local item = inventory.itemslots[k]
+        if item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item) then
             return true
         end
     end
@@ -317,9 +346,26 @@ local function FindContainerAction(inst)
     end
     --物品栏不为空则把东西放箱子里
     if isInventoryNotEmpty(inventory) then
-        local target = findChest(inst)
+        local target = nil
+        if isHasNotFoodItem(inst, inventory) then
+            target = findChest(inst)
+            if target and not target:HasTag("fire") and not target:HasTag("burnt") then
+                inst.give_chest_target = target
+                local act = BufferedAction(inst, target, ACTIONS.GIVE)
+                if act then
+                    act:AddSuccessAction(function()
+                    end)
+                    act:AddFailAction(function()
+                    end)
+                end
+                return act
+            end
+        end
+        if isHasFoodItem(inst, inventory) then
+            target = findIceBox(inst)
+        end
         if target and not target:HasTag("fire") and not target:HasTag("burnt") then
-            inst.give_chest_target = target
+            inst.give_icebox_target = target
             local act = BufferedAction(inst, target, ACTIONS.GIVE)
             if act then
                 act:AddSuccessAction(function()
@@ -332,18 +378,77 @@ local function FindContainerAction(inst)
     end
 end
 
+local function KeepChoppingAction(inst)
+    return inst.tree_target ~= nil
+            or (inst.components.follower.leader ~= nil and
+            inst:IsNear(inst.components.follower.leader, KEEP_CHOPPING_DIST))
+            or FindDeciduousTreeMonster(inst) ~= nil
+end
+
+local function StartChoppingCondition(inst)
+    return inst.tree_target ~= nil
+            or (inst.components.follower.leader ~= nil and
+            inst.components.follower.leader.sg ~= nil and
+            inst.components.follower.leader.sg:HasStateTag("chopping"))
+            or FindDeciduousTreeMonster(inst) ~= nil
+end
+
+local function FindTreeToChopAction(inst)
+    local target = FindEntity(inst, SEE_TREE_DIST, nil, { "CHOP_workable" })
+    if target ~= nil then
+        if inst.tree_target ~= nil then
+            target = inst.tree_target
+            inst.tree_target = nil
+        else
+            target = FindDeciduousTreeMonster(inst) or target
+        end
+        return BufferedAction(inst, target, ACTIONS.CHOP)
+    end
+end
+
+--开始采集的条件
+local function StartHarvestCondition(inst)
+    if not inst then
+        return false
+    end
+    local leader = inst.components.follower and inst.components.follower.leader or nil
+    if leader then
+        local leader_hands_equip_item = leader.components.inventory
+                and leader.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
+        return leader_hands_equip_item and (leader_hands_equip_item.prefab == "farm_hoe"
+                or leader_hands_equip_item.prefab == "golden_farm_hoe")
+    end
+    return false
+
+    --local start = inst and leader
+    --        and leader.components.inventory
+    --        and leader.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) ==
+    --        --and inst.components.follower.leader.sg
+    --        --and inst.components.follower.leader.sg:HasStateTag("doing")
+    --return start
+end
+
+--保持采集的条件（玩家在附近）
+local function KeepHarvestAction(inst)
+    local leader = inst.components.follower.leader
+    local keep = inst and leader and
+            inst:IsNear(leader, KEEP_HARVEST_DIST)
+    return keep
+end
+
 --找采集的东西
 local function FindThingsToHarvestAction(inst)
     if inst.sg:HasStateTag("busy") then
         return
     end
-
     local target = FindEntity(inst, SEE_HARVEST_ITEM_DIST, function(item)
-        return item.components.pickable and item.components.pickable:CanBePicked()
+        return item.components.pickable and item.components.pickable:CanBePicked() and item:IsValid()
                 and item:HasTag("plant") and item:HasTag("renewable")
+                and not (item.components.burnable ~= nil
+                and (item.components.burnable:IsBurning() or item.components.burnable:IsSmoldering()))
     end)
 
-    if target and target.components.pickable then
+    if target then
         inst.pkc_harvest_target = target
         local act = BufferedAction(inst, target, ACTIONS.PICKUP)
         return act
@@ -361,17 +466,21 @@ function PigBrain:OnStart()
         PriorityNode{
             --找食物
             ChattyNode(self.inst, "PIG_TALK_FIND_MEAT", DoAction(self.inst, FindFoodAction )),
+            --把身上的东西放箱子里
+            ChattyNode(self.inst, "PIG_TALK_FIND_GROUND_ITEM", DoAction(self.inst, FindContainerAction )),
+            --帮忙采集
+            IfNode(function() return StartHarvestCondition(self.inst) end, "harvest",
+                WhileNode(function() return KeepHarvestAction(self.inst) end, "keep harvest",
+                    LoopNode{
+                        ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindThingsToHarvestAction ))})),
             --帮忙砍树
             IfNode(function() return StartChoppingCondition(self.inst) end, "chop",
                 WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
                     LoopNode{ 
                         ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindTreeToChopAction ))})),
-            --帮忙采集
             --ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindThingsToHarvestAction )),
-            --IfNode(function() return StartChoppingCondition(self.inst) end, "chop",
-            --        WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
-            --                LoopNode{
-            --                    ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindTreeToChopAction ))})),
+            --IfNode(function()  return StartHarvestCondition(self.inst) end, "harvest",
+            --        ChattyNode(self.inst, "PIG_TALK_HELP_CHOP_WOOD", DoAction(self.inst, FindThingsToHarvestAction ))),
             --跟随主人
             ChattyNode(self.inst, "PIG_TALK_FOLLOWWILSON",
                 Follow(self.inst, GetLeader, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
@@ -381,8 +490,6 @@ function PigBrain:OnStart()
                     FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
             --在家附近徘徊
             Leash(self.inst, GetNoLeaderHomePos, LEASH_MAX_DIST, LEASH_RETURN_DIST),
-            --把身上的东西放箱子里
-            ChattyNode(self.inst, "PIG_TALK_FIND_GROUND_ITEM", DoAction(self.inst, FindContainerAction )),
             --找掉地上的东西
             ChattyNode(self.inst, "PIG_TALK_FIND_GROUND_ITEM", DoAction(self.inst, FindGroundItemAction )),
             --与玩家保持距离
