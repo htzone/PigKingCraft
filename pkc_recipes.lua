@@ -14,6 +14,8 @@ end
 
 local homesign = GLOBAL.AllRecipes["homesign"]
 homesign.sortkey = -20
+local treasurechest = GLOBAL.AllRecipes["treasurechest"]
+treasurechest.sortkey = -19
 
 local recipe_ewecushat = AddRecipe("pkc_ewecushat",
         { Ingredient("goldnugget", 25), Ingredient("hammer", 4), Ingredient("feather_crow", 2) },
