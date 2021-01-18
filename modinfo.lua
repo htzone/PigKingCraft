@@ -1,5 +1,5 @@
 -- This information tells other players more about the mod
-name = "猪王争霸(PigKingCraft)III"
+name = "11猪王争霸(PigKingCraft)开发版III"
 description = [[
 版本(V3.0.0) 请确保使用最新版本/Please make sure to use the latest version.
 

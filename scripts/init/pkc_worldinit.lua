@@ -405,8 +405,15 @@ AddPrefabPostInit("world", function(inst)
 	end
 end)
 
+local json = require "json"
 local function onPlayerJoin(inst, player)
 	inst:DoTaskInTime(0, function()
+		if inst and inst.components.pkc_playerinfos and GLOBAL.PKC_PLAYER_INFOS then
+			if IsServer then
+				--让客户端获取最新数据
+				inst.components.pkc_playerinfos._playerinfos:set(json.encode(GLOBAL.PKC_PLAYER_INFOS))
+			end
+		end
 	end)
 end
 
@@ -438,6 +445,10 @@ local function network(inst)
 		inst:ListenForEvent("pkc_kingbekilled", function(world, data) onKingbekilled(data, inst) end, GLOBAL.TheWorld)
 		--胜利
 		inst:ListenForEvent("pkc_win", function(world, data) onWin(data, inst) end, GLOBAL.TheWorld)
+		--玩家加入
+		inst:ListenForEvent("ms_playerjoined", function (world, player) onPlayerJoin(inst, player) end, GLOBAL.TheWorld)
+		--玩家离开
+		--inst:ListenForEvent("ms_playerleft", function (world, player) onPlayerLeft(inst, player) end, GLOBAL.TheWorld)
 		--玩家加入
 		--inst:ListenForEvent("ms_playerjoined", function (world, player) onPlayerJoin(inst, player) end, GLOBAL.TheWorld)
 		--玩家离开
