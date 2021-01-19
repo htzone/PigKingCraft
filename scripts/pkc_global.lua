@@ -7,8 +7,7 @@
 ----[[声明全局变量]]----
 
 	--测试模式
-	GLOBAL.PKC_ISTEST = GetModConfigData("is_test")
-
+	--GLOBAL.PKC_ISTEST = GetModConfigData("is_test")
 	--游戏语言
 	GLOBAL.GAME_LANGUAGE = GetModConfigData("language")
 	--分组数

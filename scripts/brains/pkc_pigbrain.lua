@@ -552,7 +552,7 @@ function PigBrain:OnStart()
                     PriorityNode({
                         ChattyNode(self.inst, "PIG_TALK_FERTILIZER_ITEM", DoAction(self.inst, AutoFertilizerAction )),
                         ChattyNode(self.inst, "PIG_FIND_POOP_ITEM", DoAction(self.inst, FindPoopAction )),
-                    }, 0.5)),
+                    }, 0.1)),
             --把身上的东西放箱子里
             IfNode(function() return isInventoryNotEmpty(self.inst) end, "isInventoryNotEmpty",
                     ChattyNode(self.inst, "PIG_TALK_FIND_CONTAINER", DoAction(self.inst, FindContainerAction ))),

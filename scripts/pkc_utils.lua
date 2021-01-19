@@ -399,13 +399,26 @@ function pkc_spawnat(inst, prefname, offset, mode, fn)
     end
 end
 
+--清理猪王附近的东西
+local function clearNear(inst, radius, fn)
+    if inst and inst.Transform then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, radius)
+        for _, obj in ipairs(ents) do
+            if obj and obj ~= inst and not obj:HasTag("burnt") and (fn == nil or fn(obj)) then
+                obj:Remove()
+            end
+        end
+    end
+end
+
 --环绕安置
 --@RedPig 12-15
 --@param target 作为中心点的物体
 --@param prefab_name prefab名称
 --@param radius	半径
 --@param mode 需要安置的数量
-function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
+function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clear)
     local pos = Vector3(target.Transform:GetWorldPosition())
     local attempt_angle = (2 * PI) / num
     local tmp_angles = {}
@@ -425,8 +438,6 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
         local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
         local tmp_pos = pos + offset
         local valid_tile = TheWorld.Map:IsAboveGroundAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z, false)
-        --local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
-        --local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
         if valid_tile then
             local mob = SpawnPrefab(prefab_name)
             if mob then
@@ -434,6 +445,9 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
                     mob.components.writeable:SetText(text)
                 end
                 mob.Transform:SetPosition(tmp_pos:Get())
+                if clear then
+                    clearNear(mob, 2, function(item) return not item:HasTag("pkc_defences") end)
+                end
                 if mob:HasTag("pkc_defences") then
                     mob.ownername = "RedPig"
                     mob.ownerid = "Fuckyou"
@@ -443,13 +457,12 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text)
     end
 end
 
-function pkc_roundSpawn(target, prefab_name, radius, num)
-    pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "")
+function pkc_roundSpawn(target, prefab_name, radius, num, clear)
+    pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "", clear)
 end
 
 --判断在一定范围内有没有海
 function pkc_isValidRange(center_pos, radius)
-    --local pt = Vector3(target.Transform:GetWorldPosition())
     local theta = math.random() * 2 * PI
     local result_offset = FindValidPositionByFan(theta, radius, 36, function(offset)
         local pos = center_pos + offset
@@ -459,8 +472,6 @@ function pkc_isValidRange(center_pos, radius)
             return false
         end
         return true
-        --local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 1)
-        --return next(ents) == nil
     end)
     if result_offset == nil then
         return true
@@ -490,8 +501,6 @@ function pkc_isNoOceanRange(center_pos, radius)
         local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
         local tmp_pos = center_pos + offset
         local valid_tile = TheWorld.Map:IsAboveGroundAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z, false)
-        --local tile = TheWorld.Map:GetTileAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z)
-        --local canSpawn = (tile ~= GROUND.IMPASSABLE and tile ~= GROUND.INVALID and tile ~= 255)
         if not valid_tile then
             isNearOcean = true
             break
@@ -616,9 +625,4 @@ function isSameGroup(inst1, inst2)
             and inst1.components.pkc_group and inst2.inst.components.pkc_group
             and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
 end
-
---function isSameGroupByUserId(curUserid, userid)
---	return PKC_PLAYER_INFOS[curUserid] and PKC_PLAYER_INFOS[userid]
---			and PKC_PLAYER_INFOS[curUserid].GROUP_ID == PKC_PLAYER_INFOS[userid].GROUP_ID
---end
 

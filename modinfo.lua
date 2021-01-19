@@ -1,16 +1,14 @@
 -- This information tells other players more about the mod
 name = "11猪王争霸(PigKingCraft)开发版III"
 description = [[
-版本(V3.0.0) 请确保使用最新版本/Please make sure to use the latest version.
-
-<饥荒分组生存与对抗> / <Group survival and PvP>
+<饥荒分组生存与对抗> / <Group Survival and PvP>
 允许你和你的小伙伴们一起对抗其他组的成员，最多可分四组，保护你的猪王，并通过生存和对抗得分赢得这场比赛的胜利.
 Survival and protect your pig king, 4 teams at most.
 
-<重要> / <Important>
+<重要> / <Important Tips>
 需在无尽和PVP模式下开启该模组.
 比赛结束后会自动重置世界，如果想关闭该功能可在模组配置界面进行配置.
-You need to run this module in endless and PvP mode.The world will be reset automatically after winning,you can configure it in the module configuration page.
+You need to open this module in endless and PvP mode. The world will be regenerated automatically after winning, you can configure it in the module configuration page.
 点击右下方的“配置模组”可设置更多选项 /Click "Configuration Module" to set more options                                                        ↓↓↓
 
 ]]
@@ -56,16 +54,6 @@ icon = "modicon.tex"
 
 configuration_options =
 {
-    {
-        name = "is_test",
-        label = "是否测试模式(Test)",
-        options =
-        {
-            {description = "否(No)", data = false, hover = "no" },
-            {description = "是(Yes)", data = true, hover = "yes"},
-        },
-        default = false,
-    },
 	{
         name = "language",
         label = "游戏语言(Language)",
@@ -98,8 +86,8 @@ configuration_options =
         label = "队伍选择(Team Selection)",
         options =
         {
-			{description = "随机队伍(RandomTeam)", data = true, hover = "随机队伍(RandomGroup)" },
-            {description = "指定队伍(SpecifyTeam)", data = false, hover = "指定队伍(SpecifyGroup)"},
+			{description = "随机队伍(RandomTeam)", data = true, hover = "随机队伍(Random Team)" },
+            {description = "指定队伍(SpecifyTeam)", data = false, hover = "指定队伍(Specify Team)"},
         },
         default = true,
     },
@@ -167,8 +155,8 @@ configuration_options =
         label = "结束自动重置世界(AutoResetAfterWin)",
         options =
         {
-			{description = "否(No)", data = false, hover = "If auto regenerate world after win" },
-            {description = "是(Yes)", data = true, hover = "赢取胜利后自动重置世界"},
+			{description = "否(No)", data = false, hover = "否/No" },
+            {description = "是(Yes)", data = true, hover = "赢取胜利后自动重置世界/If auto regenerate world after win"},
         },
         default = true,
     },
@@ -177,12 +165,12 @@ configuration_options =
         label = "初始防御塔数(EyeTurretNum)",
         options =
         {
-			{description = "1", data = 1, hover = "EyeTurretNumNearPigking"},
-            {description = "2", data = 2, hover = "EyeTurretNumNearPigking"},
-			{description = "3", data = 3, hover = "EyeTurretNumNearPigking"},
-			{description = "4", data = 4, hover = "EyeTurretNumNearPigking"},
-			{description = "5", data = 5, hover = "EyeTurretNumNearPigking"},
-			{description = "6", data = 6, hover = "EyeTurretNumNearPigking"},
+			{description = "1", data = 1, hover = "Eyeturret num near pigking"},
+            {description = "2", data = 2, hover = "Eyeturret num near pigking"},
+			{description = "3", data = 3, hover = "Eyeturret num near pigking"},
+			{description = "4", data = 4, hover = "Eyeturret num near pigking"},
+			{description = "5", data = 5, hover = "Eyeturret num near pigking"},
+			{description = "6", data = 6, hover = "Eyeturret num near pigking"},
         },
         default = 4,
     },
@@ -191,22 +179,42 @@ configuration_options =
         label = "初始防御猪人房数(PigHouseNum)",
         options =
         {
-			{description = "1", data = 1, hover = "PigHouseNumNearPigking"},
-            {description = "2", data = 2, hover = "PigHouseNumNearPigking"},
-			{description = "3", data = 3, hover = "PigHouseNumNearPigking"},
-			{description = "4", data = 4, hover = "PigHouseNumNearPigking"},
-			{description = "5", data = 5, hover = "PigHouseNumNearPigking"},
-			{description = "6", data = 6, hover = "PigHouseNumNearPigking"},
+			{description = "1", data = 1, hover = "Pig house num near pigking"},
+            {description = "2", data = 2, hover = "Pig house num near pigking"},
+			{description = "3", data = 3, hover = "Pig house num near pigking"},
+			{description = "4", data = 4, hover = "Pig house num near pigking"},
+			{description = "5", data = 5, hover = "Pig house num near pigking"},
+			{description = "6", data = 6, hover = "Pig house num near pigking"},
         },
         default = 6,
     },
     {
         name = "prevent_bad_boy",
-        label = "防止队友恶意破坏(PreventBadBoy)",
+        label = "防止队友恶意破坏(LimitBadBoy)",
         options =
         {
-            {description = "开启(Yes)", data = true, hover = "防止队友恶意破坏开启"},
-            {description = "关闭(No)", data = false, hover = "防止队友恶意破坏关闭"},
+            {description = "开启(Yes)", data = true, hover = "防止队友恶意破坏开启/Prevent malicious damage by teammates"},
+            {description = "关闭(No)", data = false, hover = "防止队友恶意破坏关闭/Prevent malicious damage by teammates"},
+        },
+        default = true,
+    },
+    {
+        name = "is_long_autumn",
+        label = "秋天较长模式(IsLongAutumn)",
+        options =
+        {
+            {description = "否(No)", data = false, hover = "No" },
+            {description = "是(Yes)", data = true, hover = "秋天的时间会比其他季节的时间长，占比为4:1:1:1/The Autumn length is longer than other seasons"},
+        },
+        default = true,
+    },
+    {
+        name = "is_fast_hand",
+        label = "是否开快速采集(FastHandSwitch)",
+        options =
+        {
+            {description = "否(OFF)", data = false, hover = "OFF" },
+            {description = "是(ON)", data = true, hover = "ON"},
         },
         default = true,
     },

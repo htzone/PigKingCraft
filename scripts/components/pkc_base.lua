@@ -10,7 +10,7 @@ end)
 
 --是否为安全位置
 local function isSavePos(pos)
-	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 15)
+	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 18)
 	for _, obj in ipairs(ents) do
 		if obj and (obj:HasTag("blocker") or obj.prefab == "mermhouse")
 				and obj:GetPosition():Dist(pos) <= 8 then
@@ -143,9 +143,9 @@ local function produceSingleBase(previousPos, groupId)
 	clearPigkingNear(pigking)
 	
 	--安置建筑
-	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM) --猪人房
-	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM) --眼球塔
-	pkc_roundSpawnForWriteable(pigking, homesignPrefab, 8, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26) --传送牌
+	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM, true) --猪人房
+	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM, false) --眼球塔
+	pkc_roundSpawnForWriteable(pigking, homesignPrefab, 9, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26, true) --传送牌
 	
 	return pos
 end

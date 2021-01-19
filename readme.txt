@@ -1,5 +1,6 @@
 TGP创客空间搜MOD名称 猪王争霸
 Steam创意工坊订阅地址：http://steamcommunity.com/sharedfiles/filedetails/?id=807268921
+GitHub地址：https://github.com/htzone/PigKingCraft
 
 饥荒分组生存对抗 - 猪王争霸
 你们要的饥荒分组生存对抗来了，玩腻了饥荒无止境的生存，不妨来试试这个MOD吧。
