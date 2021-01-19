@@ -17,6 +17,8 @@ local actionhandlers =
     ActionHandler(ACTIONS.TAKEITEM, "pickup"),
     ActionHandler(ACTIONS.UNPIN, "pickup"),
     ActionHandler(ACTIONS.GIVE, "givetochest"),
+    ActionHandler(ACTIONS.DROP, "fertilizer"),
+    ActionHandler(ACTIONS.RUMMAGE, "getItemFromContainer"),
 }
 
 --重写被攻击状态（减少硬直）
@@ -254,8 +256,8 @@ local states=
                 if inst and inst.pkc_harvest_target then
                     if inst.pkc_harvest_target.components.pickable then
                         inst.pkc_harvest_target.components.pickable:Pick(inst)
-                        inst.pkc_harvest_target = nil
                     end
+                    inst.pkc_harvest_target = nil
                 end
             end),
             TimeEvent(5*FRAMES, function(inst)
@@ -278,7 +280,8 @@ local states=
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("pig_pickup")
             local target = inst.give_chest_target or inst.give_icebox_target
-            if target and target.components.container then
+            if target and target.components.container
+                    and target.components.container.canbeopened and not target.components.container:IsOpen() then
                 target.components.container:Open(inst)
             end
         end,
@@ -292,9 +295,9 @@ local states=
         {
             EventHandler("animover", function(inst)
                 --动画结束后将物品栏里的东西放到箱子里面
-                local chest_target = inst.give_chest_target
-                local icebox_target = inst.give_icebox_target
                 if inst then
+                    local chest_target = inst.give_chest_target
+                    local icebox_target = inst.give_icebox_target
                     if chest_target then
                         local receive_container = chest_target.components.container
                         local inventory = inst.components.inventory
@@ -302,7 +305,8 @@ local states=
                                 and not receive_container:IsFull() then
                             for k, _ in pairs(inventory.itemslots) do
                                 local item = inventory.itemslots[k]
-                                if not (item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item)) then
+                                if item and not (item.components.perishable
+                                        and inst.components.eater and inst.components.eater:CanEat(item)) then
                                     receive_container:GiveItem(inventory:RemoveItemBySlot(k))
                                 end
                             end
@@ -322,9 +326,86 @@ local states=
                     end
                     inst.give_chest_target = nil
                     inst.give_icebox_target = nil
+                    inst.sg:GoToState("idle")
+                    --local container = inst.give_chest_target or inst.give_icebox_target
+                    --if container and container.components.container and container.components.container:IsOpen() then
+                    --    container.components.container:Close()
+                    --end
                 end
-                inst.sg:GoToState("idle")
             end),
+        },
+    },
+    State{
+        name = "fertilizer",
+        tags = {"busy"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+        end,
+
+        timeline=
+        {
+            TimeEvent(5 * FRAMES, function(inst)
+                local pkc_canbefertilized_target = inst.pkc_canbefertilized_target
+                local poop_target = inst.pkc_poop_fertilized_target
+                if pkc_canbefertilized_target and pkc_canbefertilized_target.components.pickable
+                        and pkc_canbefertilized_target.components.pickable:CanBeFertilized() and poop_target then
+                    if inst.components.inventory then
+                        pkc_canbefertilized_target.components.pickable:Fertilize(inst.components.inventory:RemoveItem(poop_target), inst)
+                        inst.pkc_canbefertilized_target = nil
+                        inst.pkc_poop_fertilized_target = nil
+                    end
+                end
+                inst:PerformBufferedAction()
+            end),
+            TimeEvent(5 * FRAMES, function(inst)
+                inst:PerformBufferedAction()
+            end)
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end ),
+        },
+    },
+    State{
+        name = "getItemFromContainer",
+        tags = {"busy"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+            local target = inst.pkc_chest_target
+            if target and target.components.container
+                    and target.components.container.canbeopened and not target.components.container:IsOpen() then
+                target.components.container:Open(inst)
+            end
+        end,
+
+        timeline=
+        {
+            TimeEvent(10 * FRAMES, function(inst)
+                inst:PerformBufferedAction()
+            end),
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst)
+                if inst then
+                    local chest = inst.pkc_chest_target
+                    local poop = inst.pkc_poop_target
+                    if chest and chest.components.container and poop then
+                        if inst.components.inventory then
+                            inst.components.inventory:GiveItem(chest.components.container:RemoveItem(poop))
+                        end
+                    end
+                    inst.pkc_chest_target = nil
+                    inst.pkc_poop_target = nil
+                    inst.sg:GoToState("idle")
+                end
+            end ),
         },
     },
 }

@@ -13,9 +13,11 @@ if armor_bramble  then
 end
 
 local homesign = GLOBAL.AllRecipes["homesign"]
-homesign.sortkey = -20
+homesign.sortkey = -30
 local treasurechest = GLOBAL.AllRecipes["treasurechest"]
-treasurechest.sortkey = -19
+treasurechest.sortkey = -29
+local pighouse = GLOBAL.AllRecipes["pighouse"]
+pighouse.sortkey = -28
 
 local recipe_ewecushat = AddRecipe("pkc_ewecushat",
         { Ingredient("goldnugget", 25), Ingredient("hammer", 4), Ingredient("feather_crow", 2) },

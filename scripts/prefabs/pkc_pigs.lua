@@ -69,6 +69,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
         and inst.components.pkc_group:getChooseGroup() ~= giver.components.pkc_group:getChooseGroup() then
             return;
         end
+        item.pkc_isplayergive = true --tag for player give
         --meat makes us friends (unless I'm a guard)
         if item.components.edible.foodtype == FOODTYPE.MEAT or item.components.edible.foodtype == FOODTYPE.HORRIBLE or item.prefab == "goldnugget" then
             if inst.components.combat:TargetIs(giver) then
@@ -529,7 +530,7 @@ local function SetWerePig(inst)
     inst.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
     inst.components.lootdropper.numrandomloot = 0
 
-    inst.components.health:SetMaxHealth(2.5 * TUNING.WEREPIG_HEALTH)
+    inst.components.health:SetMaxHealth(2 * TUNING.WEREPIG_HEALTH)
     inst.components.combat:SetTarget(nil)
     inst.components.combat:SetRetargetFunction(3, WerepigRetargetFn)
     inst.components.combat:SetKeepTargetFunction(WerepigKeepTargetFn)

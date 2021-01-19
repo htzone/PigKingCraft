@@ -77,12 +77,19 @@
 
 	--自定义STRING
 	if GLOBAL.GAME_LANGUAGE == "chinese" then
+		GLOBAL.STRINGS.NAMES.HOMESIGN = "传送路牌"
+		GLOBAL.STRINGS.RECIPE_DESC.HOMESIGN = "能将你传送到其他路牌附近."
+
 		local desc_red = "那是红色军团的头盔！"
 		local desc_blu = "那是蓝色军团的头盔！"
 		local desc_gre = "那是绿色军团的头盔！"
 		local desc_pur = "那是紫色军团的头盔！"
 
-		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "我来帮你们收拾烂摊子！", "捡起来放箱子吧！", "发现可疑物！" }
+		GLOBAL.STRINGS.PIG_TALK_FIND_CONTAINER = {"找个东西装一下吧！", "箱子满了我就不能放了", "找个地方放一下", "主人们有更多的箱子么", "我拿了点东西回来"}
+		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "还是我来收拾烂摊子吧！", "捡起来放箱子吧！", "发现可疑物！", "看我发现了什么！" }
+		GLOBAL.STRINGS.PIG_TALK_HARVEST_ITEM = { "大丰收啊！", "猪人喜欢劳动！", "要是我能偷偷吃点就好了！", "绝对不能吃！这是主人们的", "又到了收获的季节", "我是勤劳的猪人" }
+		GLOBAL.STRINGS.PIG_TALK_FERTILIZER_ITEM = { "植物需要施肥！", "猪人喜欢劳动！", "用我的便便滋润它！", "给你表演个魔术" }
+		GLOBAL.STRINGS.PIG_FIND_POOP_ITEM = { "哪里有便便？", "找坨便便！", "需要屎来滋润它", "怎么办，庄稼枯萎了！" }
 		GLOBAL.STRINGS.NAMES.PKC_SPARTAHELMUT = "红色军团头盔"
 		GLOBAL.STRINGS.RECIPE_DESC.PKC_SPARTAHELMUT = "高贵身份的象征，队伍专属装备."
 		GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.PKC_SPARTAHELMUT = desc_red
@@ -203,12 +210,19 @@
 			CUIPIG = "紫队",
 		}
 	else
+		GLOBAL.STRINGS.NAMES.HOMESIGN = "Transmission Signboard"
+		GLOBAL.STRINGS.RECIPE_DESC.HOMESIGN = "It can teleport you to other signboard."
+
 		local desc_red = "That's the red group helmet!"
 		local desc_blu = "That's the blue group helmet!"
 		local desc_gre = "That's the green group helmet!"
 		local desc_pur = "That's the purple group helmet!"
 
-		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "我来帮你们收拾烂摊子！", "捡起来放箱子吧！", "发现可疑物！" }
+		GLOBAL.STRINGS.PIG_TALK_FIND_CONTAINER = {"Find something to put", "I can't put into the chest if it's full", "Are there any more chests here?"}
+		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "The hosts are too lazy!", "Let me help you clean up the mess!", "Pick it up and put it in the box!", "Suspicious objects found!" }
+		GLOBAL.STRINGS.PIG_TALK_HARVEST_ITEM = { "Great harvest!", "Pig man like to work!", "If only I could steal some!" }
+		GLOBAL.STRINGS.PIG_TALK_FERTILIZER_ITEM = { "Plants need fertilizer!", "Pig man like to work!", "Moisten it with my poop!", "I'll show you a magic trick!" }
+		GLOBAL.STRINGS.PIG_FIND_POOP_ITEM = { "Where is the poop?", "Look for shit!", "What to do? The crops are withered!" }
 		GLOBAL.STRINGS.NAMES.PKC_SPARTAHELMUT = "Red Group Helmet"
 		GLOBAL.STRINGS.RECIPE_DESC.PKC_SPARTAHELMUT = "The symbol of noble, can let pig man follow you."
 		GLOBAL.STRINGS.CHARACTERS.GENERIC.DESCRIBE.PKC_SPARTAHELMUT = desc_red
