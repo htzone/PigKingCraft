@@ -67,14 +67,16 @@ end
 --显示数字
 local function showSortNum(playerListing, i)
     if isDedicated then
-        playerListing.number:SetString(i-1)
+        playerListing.number:SetPosition(-430,0,0)
+        playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i-1))
         if i > 1 then
             playerListing.number:Show()
         else
             playerListing.number:Hide()
         end
     else
-        playerListing.number:SetString(i)
+        playerListing.number:SetPosition(-430,0,0)
+        playerListing.number:SetString(string.format(PKC_SPEECH.SCORE_KILL_NUM.SPEECH3, i))
         playerListing.number:Show()
     end
 end
@@ -96,7 +98,7 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
     OldDoInit(self, ClientObjs, ...)
     if not self.scroll_list.old_updatefn then -- if we haven't already patched the widgets
         for i, playerListing in pairs(self.scroll_list.static_widgets) do
-            showSortNum(playerListing, i)
+            --showSortNum(playerListing, i)
             showHighLight(playerListing)
             playerListing.killNum = playerListing:AddChild(Text("bp50", 35, ""))
             playerListing.killNum:SetPosition(110, 3, 0)
@@ -105,7 +107,8 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
             playerListing.score:SetPosition(190, 3, 0)
             playerListing.score:SetHAlign(ANCHOR_MIDDLE)
             playerListing.pkc_colour = { 1, 1, 1, 1 }
-            if PKC_PLAYER_INFOS[playerListing.userid] ~= nil then
+            if isDedicated and not playerListing.ishost and PKC_PLAYER_INFOS[playerListing.userid] ~= nil
+                    or (not isDedicated and PKC_PLAYER_INFOS[playerListing.userid] ~= nil) then
                 --设置队伍名颜色
                 playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
                 = getGroupColor(playerListing.userid)
@@ -129,25 +132,31 @@ function PlayerStatusScreen:DoInit(ClientObjs, ...)
         end
 
         self.scroll_list.old_updatefn = self.scroll_list.updatefn
-        self.scroll_list.updatefn = function(playerListing, client, ...)
-            self.scroll_list.old_updatefn(playerListing, client, ...)
+        self.scroll_list.updatefn = function(playerListing, client, i, ...)
+            self.scroll_list.old_updatefn(playerListing, client, i, ...)
+            showSortNum(playerListing, i)
             showHighLight(playerListing)
-            if PKC_PLAYER_INFOS[client.userid] ~= nil then
+            if (isDedicated and not client.performance ~= nil and PKC_PLAYER_INFOS[client.userid] ~= nil)
+                    or (not isDedicated and PKC_PLAYER_INFOS[client.userid] ~= nil) then
                 --设置队伍名颜色
                 playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                = getGroupColor(playerListing.userid)
+                = getGroupColor(client.userid)
                 --设置击杀数和颜色
                 playerListing.killNum:Show()
                 playerListing.killNum:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH1
-                        .. tostring(getPlayerKillNum(playerListing.userid)))
+                        .. tostring(getPlayerKillNum(client.userid)))
                 playerListing.killNum:SetColour(playerListing.pkc_colour)
                 --设置得分数和颜色
                 playerListing.score:Show()
                 playerListing.score:SetString(PKC_SPEECH.SCORE_KILL_NUM.SPEECH2
-                        .. tostring(getPlayerScore(playerListing.userid)))
+                        .. tostring(getPlayerScore(client.userid)))
                 playerListing.score:SetColour(playerListing.pkc_colour)
 
                 playerListing.characterBadge.headframe:SetTint(unpack(playerListing.pkc_colour))
+            else
+                playerListing.killNum:Hide()
+                playerListing.score:Hide()
+                playerListing.characterBadge.headframe:SetTint(unpack(DEFAULT_PLAYER_COLOUR))
             end
         end
     end
@@ -200,7 +209,7 @@ function PlayerStatusScreen:OnUpdate(dt)
             if self.scroll_list ~= nil then
                 for i, playerListing in ipairs(self.player_widgets) do
                     showHighLight(playerListing)
-                    showSortNum(playerListing, i)
+                    --showSortNum(playerListing, i)
                     for _,client in ipairs(ClientObjs) do
                         if playerListing.userid == client.userid
                                 and playerListing.ishost == (client.performance ~= nil) then
@@ -211,13 +220,18 @@ function PlayerStatusScreen:OnUpdate(dt)
                             local w, h = playerListing.name:GetRegionSize()
                             playerListing.name:SetPosition(playerListing.name._align.x + w * .5, 0, 0)
 
-                            playerListing.pkc_colour = playerListing.pkc_colour or { 1, 1, 1, 1 }
-                            playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
-                            = getGroupColor(client.userid)
-                            playerListing.characterBadge:Set(
-                                client.prefab or "",
-                                playerListing.pkc_colour,
-                                playerListing.ishost, client.userflags or 0)
+                            if isDedicated and client.performance ~= nil then
+                                print("test1....")
+                                playerListing.characterBadge:Set(client.prefab or "", client.colour or DEFAULT_PLAYER_COLOUR, playerListing.ishost, client.userflags or 0)
+                            else
+                                playerListing.pkc_colour = playerListing.pkc_colour or { 1, 1, 1, 1 }
+                                playerListing.pkc_colour[1], playerListing.pkc_colour[2], playerListing.pkc_colour[3]
+                                = getGroupColor(client.userid)
+                                playerListing.characterBadge:Set(
+                                        client.prefab or "",
+                                        playerListing.pkc_colour,
+                                        playerListing.ishost, client.userflags or 0)
+                            end
 
                             if playerListing.characterBadge:IsAFK() then
                                 playerListing.age:SetString(STRINGS.UI.PLAYERSTATUSSCREEN.AFK)

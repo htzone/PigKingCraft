@@ -46,6 +46,28 @@ local function startingInventory(inst, player)
 	giveItemToPlayer(startInventory, 5, "flint")
 	giveItemToPlayer(startInventory, 5, "rocks")
 	giveItemToPlayer(startInventory, 2, "meat")
+	--如果是冬天
+	if GLOBAL.TheWorld.state.iswinter
+			or (GLOBAL.TheWorld.state.isautumn and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 5, "cutgrass")
+		giveItemToPlayer(startInventory, 5, "twigs")
+		giveItemToPlayer(startInventory, 5, "log")
+		giveItemToPlayer(startInventory, 1, "heatrock")
+		giveItemToPlayer(startInventory, 1, "winterhat")
+	end
+	--如果是春天
+	if GLOBAL.TheWorld.state.isspring
+			or (GLOBAL.TheWorld.state.iswinter and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 1, "umbrella")
+	end
+	--如果是夏天
+	if GLOBAL.TheWorld.state.issummer
+			or (GLOBAL.TheWorld.state.isspring and GLOBAL.TheWorld.state.remainingdaysinseason < 3) then
+		giveItemToPlayer(startInventory, 6, "nitre")
+		giveItemToPlayer(startInventory, 6, "ice")
+		giveItemToPlayer(startInventory, 1, "heatrock")
+		giveItemToPlayer(startInventory, 1, "strawhat")
+	end
 	--如果初始点在洞穴
 	if GLOBAL.TheWorld:HasTag("cave") then
 		giveItemToPlayer(startInventory, 1, "minerhat") --矿工帽
@@ -76,7 +98,8 @@ end
 --检查是不是同盟关系。
 local function checkIsGroupMemberFn(attacker, target)
 	if attacker and target then
-		if attacker.components.pkc_group and target.components.pkc_group and target.components.pkc_group:getChooseGroup() ~= 0 then
+		if attacker.components.pkc_group and target.components.pkc_group
+				and target.components.pkc_group:getChooseGroup() ~= 0 then
 			if attacker.components.pkc_group:getChooseGroup() == target.components.pkc_group:getChooseGroup() then
 				return true
 			end
@@ -363,9 +386,7 @@ local function TransToOtherBase(inst)
 	end
 end
 
-
 --世界初始化
---@大猪猪 10-31
 AddPrefabPostInit("world", function(inst)
 	if inst then
 		--添加防止队友相互攻击组件
@@ -384,8 +405,15 @@ AddPrefabPostInit("world", function(inst)
 	end
 end)
 
+local json = require "json"
 local function onPlayerJoin(inst, player)
 	inst:DoTaskInTime(0, function()
+		if inst and inst.components.pkc_playerinfos and GLOBAL.PKC_PLAYER_INFOS then
+			if IsServer then
+				--让客户端获取最新数据
+				inst.components.pkc_playerinfos._playerinfos:set(json.encode(GLOBAL.PKC_PLAYER_INFOS))
+			end
+		end
 	end)
 end
 
@@ -417,6 +445,10 @@ local function network(inst)
 		inst:ListenForEvent("pkc_kingbekilled", function(world, data) onKingbekilled(data, inst) end, GLOBAL.TheWorld)
 		--胜利
 		inst:ListenForEvent("pkc_win", function(world, data) onWin(data, inst) end, GLOBAL.TheWorld)
+		--玩家加入
+		inst:ListenForEvent("ms_playerjoined", function (world, player) onPlayerJoin(inst, player) end, GLOBAL.TheWorld)
+		--玩家离开
+		--inst:ListenForEvent("ms_playerleft", function (world, player) onPlayerLeft(inst, player) end, GLOBAL.TheWorld)
 		--玩家加入
 		--inst:ListenForEvent("ms_playerjoined", function (world, player) onPlayerJoin(inst, player) end, GLOBAL.TheWorld)
 		--玩家离开

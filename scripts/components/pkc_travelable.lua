@@ -1,10 +1,3 @@
---TODO
---1.玩家木牌颜色
---2.调整当前站点颜色，未知颜色
---2.延时调整，普通木牌10秒，玩家15秒
---3.被传送玩家附近有其他敌对玩家时不能传送
---4.删掉之前的木牌代码
---5.把删除的建造限制代码恢复
 
 local function ontraveller(self, traveller)
 	self.inst.replica.pkc_travelable:SetTraveller(traveller)
@@ -52,42 +45,57 @@ local function IsNearDanger(traveller)
 	if burnable ~= nil and (burnable:IsBurning() or burnable:IsSmoldering()) then
 		return true
 	end
-	if traveller:HasTag("spiderwhisperer") then
-		return FindEntity(
-			traveller,
-			10,
-			function(target)
-				return (target.components.combat ~= nil and target.components.combat.target == traveller) or (not (target:HasTag("player") or target:HasTag("spider")) and (target:HasTag("monster") or target:HasTag("pig")))
-			end,
-			nil,
-			nil,
-			{"monster", "pig", "_combat"}
-		) ~= nil
-	end
-	return FindEntity(
+	--if traveller:HasTag("spiderwhisperer") then
+	--	return FindEntity(
+	--		traveller,
+	--		10,
+	--		function(target)
+	--			return (target.components.combat ~= nil and target.components.combat.target == traveller)
+	--					or (not (target:HasTag("player") or target:HasTag("spider"))
+	--					and (target:HasTag("monster") or target:HasTag("pig")))
+	--		end,
+	--		nil,
+	--		nil,
+	--		{"monster", "pig", "_combat"}
+	--	) ~= nil
+	--end
+	--local entity = FindEntity(
+	--	traveller,
+	--	10,
+	--	function(target)
+	--		return (target.components.combat ~= nil and target.components.combat.target == traveller)
+	--				or (target:HasTag("monster") and not target:HasTag("player"))
+	--				or (not target:HasTag("playerghost")
+	--				and target.components.pkc_group and traveller.components.pkc_group
+	--				and not traveller.components.pkc_group:isSameGroup(target))
+	--	end,
+	--	nil,
+	--	nil,
+	--	{"monster", "_combat"})
+
+	local entity = FindEntity(
 		traveller,
 		10,
 		function(target)
-			return (target.components.combat ~= nil and target.components.combat.target == traveller) or (target:HasTag("monster") and not target:HasTag("player"))
+			return (target.components.combat ~= nil and target.components.combat.target == traveller)
+					or (target.components.pkc_group and traveller.components.pkc_group
+					and not traveller.components.pkc_group:isSameGroup(target))
 		end,
 		nil,
 		nil,
-		{"monster", "_combat"}
-	) ~= nil
+		{"monster", "_combat"})
+	return entity ~= nil
 end
 
 function Travelable:ListDestination(traveller)
 	if not traveller.components.pkc_group then return end
 	local groupId = traveller.components.pkc_group:getChooseGroup()
-
 	local x, y, z = self.inst.Transform:GetWorldPosition()
 	local dests = TheSim:FindEntities(x, y, z, find_dist, {"pkc_travelable", "pkc_group"..groupId})
 	self.destinations = {}
 
-	for k, v in pairs(dests) do
-		if v and v.components.pkc_travelable and not (v.components.pkc_travelable.ownership
-				and v:HasTag(ownershiptag)
-				and traveller.userid ~= nil and not v:HasTag("uid_" .. traveller.userid)) then
+	for _, v in pairs(dests) do
+		if v and v.components.pkc_travelable then
 			table.insert(self.destinations, v)
 		elseif v and v:HasTag("player") and v ~= traveller
 				and v.components.pkc_group and traveller.components.pkc_group
@@ -100,62 +108,56 @@ function Travelable:ListDestination(traveller)
 	self.site = self.totalsites
 end
 
+-- 入口：开始传送
 function Travelable:BeginTravel(traveller)
 	local comment = self.inst.components.talker
 
-	if not traveller then
+	-- 旅行前的一系列检查工作
+	if not traveller then -- 没有旅行者
 		if comment then
-			comment:Say("谁摸了我？")
+			comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH4)
 		end
 		return
 	end
+	-- 摸了不是自己队伍的路牌
 	local talk = traveller.components.talker
-
 	if traveller.components.pkc_group and self.inst.pkc_group_id
 			and traveller.components.pkc_group:getChooseGroup() ~= self.inst.pkc_group_id then
 		if talk then talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH3) end
 		return
 	end
-
-	if self.ownership and self.inst:HasTag(ownershiptag)
-			and traveller.userid ~= nil and not self.inst:HasTag("uid_" .. traveller.userid) then
+	-- 目前有人在传送还轮不到你
+	if self.traveller then
 		if comment then
-			comment:Say("私人财产.")
+			comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH15)
 		elseif talk then
-			talk:Say("这个木牌是私人财产.")
+			talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH15)
 		end
 		return
-	elseif self.traveller then
-		if comment then
-			comment:Say("轮到你了.")
-		elseif talk then
-			talk:Say("轮到我了.")
-		end
-		return
-	elseif IsNearDanger(traveller) then
+	elseif IsNearDanger(traveller) then -- 附近有危险不能传送
 		if talk then
-			talk:Say("现在旅行不安全.")
+			talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH16)
 		elseif comment then
-			comment:Say("现在旅行不安全.")
+			comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH16)
 		end
 		return
 	end
 
-	local isintask = false
-	for k, v in pairs(self.travellers) do
+	local isInTask = false
+	for _, v in pairs(self.travellers) do
 		if v == traveller then
-			isintask = true
+			isInTask = true -- 是否正处在传送状态
+			break
 		end
 	end
 
-	if not self.traveltask or isintask then
+	if self.inst.teleportCoolDown == nil or isInTask then
 		self.inst:StartUpdatingComponent(self)
-
+		-- 找到所有需要传送的点
 		self:ListDestination(traveller)
 		self:MakeInfos()
 		self:CancelTravel(traveller)
 		self.travellers = {}
-
 		self.traveller = traveller
 		self.inst:ListenForEvent("ms_closepopups", self.onclosepopups, traveller)
 		self.inst:ListenForEvent("onremove", self.onclosepopups, traveller)
@@ -199,9 +201,162 @@ function Travelable:MakeInfos()
 			cost_sanity = 0
 		end
 
-		infos = infos .. (infos == "" and "" or "\n") .. i .. "\t" .. name .. "\t" .. cost_hunger .. "\t" .. cost_sanity
+		local isPlayer = destination:HasTag("player")
+		infos = infos .. (infos == "" and "" or "\n") .. i .. "\t" .. name
+				.. "\t" .. cost_hunger
+				.. "\t" .. cost_sanity
+				.. "\t" .. tostring(isPlayer)
 	end
 	self.inst.replica.pkc_travelable:SetDestInfos(infos)
+end
+
+local function getPlayersToTravel(self, operator)
+	local players = {}
+	local x, y, z = self.inst.Transform:GetWorldPosition()
+	local nearPlayers = TheSim:FindEntities(x, y, z, 5)
+	for _, v in ipairs(nearPlayers) do
+		if v and v:HasTag("player") and not v:HasTag("playerghost")
+				and operator.components.pkc_group and v.components.pkc_group
+				and operator.components.pkc_group:isSameGroup(v) then
+			table.insert(players, v)
+		end
+	end
+	return players
+end
+
+local function getCoolDownTime(self, destination)
+	if destination then
+		if destination:HasTag("player") then
+			return PLAYER_TELEPORT_TIME
+		else
+			return SIGN_TELEPORT_TIME
+		end
+	end
+	return 10
+end
+
+local function canTeleport(destination, comment, talk)
+	local canTeleport = false
+	if destination and destination:HasTag("pkc_travelable") then
+		if destination:HasTag("player") then
+			if destination:HasTag("playerghost") then
+				canTeleport = false
+				if comment then
+					comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
+				elseif talk then
+					talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
+				end
+			else
+				canTeleport = true
+			end
+		else
+			canTeleport = true
+		end
+	end
+	return canTeleport
+end
+
+local function travelTask(self, traveller, destination, comment, talk, cost_hunger, cost_sanity)
+	self.inst:DoTaskInTime(1, function()
+		if self.inst.teleportCoolDown then
+			if self.inst.teleportCoolDown > 1 then
+				self.inst.teleportCoolDown = self.inst.teleportCoolDown - 1
+				if comment then
+					comment:Say(string.format(PKC_SPEECH.GROUP_SIGN.SPEECH20, self.inst.teleportCoolDown))
+					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
+				end
+				if math.random(10) / 10 >= 0.9 and destination and destination:HasTag("player")
+						and destination.components.talker then
+					destination.components.talker:Say(PKC_SPEECH.GROUP_SIGN.SPEECH21)
+				end
+				travelTask(self, traveller, destination, comment, talk, cost_hunger, cost_sanity)
+			else
+				if canTeleport(destination) then
+					local travellers = getPlayersToTravel(self, traveller)
+					for _, who in pairs(travellers) do
+						if destination == nil or not destination:IsValid() then
+							if comment then
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH22)
+							elseif talk then
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH22)
+							end
+						elseif who == nil or (who.components.health and who.components.health:IsDead()) then
+							if comment then
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH23)
+							end
+						elseif not who:IsNear(self.inst, 10) then
+							if comment then
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH24)
+							end
+						elseif IsNearDanger(who) then
+							if talk then
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH25)
+							elseif comment then
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH25)
+							end
+						elseif who.components.hunger and who.components.hunger.current >= cost_hunger
+								and who.components.sanity and who.components.sanity.current >= cost_sanity then
+							-- /follow
+							who.components.hunger:DoDelta(-cost_hunger)
+							who.components.sanity:DoDelta(-cost_sanity)
+							pkc_teleport(who, destination, -1)
+							-- follow
+							if who.components.leader and who.components.leader.followers then
+								for kf, vf in pairs(who.components.leader.followers) do
+									pkc_teleport(kf, destination, 1)
+								end
+							end
+
+							local inventory = who.components.inventory
+							if inventory then
+								for ki, vi in pairs(inventory.itemslots) do
+									if vi.components.leader and vi.components.leader.followers then
+										for kif, vif in pairs(vi.components.leader.followers) do
+											pkc_teleport(kif, destination, 1)
+										end
+									end
+								end
+							end
+
+							local container = inventory:GetOverflowContainer()
+							if container then
+								for kb, vb in pairs(container.slots) do
+									if vb.components.leader and vb.components.leader.followers then
+										for kbf, vbf in pairs(vb.components.leader.followers) do
+											pkc_teleport(kbf, destination, -1)
+										end
+									end
+								end
+							end
+						else
+							if talk then
+								talk:Say(PKC_SPEECH.GROUP_SIGN.SPEECH19)
+							elseif comment then
+								comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH19)
+							end
+						end
+					end
+					self.travellers = {}
+					self.inst.teleportCoolDown = nil
+				end
+			end
+		end
+	end)
+end
+
+local function teleportToTarget(self, traveller, destination, cost_hunger, cost_sanity)
+	local comment = self.inst.components.talker
+	local talk = traveller.components.talker
+	if self.inst.teleportCoolDown == nil then
+		self.inst.teleportCoolDown = getCoolDownTime(self, destination)
+		self.inst:DoTaskInTime(0, function()
+			if comment then
+				comment:Say(PKC_SPEECH.GROUP_SIGN.SPEECH18)
+				self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
+			end
+		end)
+		travelTask(self, traveller, destination, comment, talk, cost_hunger, cost_sanity)
+	end
 end
 
 function Travelable:Travel(traveller, index)
@@ -218,12 +373,12 @@ function Travelable:Travel(traveller, index)
 		else
 			desc = destination and destination.components.writeable and destination.components.writeable:GetText()
 		end
-		local description = desc and string.format('"%s"', desc) or "未知目的地"
+		local description = desc and string.format('"%s"', desc) or PKC_SPEECH.GROUP_SIGN.SPEECH17
 		local information = ""
 		local cost_hunger = min_hunger_cost
 		local cost_sanity = 0
-		local xi, yi, zi = self.inst.Transform:GetWorldPosition()
-		local xf, yf, zf = destination.Transform:GetWorldPosition()
+		local xi, _, zi = self.inst.Transform:GetWorldPosition()
+		local xf, _, zf = destination.Transform:GetWorldPosition()
 		local dist = math.sqrt((xi - xf) ^ 2 + (zi - zf) ^ 2)
 
 		if destination and destination:HasTag("pkc_travelable") then
@@ -239,145 +394,15 @@ function Travelable:Travel(traveller, index)
 
 			information = "去: " .. description .. " (" .. string.format("%.0f", self.site) .. "/"
 					.. string.format("%.0f", self.totalsites) .. ")" .. "\n" .. "饥饿: "
-					.. string.format("%.0f", cost_hunger) .. "\n" .. "理智: " .. string.format("%.1f", cost_sanity)
+					.. string.format("%.0f", cost_hunger) .. "\n" .. "理智: "
+					.. string.format("%.1f", cost_sanity)
 			if comment then
 				comment:Say(string.format(information), 3)
 			elseif talk then
 				talk:Say(string.format(information), 3)
 			end
 
-			self.traveltask =
-				self.inst:DoTaskInTime(
-				8,
-				function()
-					self.traveltask = nil
-					for k, who in pairs(self.travellers) do
-						if destination == nil or not destination:IsValid() then
-							if comment then
-								comment:Say("目的地不再可达.")
-							elseif talk then
-								talk:Say("目的地不再可达.")
-							end
-						elseif who == nil or (who.components.health and who.components.health:IsDead()) then
-							if comment then
-								comment:Say("我们不运送尸体.")
-							end
-						elseif not who:IsNear(self.inst, 10) then
-						elseif IsNearDanger(who) then
-							if talk then
-								talk:Say("现在旅行不安全.")
-							elseif comment then
-								comment:Say("现在旅行不安全.")
-							end
-						elseif destination.components.pkc_travelable and destination.components.pkc_travelable.ownership
-								and destination:HasTag(ownershiptag) and who.userid ~= nil and not destination:HasTag("uid_" .. who.userid) then
-							if comment then
-								comment:Say("那是别人的地盘.")
-							elseif talk then
-								talk:Say("那是别人的地盘.")
-							end
-						elseif who.components.hunger and who.components.hunger.current >= cost_hunger
-								and who.components.sanity and who.components.sanity.current >= cost_sanity then
-							-- /follow
-							who.components.hunger:DoDelta(-cost_hunger)
-							who.components.sanity:DoDelta(-cost_sanity)
-							if who.Physics ~= nil then
-								who.Physics:Teleport(xf - 1, 0, zf)
-							else
-								who.Transform:SetPosition(xf - 1, 0, zf)
-							end
-
-							-- follow
-							if who.components.leader and who.components.leader.followers then
-								for kf, vf in pairs(who.components.leader.followers) do
-									if kf.Physics ~= nil then
-										kf.Physics:Teleport(xf + 1, 0, zf)
-									else
-										kf.Transform:SetPosition(xf + 1, 0, zf)
-									end
-								end
-							end
-
-							local inventory = who.components.inventory
-							if inventory then
-								for ki, vi in pairs(inventory.itemslots) do
-									if vi.components.leader and vi.components.leader.followers then
-										for kif, vif in pairs(vi.components.leader.followers) do
-											if kif.Physics ~= nil then
-												kif.Physics:Teleport(xf, 0, zf + 1)
-											else
-												kif.Transform:SetPosition(xf, 0, zf + 1)
-											end
-										end
-									end
-								end
-							end
-
-							local container = inventory:GetOverflowContainer()
-							if container then
-								for kb, vb in pairs(container.slots) do
-									if vb.components.leader and vb.components.leader.followers then
-										for kbf, vbf in pairs(vb.components.leader.followers) do
-											if kbf.Physics ~= nil then
-												kbf.Physics:Teleport(xf, 0, zf - 1)
-											else
-												kbf.Transform:SetPosition(xf, 0, zf - 1)
-											end
-										end
-									end
-								end
-							end
-						else
-							if talk then
-								talk:Say("我不会成功.")
-							elseif comment then
-								comment:Say("你不会成功的.")
-							end
-						end
-					end
-					self.travellers = {}
-				end
-			)
-
-			self.traveltask5 =
-				self.inst:DoTaskInTime(
-				3,
-				function()
-					comment:Say("5秒后开始传送.")
-				end
-			)
-			self.traveltask4 =
-				self.inst:DoTaskInTime(
-				4,
-				function()
-					comment:Say("靠近此处.")
-					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
-				end
-			)
-			self.traveltask3 =
-				self.inst:DoTaskInTime(
-				5,
-				function()
-					comment:Say("3秒后开始传送.")
-					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
-				end
-			)
-			self.traveltask2 =
-				self.inst:DoTaskInTime(
-				6,
-				function()
-					comment:Say("2秒后开始传送.")
-					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
-				end
-			)
-			self.traveltask1 =
-				self.inst:DoTaskInTime(
-				7,
-				function()
-					comment:Say("1秒后开始传送.", 1)
-					self.inst.SoundEmitter:PlaySound("dontstarve/HUD/craft_down")
-				end
-			)
+			teleportToTarget(self, traveller, destination, cost_hunger, cost_sanity)
 		elseif comment then
 			comment:Say("目的地无法到达.")
 		elseif talk then
@@ -388,6 +413,7 @@ function Travelable:Travel(traveller, index)
 end
 
 function Travelable:CancelTravel(traveller)
+	self.inst.teleportCoolDown = nil
 	if self.traveltask ~= nil then
 		self.traveltask:Cancel()
 		self.traveltask = nil

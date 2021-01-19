@@ -11,11 +11,12 @@ local actionhandlers =
     ActionHandler(ACTIONS.GOHOME, "gohome"),
     ActionHandler(ACTIONS.EAT, "eat"),
     ActionHandler(ACTIONS.CHOP, "chop"),
-    ActionHandler(ACTIONS.PICKUP, "pickup"),
+    ActionHandler(ACTIONS.PICKUP, "harvest"),
     ActionHandler(ACTIONS.EQUIP, "pickup"),
     ActionHandler(ACTIONS.ADDFUEL, "pickup"),
     ActionHandler(ACTIONS.TAKEITEM, "pickup"),
     ActionHandler(ACTIONS.UNPIN, "pickup"),
+    ActionHandler(ACTIONS.GIVE, "givetochest"),
 }
 
 --重写被攻击状态（减少硬直）
@@ -236,7 +237,96 @@ local states=
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end ),
         },        
-    },    
+    },
+    State{
+        name = "harvest",
+        tags = {"picking"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+        end,
+
+        timeline=
+        {
+            TimeEvent(5*FRAMES, function(inst)
+                inst:PerformBufferedAction()
+                if inst and inst.pkc_harvest_target then
+                    if inst.pkc_harvest_target.components.pickable then
+                        inst.pkc_harvest_target.components.pickable:Pick(inst)
+                        inst.pkc_harvest_target = nil
+                    end
+                end
+            end),
+            TimeEvent(5*FRAMES, function(inst)
+                inst:PerformBufferedAction()
+            end)
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState("idle")
+            end ),
+        },
+    },
+    State{
+        name = "givetochest",
+        tags = {"busy"},
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("pig_pickup")
+            local target = inst.give_chest_target or inst.give_icebox_target
+            if target and target.components.container then
+                target.components.container:Open(inst)
+            end
+        end,
+
+        timeline=
+        {
+            TimeEvent(10*FRAMES, function(inst) inst:PerformBufferedAction() end),
+        },
+
+        events=
+        {
+            EventHandler("animover", function(inst)
+                --动画结束后将物品栏里的东西放到箱子里面
+                local chest_target = inst.give_chest_target
+                local icebox_target = inst.give_icebox_target
+                if inst then
+                    if chest_target then
+                        local receive_container = chest_target.components.container
+                        local inventory = inst.components.inventory
+                        if inventory and receive_container and inventory.itemslots
+                                and not receive_container:IsFull() then
+                            for k, _ in pairs(inventory.itemslots) do
+                                local item = inventory.itemslots[k]
+                                if not (item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item)) then
+                                    receive_container:GiveItem(inventory:RemoveItemBySlot(k))
+                                end
+                            end
+                        end
+                    elseif icebox_target then
+                        local receive_container = icebox_target.components.container
+                        local inventory = inst.components.inventory
+                        if inventory and receive_container and inventory.itemslots
+                                and not receive_container:IsFull() then
+                            for k, _ in pairs(inventory.itemslots) do
+                                local item = inventory.itemslots[k]
+                                if item and item.components.perishable and inst.components.eater and inst.components.eater:CanEat(item) then
+                                    receive_container:GiveItem(inventory:RemoveItemBySlot(k))
+                                end
+                            end
+                        end
+                    end
+                    inst.give_chest_target = nil
+                    inst.give_icebox_target = nil
+                end
+                inst.sg:GoToState("idle")
+            end),
+        },
+    },
 }
 
 CommonStates.AddWalkStates(states,

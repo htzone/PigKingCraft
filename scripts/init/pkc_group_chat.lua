@@ -18,9 +18,9 @@ function input_chat_screen:DoInit()
     oldDoInit(self)
     if self.chat_type then
         if self.whisper then
-            self.chat_type:SetString("对所有人说")
+            self.chat_type:SetString(PKC_SPEECH.CHAT_QUEUE.SPEECH1)
         else
-            self.chat_type:SetString("对队伍内说")
+            self.chat_type:SetString(PKC_SPEECH.CHAT_QUEUE.SPEECH2)
         end
     end
 end
@@ -62,8 +62,11 @@ function chat_queue:OnMessageReceivedForPKC(userid, name, prefab, message, colou
     if profileflair == nil then
         profileflair = "default"
     end
-    colour = {}
-    colour[1], colour[2], colour[3] = HexToPercentColor(getGroupColorByGroupId(PKC_PLAYER_INFOS[userid].GROUP_ID))
+    if PKC_PLAYER_INFOS[userid] then
+        colour = {}
+        colour[1], colour[2], colour[3] = HexToPercentColor(getGroupColorByGroupId(PKC_PLAYER_INFOS[userid].GROUP_ID))
+    end
+
     --调换了下原始设定，改为按Y发起队伍内，按U发起所有人
     whisper = not whisper
     if whisper then

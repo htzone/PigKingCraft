@@ -29,7 +29,8 @@ local prefabs =
 }
 
 local MAX_TARGET_SHARES = 5
-local SHARE_TARGET_DIST = 45
+local SHARE_TARGET_DIST = 50
+local PIG_TARGET_DIST = 30
 
 local function ontalk(inst, script)
     inst.SoundEmitter:PlaySound("dontstarve/pig/grunt")
@@ -117,12 +118,12 @@ local function OnEat(inst, food)
     if food.components.edible ~= nil then
         if food.components.edible.foodtype == FOODTYPE.VEGGIE then
             SpawnPrefab("poop").Transform:SetPosition(inst.Transform:GetWorldPosition())
-        elseif food.components.edible.foodtype == FOODTYPE.MEAT and
-            inst.components.werebeast ~= nil and
-            not inst.components.werebeast:IsInWereState() and
-            food.components.edible:GetHealth(inst) < 0 then
---            inst.components.werebeast:TriggerDelta(1)
-			inst.components.werebeast:TriggerDelta(1)
+        elseif food.components.edible.foodtype == FOODTYPE.MEAT then
+            SpawnPrefab("poop").Transform:SetPosition(inst.Transform:GetWorldPosition())
+            if inst.components.werebeast ~= nil and not inst.components.werebeast:IsInWereState() and
+                    food.components.edible:GetHealth(inst) < 0 then
+                inst.components.werebeast:TriggerDelta(1)
+            end
         end
     end
 end
@@ -154,10 +155,6 @@ local function IsNonWerePig(dude)
     return dude:HasTag("pig") and not dude:HasTag("werepig")
 end
 
---local function OnlyMyGroupPig(dude)
---    return dude:HasTag("pig") and dude.components.pkc_group and dude.components.pkc_group:getChooseGroup() 
---end
-
 local function IsGuardPig(dude)
     return dude:HasTag("guard") and dude:HasTag("pig")
 end
@@ -176,19 +173,38 @@ local function OnAttacked(inst, data)
         elseif inst:HasTag("guard") then
             inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, attacker:HasTag("pig") and IsGuardPig or IsPig, MAX_TARGET_SHARES)
         elseif not (attacker:HasTag("pig") and attacker:HasTag("guard")) then
-            inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, 
-			function(dude) 
-				return dude:HasTag("pig") and dude.components.pkc_group and inst.components.pkc_group 
-				and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup() 
-			end, 
-			MAX_TARGET_SHARES)
+            if not inst.components.pkc_group then
+                --print("pkc_pig..attacker:"..tostring(attacker.prefab))
+                inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, function(dude)
+                    return dude:HasTag("pig") and not dude:HasTag("werepig")
+                            and not dude.components.pkc_group
+                end, MAX_TARGET_SHARES)
+            else
+                --print("pkc_pig..attacker:"..tostring(attacker.prefab))
+                inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST,
+                        function(dude)
+                            local fn_result = dude:HasTag("pig") and not dude:HasTag("werepig")
+                                    and dude.components.pkc_group and inst.components.pkc_group
+                                    and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
+                            --print("pkc_fn_result:"..tostring(fn_result))
+                            return fn_result
+                        end,
+                        MAX_TARGET_SHARES)
+            end
         end
     end
 end
 
 local function OnNewTarget(inst, data)
+    local target = data.target
     if inst:HasTag("werepig") then
-        inst.components.combat:ShareTarget(data.target, SHARE_TARGET_DIST, IsWerePig, MAX_TARGET_SHARES)
+        inst.components.combat:ShareTarget(target, SHARE_TARGET_DIST, IsWerePig, MAX_TARGET_SHARES)
+    end
+    if inst.components.pkc_group and IsNonWerePig(inst) then
+        inst.components.combat:ShareTarget(target, SHARE_TARGET_DIST, function(dude)
+            return dude and dude:HasTag("pig") and not dude:HasTag("werepig") and dude.components.pkc_group
+                    and inst.components.pkc_group:getChooseGroup() == dude.components.pkc_group:getChooseGroup()
+        end, MAX_TARGET_SHARES)
     end
 end
 
@@ -212,13 +228,38 @@ end
 ]]--
 
 local function NormalRetargetFn(inst)
-	local dist = TUNING.PIG_TARGET_DIST		
+	local dist = PIG_TARGET_DIST
 	local invader = nil
 	invader = FindEntity(inst, dist, function(guy)
 		if not inst.components.pkc_group then
 			return guy:HasTag("monster") and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
 		end
-		return (guy:HasTag("monster") 
+        ----不能以同队作为目标
+        --if guy and guy.components.pkc_group
+        --        and guy:HasTag("pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())) then
+        --    return false
+        --end
+        --
+        ----不能以同队的随从为目标
+        --if guy and guy.components.follower then
+        --    local leader = guy.components.follower.leader
+        --    if leader and leader.components.pkc_group
+        --            and leader.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup() then
+        --        return false
+        --    end
+        --end
+
+        --以敌对成员的随从为目标
+        if guy and guy.components.follower then
+            local leader = guy.components.follower.leader
+            if leader and leader.components.pkc_group and inst and inst.components.pkc_group
+                    and leader.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup() then
+                return true
+            end
+        end
+
+        --以怪物或敌对成员为目标，且不能为灵魂
+		return (guy:HasTag("monster")
 		or  (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
 		and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
 	end)
@@ -283,8 +324,8 @@ local function SetNormalPig(inst)
     inst.components.sleeper:SetWakeTest(DefaultWakeTest)
 
     inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 1)
-    --inst.components.lootdropper:AddRandomLoot("pigskin", 1)
+    inst.components.lootdropper:AddRandomLoot("meat", 2)
+    inst.components.lootdropper:AddRandomLoot("pigskin", 1)
     inst.components.lootdropper.numrandomloot = 1
 
     inst.components.health:SetMaxHealth(PKC_PIGMAN_HEALTH)
@@ -770,9 +811,22 @@ local function nightpig(groupId)
     return inst
 end
 
+
+local function wearHat(inst, hatName)
+    if inst then
+        inst.AnimState:OverrideSymbol("swap_hat", hatName, "swap_hat")
+        inst.AnimState:Show("HAT")
+        inst.AnimState:Show("HAT_HAIR")
+        inst.AnimState:Hide("HAIR_NOHAT")
+        inst.AnimState:Hide("HAIR")
+    end
+end
+
 return 
 Prefab("pkc_pigman_big", function()
 	local inst = normal(GROUP_BIGPIG_ID)
+    --戴帽子
+    wearHat(inst, "ewecushat_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.BIGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -782,6 +836,8 @@ Prefab("pkc_pigman_big", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_red", function()
 	local inst = normal(GROUP_REDPIG_ID)
+    --戴帽子
+    wearHat(inst, "spartahelmut_swap2")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.REDPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -791,6 +847,8 @@ Prefab("pkc_pigman_red", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_cui", function()
 	local inst = normal(GROUP_CUIPIG_ID)
+    --戴帽子
+    wearHat(inst, "summerbandana_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.CUIPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)
@@ -800,6 +858,8 @@ Prefab("pkc_pigman_cui", function()
 end, assets, prefabs),
 Prefab("pkc_pigman_long", function()
 	local inst = normal(GROUP_LONGPIG_ID)
+    --戴帽子
+    wearHat(inst, "birchnuthat_swap")
 	--设置颜色
 	local r, g, b = HexToPercentColor(PKC_GROUP_INFOS.LONGPIG.pigman_color)
 	inst.AnimState:SetMultColour(r, g, b, 1)

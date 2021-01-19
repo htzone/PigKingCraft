@@ -637,7 +637,8 @@ local function canBuilHomeSign(act)
 		return false
 	end
 	if homeSigns ~= nil and #homeSigns ~= 0 then
-		GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH1..(#homeSigns + 1))
+		GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH1,
+				#homeSigns + 1, GLOBAL.PKC_GROUPHOMESIGN_NUM))
 	end
 	return true
 end
@@ -680,19 +681,19 @@ GLOBAL.ACTIONS.BUILD.fn = function(act)
 		return old_BUILD(act)
 	end
 
---	if act.recipe == "homesign" then --建造路牌
---		if not canBuilHomeSign(act) then
---			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_GROUPHOMESIGN_NUM))
---			return false
---		end
---	end
---
---	if act.recipe == "pighouse" then --建造猪房
---		if not canBuildPigHouse(act) then
---			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_MAX_PIGHOUSE_NUM))
---			return false
---		end
---	end
+	if act.recipe == "homesign" then --建造路牌
+		if not canBuilHomeSign(act) then
+			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_GROUPHOMESIGN_NUM))
+			return false
+		end
+	end
+
+	if act.recipe == "pighouse" then --建造猪房
+		if not canBuildPigHouse(act) then
+			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_MAX_PIGHOUSE_NUM))
+			return false
+		end
+	end
 
 	local x, y, z = act.doer.Transform:GetWorldPosition()
 	local ents = GLOBAL.TheSim:FindEntities(x, y, z, 8)
@@ -1173,7 +1174,7 @@ AddPrefabPostInit("book_sleep", function(inst)
 	end
 end)
 
-----重写死亡掉落物品方法(死亡随机掉落)
+----重写死亡掉落物品方法(死亡随机掉落 物品10%的概率，装备30%)
 local function customDropEverything(self, ondeath, keepequip)
 	if self.activeitem ~= nil then
 		self:DropItem(self.activeitem)
@@ -1183,7 +1184,7 @@ local function customDropEverything(self, ondeath, keepequip)
 	--物品栏掉落
 	for _, v in pairs(self.itemslots) do
 		if v ~= nil then
-			if math.random() < .3 then
+			if math.random() < .1 then
 				self:DropItem(v, true, true)
 			end
 		end
@@ -1195,20 +1196,22 @@ local function customDropEverything(self, ondeath, keepequip)
 	if container then
 		for _, v in pairs(container.slots) do
 			if v ~= nil then
-				if math.random() < .3 then
+				if math.random() < .1 then
 					self:DropItem(v, true, true)
 				end
 			end
 		end
 	end
 
-	--装备栏除背包以外全掉落
+	--装备栏物品掉落
 	if not keepequip then
 		for _, v in pairs(self.equipslots) do
 			if v ~= nil then
 				if not (ondeath and v.components.inventoryitem.keepondeath) then
 					if not v:HasTag("backpack") and not v.components.container then
-						self:DropItem(v, true, true)
+						if math.random() < .3 then
+							self:DropItem(v, true, true)
+						end
 					end
 				end
 			end

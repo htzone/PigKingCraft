@@ -10,12 +10,14 @@ end)
 
 --是否为安全位置
 local function isSavePos(pos)
-	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 20)
+	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 15)
 	for _, obj in ipairs(ents) do
-		if obj and (obj:HasTag("blocker") or obj.prefab == "mermhouse") and obj:GetPosition():Dist(pos) <= 8 then
+		if obj and (obj:HasTag("blocker") or obj.prefab == "mermhouse")
+				and obj:GetPosition():Dist(pos) <= 8 then
 			return false
 		end
-		if obj and (obj:HasTag("houndmound") or obj:HasTag("beehive") or obj:HasTag("tallbird") or obj:HasTag("lava") or obj:HasTag("spiderden")) then
+		if obj and (obj:HasTag("beehive")
+				or obj:HasTag("lava")) then
 			return false
 		end
 	end
@@ -44,7 +46,6 @@ local function rebuildTile(tile, pt, offset)
 end
 
 --生成单个设施 
---@大猪猪 10-31
 local function produceSingleUtil(prefname, pos, offset)
 	local prefab = SpawnPrefab(prefname)
 	if prefab then
@@ -55,39 +56,44 @@ local function produceSingleUtil(prefname, pos, offset)
 end
 
 --位置是否合格
---@大猪猪 10-31
-local function isValidBasePos(pos, previousPos)
+local function isValidBasePos(pos, previousPos, minDistance)
 	for _, v in pairs(previousPos) do
-		if v and pos:Dist(v) < GROUP_DISTANCE then
-			return false	--只要有一个小于允许的最小距离,那么继续选位置
+		if v and pos:Dist(v) < minDistance then
+			return false -- 只要有一个小于允许的最小距离,那么继续选位置
 		end
 	end
-	if not isSavePos(pos) then --不是安全的位置
+	if not isSavePos(pos) then -- 不是安全的位置
 		return false
 	end
 	return true
 end
 
 --相同的构造部分
-local function commenBuild(previousPos)
+local function commonBuild(previousPos)
 	local centers = {}
 	local ground = TheWorld
 	for _, node in ipairs(ground.topology.nodes) do
 		if ground.Map:IsPassableAtPoint(node.x, 0, node.y) then
 			if node.tags ~= nil and table.contains( node.tags, "lunacyarea" ) then
-			
+				-- do nothing 基地不要生成在月岛
 			else
 				table.insert(centers, {x = node.x, z = node.y})
 			end
 		end
 	end
 	local pos = nil
+	local tryMakeBaseTimes = 0
 	if #centers > 0 then
 		pos = choosePos(centers)
-		while not isValidBasePos(pos, previousPos) do
+		local size, _ = TheWorld.Map:GetSize()
+		size = math.abs(size)
+		local minDistance = GROUP_NUM > 2 and size * 0.6 or size * 0.8
+		while not isValidBasePos(pos, previousPos, minDistance) do
 			pos = choosePos(centers)
+			tryMakeBaseTimes = tryMakeBaseTimes + 1
 		end
 	end
+	print("pkc_tryMakeBaseTimes:"..tryMakeBaseTimes)
 	return pos
 end
 
@@ -95,7 +101,7 @@ end
 local function clearPigkingNear(pigking)
 	if pigking and pigking.Transform then
 		local x, y, z = pigking.Transform:GetWorldPosition()
-		local ents = TheSim:FindEntities(x, y, z, 4)
+		local ents = TheSim:FindEntities(x, y, z, 8)
 		for _, obj in ipairs(ents) do
 			if obj and obj ~= pigking and not obj:HasTag("burnt") then
 				obj:Remove()
@@ -105,14 +111,11 @@ local function clearPigkingNear(pigking)
 end
 
 --生成单个基地
---@大猪猪 10-31
 local function produceSingleBase(previousPos, groupId)
-	local pos = commenBuild(previousPos)
+	local pos = commonBuild(previousPos)
 	local pigking = nil
 	local pighousePrefab = nil
-	local pighouse = nil
 	local eyetuuretPrefab = nil
-	local eyetuuret = nil
 	local homesignPrefab = nil
 	if groupId == GROUP_BIGPIG_ID then
 		pigking = produceSingleUtil("pkc_bigpig", pos, Vector3(-3, 0, -3))
@@ -140,19 +143,18 @@ local function produceSingleBase(previousPos, groupId)
 	clearPigkingNear(pigking)
 	
 	--安置建筑
-	pkc_roundSpawn(pigking, pighousePrefab, 10, PKC_PIGHOUSE_NUM) --猪人房
+	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM) --猪人房
 	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM) --眼球塔
-	pkc_roundSpawn(pigking, homesignPrefab, 7, 1) --传送牌
+	pkc_roundSpawnForWriteable(pigking, homesignPrefab, 8, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26) --传送牌
 	
 	return pos
 end
 
 --生成基地并保存基地的位置	
---@大猪猪 10-31
-function PKC_BASE:produceBase(group_num)	--参数是基地的个数
+function PKC_BASE:produceBase(group_num) -- 参数是基地的个数
 	if not self.inst.hasProduceBase then
 		local pt = self.inst:GetPosition()
-		local pos1 = produceSingleBase({pt}, GROUP_BIGPIG_ID)	--产生基地,且和已经存在的位置做距离的比较
+		local pos1 = produceSingleBase({pt}, GROUP_BIGPIG_ID)	-- 产生基地,且和已经存在的位置做距离的比较
 		TheWorld.components.pkc_baseinfo:SetBasePos("BIG", pos1)
 		
 		local pos2 = produceSingleBase({pt,pos1}, GROUP_REDPIG_ID)

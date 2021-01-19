@@ -16,6 +16,8 @@ local prefabs =
     "collapse_small",
 }
 
+local loot_table = {"boards",}
+
 local function onhammered(inst, worker)
     if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
         inst.components.burnable:Extinguish()
@@ -89,6 +91,7 @@ local function fn(groupId)
     inst:AddComponent("inspectable")
     inst:AddComponent("writeable")
     inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetLoot(loot_table)
 
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)

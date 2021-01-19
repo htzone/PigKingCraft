@@ -1,6 +1,6 @@
 --
 -- 猪王争霸（PigKingCraft）
--- Author: RedPig, 大猪猪, 龙飞, 老崔
+-- Author: RedPig
 -- Date: 2016/10/01
 --
 --[[
@@ -40,7 +40,7 @@
                 , , ,,,:,,::::::::iiiiiiiiii:,:,:::::::::iiir;ri7vL77rrirri::
                  :,, , ::::::::i:::i:::i:i::,,,,,:,::i:i:::iir;@Secbone.ii:::
                           A single dog（pig） is looking at you...
-                          仅此纪念一起搞饥荒的美好时光，朋友们...
+                          仅此纪念一起玩饥荒的美好时光，朋友们...
 
 
 ]]--
@@ -56,9 +56,19 @@ PrefabFiles = {
     "pkc_range",
     "pkc_globalposition_classified",
     "pkc_globalmapicon_noproxy",
-    "pkc_travelable_classified"
+    "pkc_travelable_classified",
+    "pkc_spartahelmut",
+    "pkc_ewecushat",
+    "pkc_summerbandana",
+    "pkc_birchnuthat",
 }
 
+Assets = {
+    Asset("ATLAS", "images/inventoryimages/pkc_spartahelmut1.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_ewecushat.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_summerbandana.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_birchnuthat.xml"),
+}
 --modimport("scripts/newxiugai")
 
 local require = GLOBAL.require
@@ -67,7 +77,7 @@ require "pkc_utils"
 --覆写网络函数
 require "pkc_networking_override"
 --木牌传送
-modimport("scripts/mods/pkc_fasttravel1")
+modimport("scripts/mods/pkc_fasttravel")
 --属性显示
 modimport("scripts/mods/pkc_showme")
 --快速采集
@@ -76,6 +86,8 @@ modimport("scripts/mods/pkc_fasthand")
 modimport("scripts/pkc_fuckglobal")
 --全局变量
 modimport("scripts/pkc_global")
+--物品制作
+modimport("pkc_recipes.lua")
 --全局常量
 modimport("scripts/pkc_constant")
 --对话设定
@@ -99,7 +111,7 @@ modimport("scripts/init/pkc_rules")
 --自动公告
 modimport("scripts/init/pkc_announce")
 --玩家积分信息
-modimport("scripts/init/pkc_playerstatus_screen")
+--modimport("scripts/init/pkc_playerstatus_screen")
 modimport("scripts/init/pkc_wwdxhz")
 --敌对据点
 modimport("scripts/init/pkc_hostilegroup")

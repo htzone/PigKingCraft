@@ -26,6 +26,11 @@ function PKC_GROUP:getChooseGroup()
 	return self._chooseGroup:value()
 end
 
+function PKC_GROUP:isSameGroup(mob)
+	return mob and mob.components.pkc_group
+			and self.inst.components.pkc_group:getChooseGroup() == mob.components.pkc_group:getChooseGroup()
+end
+
 function PKC_GROUP:setBasePos(basePos)
 	self.basePos = basePos
 end
