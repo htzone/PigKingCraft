@@ -1,6 +1,6 @@
 --
 -- 全局常量
--- Author: RedPig, 大猪猪, 龙飞
+-- Author: RedPig
 -- Date: 2016/10/03
 --
 
