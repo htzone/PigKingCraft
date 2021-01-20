@@ -1,4 +1,3 @@
--- not use this file at present
 -- 玩家计分显示屏幕
 -- Author: RedPig
 -- Date: 2016/11/23

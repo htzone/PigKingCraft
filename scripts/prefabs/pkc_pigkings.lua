@@ -89,8 +89,8 @@ local giftsTable = {
 	poop = 200,
 	spidergland = 50,
 	boards = 100,
-	gears = 10,
-	walrus_tusk = 5,
+	gears = 20,
+	walrus_tusk = 15,
 	papyrus = 50,
 	tentaclespots = 20,
 	beefalowool = 30,
@@ -98,7 +98,7 @@ local giftsTable = {
 	feather_robin = 50,
 	feather_crow = 50,
 	feather_robin_winter = 50,
-	feather_canary = 50,
+	feather_canary = 100,
 	stinger = 100,
 	durian = 50,
 	dragonfruit = 50,
@@ -106,16 +106,17 @@ local giftsTable = {
 	--turf_carpetfloor = 200,
 	--turf_checkerfloor = 200,
 	horn = 20,
-	krampus_sack = 1,
+	krampus_sack = 10,
 	nightmarefuel = 100,
 	healingsalve = 150,
 	bandage = 100,
+	eyeturret_item = 10,
 }
 
 --扔礼物
 local function throwGifts(inst)
 	inst.SoundEmitter:PlaySound("dontstarve/pig/PigKingThrowGold")
-    local gift_num = 2
+    local gift_num = 3
 	local gift_name = nil
     for k = 1, gift_num do
 		gift_name = pkc_weightedChoose(giftsTable)
