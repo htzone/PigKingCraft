@@ -1,16 +1,19 @@
 -- This information tells other players more about the mod
-name = "11猪王争霸(PigKingCraft)开发版III"
+name = "111猪王争霸(PigKingCraft)开发版III"
 description = [[
-<饥荒分组生存与对抗> / <Group Survival and PvP>
-允许你和你的小伙伴们一起对抗其他组的成员，最多可分四组，保护你的猪王，并通过生存和对抗得分赢得这场比赛的胜利.
-Survival and protect your pig king, 4 teams at most.
+<饥荒分组生存与对抗>
+允许你和你的队友一起对抗其他队伍的成员，最多可分四组，保卫你的猪王，并通过生存和对抗得分赢得这场比赛的胜利。
+<重要>
+★需要在无尽和玩家对战模式下开启该模组。
+★按Shift键冲刺，C键回城，Y键队伍聊天，U键所有人聊天，按Y输入#投降 即可发起投降。
+★比赛结束后会自动重置世界，如果想关闭该功能可在模组配置界面进行配置。
+点击右下方的“配置模组”可设置更多选项。                 ↓↓↓
 
-<重要> / <Important Tips>
-需在无尽和PVP模式下开启该模组.
-比赛结束后会自动重置世界，如果想关闭该功能可在模组配置界面进行配置.
-You need to open this module in endless and PvP mode. The world will be regenerated automatically after winning, you can configure it in the module configuration page.
-点击右下方的“配置模组”可设置更多选项 /Click "Configuration Module" to set more options                                                        ↓↓↓
-
+<Team Survival and PvP>
+Team survival and protect your pig king, 4 teams at most.
+<Important Tips>
+You need to open this mod in endless and PvP mode. Press 'Shift' key to sprint, 'C' to go home, 'Y' to team chat, 'U' to everyone chat, Press 'Y' and input '#sur' to surrender.
+You can configure other setting in the module configuration page.↓↓↓
 ]]
 --"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你." 猪王如是说...
 author = "RedPig, 大猪猪"
@@ -79,7 +82,7 @@ configuration_options =
 			{description = "100000分", data = 100000, hover = "持久战" },
 			{description = "无尽(Endless)", data = 999999, hover = "Endless" },
         },
-        default = 5000,
+        default = 10000,
     },
 	{
         name = "random_group",

@@ -46,6 +46,8 @@ end
 local function ShouldAcceptItem(inst, item)
     if item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD then
         return true
+    elseif item.prefab == "poop" then
+        return true
     elseif item.components.edible ~= nil then
         local foodtype = item.components.edible.foodtype
         if foodtype == FOODTYPE.MEAT or foodtype == FOODTYPE.HORRIBLE then
@@ -63,13 +65,13 @@ end
 
 --贿赂猪人
 local function OnGetItemFromPlayer(inst, giver, item)
+    if inst and giver and inst.components.pkc_group and giver.components.pkc_group
+            and inst.components.pkc_group:getChooseGroup() ~= giver.components.pkc_group:getChooseGroup() then
+        return;
+    end
     --I eat food
+    item.pkc_isplayergive = true --tag for player give
     if item.components.edible ~= nil then
-        if inst.components.pkc_group and giver.components.pkc_group
-        and inst.components.pkc_group:getChooseGroup() ~= giver.components.pkc_group:getChooseGroup() then
-            return;
-        end
-        item.pkc_isplayergive = true --tag for player give
         --meat makes us friends (unless I'm a guard)
         if item.components.edible.foodtype == FOODTYPE.MEAT or item.components.edible.foodtype == FOODTYPE.HORRIBLE or item.prefab == "goldnugget" then
             if inst.components.combat:TargetIs(giver) then
@@ -83,16 +85,28 @@ local function OnGetItemFromPlayer(inst, giver, item)
                     inst.components.follower:AddLoyaltyTime(item.components.edible:GetHunger() * TUNING.PIG_LOYALTY_PER_HUNGER)
                 end
                 inst.components.follower.maxfollowtime =
-                    giver:HasTag("polite")
-                    and TUNING.PIG_LOYALTY_MAXTIME + TUNING.PIG_LOYALTY_POLITENESS_MAXTIME_BONUS
-                    or TUNING.PIG_LOYALTY_MAXTIME
+                giver:HasTag("polite")
+                        and TUNING.PIG_LOYALTY_MAXTIME + TUNING.PIG_LOYALTY_POLITENESS_MAXTIME_BONUS
+                        or TUNING.PIG_LOYALTY_MAXTIME
             end
         end
         if inst.components.sleeper:IsAsleep() then
             inst.components.sleeper:WakeUp()
         end
     end
-
+    --I hate poop
+    if item.prefab == "poop" then
+        if giver and giver.components.leader then
+            giver.components.leader:RemoveFollower(inst)
+        end
+        if inst and inst.components.follower then
+            inst:DoTaskInTime(0, function()
+                inst.AnimState:PlayAnimation("idle_angry")
+                inst.components.talker:Say("猪人讨厌粑粑！！！")
+                inst.components.follower:StopFollowing()
+            end)
+        end
+    end
     --I wear hats
     if item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD then
         local current = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)

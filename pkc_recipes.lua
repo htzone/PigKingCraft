@@ -26,6 +26,8 @@ local treasurechest = GLOBAL.AllRecipes["treasurechest"]
 treasurechest.sortkey = -29
 local pighouse = GLOBAL.AllRecipes["pighouse"]
 pighouse.sortkey = -28
+local backpack = GLOBAL.AllRecipes["backpack"]
+backpack.sortkey = -30
 
 local recipe_ewecushat = AddRecipe("pkc_ewecushat",
         { Ingredient("goldnugget", 5), Ingredient("hammer", 4), Ingredient("feather_crow", 2) },

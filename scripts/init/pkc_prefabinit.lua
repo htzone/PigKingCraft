@@ -170,93 +170,35 @@ local function changeAbigailTarget(inst)
 end
 AddPrefabPostInit("abigail", changeAbigailTarget)
 
+--增加怪物标签
 local monster_list = {
 	"merm",
 	"tallbird"
 }
-
 local function setMonster(inst)
 	if GLOBAL.TheWorld.ismastersim and inst then
 		inst:AddTag("monster")
 	end
 end
-
---增加怪物标签
 for _, v in pairs(monster_list) do
 	AddPrefabPostInit(v, setMonster)
 end
 
-local SHARE_TARGET_DIST = 40
-local MAX_TARGET_SHARES = 5
-
-local function OnAttackedByDecidRoot(inst, attacker)
-	local x, y, z = inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x, y, z, SpringCombatMod(SHARE_TARGET_DIST) * .5, SUGGESTTARGET_MUST_TAGS, SUGGESTTARGET_CANT_TAGS)
-	local num_helpers = 0
-	for i, v in ipairs(ents) do
-		if v ~= inst and not v.components.health:IsDead() then
-			v:PushEvent("suggest_tree_target", { tree = attacker })
-			num_helpers = num_helpers + 1
-			if num_helpers >= MAX_TARGET_SHARES then
-				break
-			end
-		end
+--增加可交易属性
+local tradable_item = {
+	"poop",
+}
+local function addTradableAttr(item)
+	if item then
+		item:AddComponent("tradable")
 	end
 end
-
-local function isWerePig(dude)
-	return dude:HasTag("werepig")
+for _, v in pairs(tradable_item) do
+	AddPrefabPostInit(v, addTradableAttr)
 end
 
-local function isNonWerePig(dude)
-	return dude:HasTag("pig") and not dude:HasTag("werepig")
-end
 
-local function isPig(dude)
-	return dude:HasTag("pig")
-end
 
-local function isGuardPig(dude)
-	return dude:HasTag("guard") and dude:HasTag("pig")
-end
-
-local function OnPigManAttacked(inst, data)
-	local attacker = data.attacker
-	inst:ClearBufferedAction()
-
-	if attacker.prefab == "deciduous_root" and attacker.owner ~= nil then
-		OnAttackedByDecidRoot(inst, attacker.owner)
-	elseif attacker.prefab ~= "deciduous_root" then
-		inst.components.combat:SetTarget(attacker)
-		if not (attacker:HasTag("pig") and attacker:HasTag("guard")) then
-			if not inst.components.pkc_group then
-				print("pig..attacker:"..tostring(attacker.prefab))
-				inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, function(dude)
-					local fn_result = dude:HasTag("pig") and not dude:HasTag("werepig")
-							and not dude.components.pkc_group
-					print("pig_fn_result:"..tostring(fn_result))
-					return fn_result
-				end, MAX_TARGET_SHARES)
-			else
-				print("pig..attacker:"..tostring(attacker.prefab))
-				inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST,
-						function(dude)
-							return dude:HasTag("pig") and not dude:HasTag("werepig")
-									and dude.components.pkc_group and inst.components.pkc_group
-									and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
-						end,
-						MAX_TARGET_SHARES)
-			end
-		end
-	end
-end
-
-----修改猪人仇恨
---AddPrefabPostInit("pigman", function(inst)
---	if inst and isPig(inst) and not isWerePig(inst) and not isGuardPig(inst) then
---		inst:ListenForEvent("attacked", OnPigManAttacked)
---	end
---end)
 
 
 

@@ -147,6 +147,29 @@ local function morningFunny(inst)
 	inst.endhappytask = inst:DoTaskInTime(1, onendhappytask)
 end
 
+local function takePigsBackToHome(inst)
+	inst:DoTaskInTime(2, function()
+		if inst and inst.components.pkc_group then
+			local groupTag = "pkc_group" .. tostring(inst.components.pkc_group:getChooseGroup())
+			local x, y, z = inst.Transform:GetWorldPosition()
+			local pigs = TheSim:FindEntities(x, y, z, 800, { "pkc_pigman", groupTag })
+			for _, v in ipairs(pigs) do
+				if v and v.components.follower and v.components.follower.leader == nil then
+					if v.components.homeseeker
+							and v.components.homeseeker.home
+							and v.components.homeseeker.home:IsValid() then
+						local homePos = v.components.homeseeker:GetHomePos()
+						if homePos and v:GetPosition():Dist(homePos) > 100 then
+							v.Transform:SetPosition(homePos.x + 1, 0, homePos.z + 1)
+							print("pkc take pig to home...")
+						end
+					end
+				end
+			end
+		end
+	end)
+end
+
 local function OnIsNight(inst, isnight)
     if isnight then
         inst.components.trader:Disable()
@@ -155,6 +178,7 @@ local function OnIsNight(inst, isnight)
 		if inst.Light then
 			inst.Light:Enable(true)
 		end
+		takePigsBackToHome(inst)
     else
 		if inst.Light then
 			inst.Light:Enable(false)
