@@ -122,6 +122,8 @@ modimport("scripts/init/pkc_mobtobig")
 modimport("scripts/init/pkc_group_postion")
 --分组会话
 modimport("scripts/init/pkc_group_chat")
+--投降机制
+modimport("scripts/init/pkc_surrender")
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统

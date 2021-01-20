@@ -130,12 +130,36 @@ function getGroupShortNameByGroupId(groupId)
     return "Unknown"
 end
 
+function getGroupIdByUserId(userId)
+    return PKC_PLAYER_INFOS[userId] and PKC_PLAYER_INFOS[userId].GROUP_ID or 0
+end
+
+function getGroupPlayerNumByGroupId(groupId)
+    local groupPlayerNum = 0
+    for _, player in pairs(AllPlayers) do
+        if player and player.components.pkc_group
+                and player.components.pkc_group:getChooseGroup() == groupId then
+            groupPlayerNum = groupPlayerNum + 1
+        end
+    end
+    return groupPlayerNum
+end
+
 --检查table里是否包含指定key
 --@param checkTable 检查table
 --@param key 指定key
 function containsKey(checkTable, key)
-    for k, v in pairs(checkTable) do
+    for k, _ in pairs(checkTable) do
         if k == key then
+            return true
+        end
+    end
+    return false
+end
+
+function containsValue(checkTable, value)
+    for _, v in pairs(checkTable) do
+        if v == value then
             return true
         end
     end
@@ -626,3 +650,19 @@ function isSameGroup(inst1, inst2)
             and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
 end
 
+function removeByValue(list, value, removeAll)
+    local deleteNum, i, max = 0, 1, #list
+    while i <= max do
+        if list[i] == value then
+            table.remove(list, i)
+            deleteNum = deleteNum + 1
+            i = i - 1
+            max = max - 1
+            if not removeAll then
+                break
+            end
+        end
+        i = i + 1
+    end
+    return deleteNum
+end

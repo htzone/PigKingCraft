@@ -5,8 +5,8 @@
 --
 
 local CHAT_QUEUE_SIZE = 7
-local CHAT_EXPIRE_TIME = 10.0
-local CHAT_FADE_TIME = 2.0
+local CHAT_EXPIRE_TIME = 15.0
+local CHAT_FADE_TIME = 10.0
 local UserCommands = require("usercommands")
 local input_chat_screen = require("screens/chatinputscreen")
 local chat_queue = require("widgets/chatqueue")
@@ -138,10 +138,10 @@ function chat_queue:RefreshWidgetsForPKC()
                 user:Show()
                 --添加消息头部标识
                 if row_data.whisper then
-                    local title = isNullOrEmpty(row_data.username) and "" or "[队伍内] "..row_data.username
+                    local title = isNullOrEmpty(row_data.username) and "" or PKC_SPEECH.CHAT_QUEUE.SPEECH3..row_data.username
                     user:SetTruncatedString(title, self.user_width, self.user_max_chars, true)
                 else
-                    local title = isNullOrEmpty(row_data.username) and "" or "[所有人] "..row_data.username
+                    local title = isNullOrEmpty(row_data.username) and "" or PKC_SPEECH.CHAT_QUEUE.SPEECH4..row_data.username
                     user:SetTruncatedString(title, self.user_width, self.user_max_chars, true)
                 end
                 user_width = user:GetRegionSize()

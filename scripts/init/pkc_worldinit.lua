@@ -251,17 +251,34 @@ local function onWin(win_data, inst)
 end
 
 --转移财产（善后）（赢得一方占领）
-local function transferProperty(killedId, killerId)
+local function transferProperty(killedId, killerId, clearKing)
 	local ents = GLOBAL.TheSim:FindEntities(0, 0, 0, 1000,{"pkc_group"..killedId})
 	for _, obj in pairs(ents) do
 		if obj and not obj:HasTag("player") then
+			if clearKing then
+				if obj:HasTag("king") and obj:HasTag("pig") and obj:HasTag("pkc_group"..tostring(killedId)) then
+					obj:DoTaskInTime(math.random(3), function()
+						if obj.Transform then
+							local currentscale = obj.Transform:GetScale()
+							local collapse = GLOBAL.SpawnPrefab("collapse_small")
+							if collapse then
+								collapse.Transform:SetPosition(obj.Transform:GetWorldPosition())
+								collapse.Transform:SetScale(currentscale*1,currentscale*1,currentscale*1)
+							end
+						end
+						obj:Remove()
+					end)
+				end
+			end
 			if obj:HasTag("pkc_defences") and not obj:HasTag("burnt") and obj.Transform then
 				obj:DoTaskInTime(math.random(3), function()
-					local currentscale = obj.Transform:GetScale()
-					local collapse = GLOBAL.SpawnPrefab("collapse_small")
-					if collapse then
-						collapse.Transform:SetPosition(obj.Transform:GetWorldPosition())
-						collapse.Transform:SetScale(currentscale*1,currentscale*1,currentscale*1)
+					if obj.Transform then
+						local currentscale = obj.Transform:GetScale()
+						local collapse = GLOBAL.SpawnPrefab("collapse_small")
+						if collapse then
+							collapse.Transform:SetPosition(obj.Transform:GetWorldPosition())
+							collapse.Transform:SetScale(currentscale*1,currentscale*1,currentscale*1)
+						end
 					end
 					obj:Remove()
 				end)
@@ -311,7 +328,7 @@ local function removeGroup(inst, group_id)
 end
 
 --检查胜利
-local function checkWin(inst)
+local function checkWin()
 	if GLOBAL.tablelength(GLOBAL.CURRENT_EXIST_GROUPS) == 1 then
 		--最后一个队伍胜利
 		local winner = nil
@@ -343,7 +360,7 @@ local function onKingbekilled(data, inst)
 		--移除阵营
 		removeGroup(inst, data.killed_group_id)
 		--检查是否胜利了
-		checkWin(data.killer)
+		checkWin()
 		--阵营被消灭提示
 		inst:DoTaskInTime(10, function()
 			if data.killer then
@@ -354,6 +371,47 @@ local function onKingbekilled(data, inst)
 					GLOBAL.pkc_announce(GLOBAL.PKC_SPEECH.GROUP_SMASH.SPEECH1..GLOBAL.getNamebyGroupId(data.killed_group_id)..GLOBAL.PKC_SPEECH.GROUP_SMASH.SPEECH2..data.killer.name..GLOBAL.PKC_SPEECH.GROUP_SMASH.SPEECH4)
 				end
 			end
+		end)
+	end
+end
+
+local function spwanLighting(userid)
+	local currentPlayer = nil
+	for _, player in pairs(AllPlayers) do
+		if player and player.userid == userid then
+			currentPlayer = player
+			break
+		end
+	end
+	if currentPlayer and currentPlayer.Transform then
+		local pt = GLOBAL.Vector3(currentPlayer.Transform:GetWorldPosition())
+		GLOBAL.SpawnPrefab("lightning").Transform:SetPosition(pt:Get())
+	end
+end
+
+--监听投降事件
+local function onSurrender(data, inst)
+	if data and inst and data.group_id then
+		local groupName = tostring(GLOBAL.getNamebyGroupId(data.group_id))
+		spwanLighting(data.user_id)
+		inst:DoTaskInTime(1, function()
+			GLOBAL.pkc_announce(string.format(PKC_SPEECH.SURRENDER_SPEECH.SPEECH5, groupName))
+		end)
+		inst:DoTaskInTime(10, function()
+			--标记被消灭
+			inst.components.pkc_groupscore:setGroupScore(data.group_id, -9999)
+			transferProperty(data.group_id, nil, true)
+			--解散成员
+			dissolvePlayers(data.group_id)
+			--移除阵营
+			removeGroup(inst, data.group_id)
+			--阵营被消灭提示
+			spwanLighting(data.user_id)
+			GLOBAL.pkc_announce(string.format(PKC_SPEECH.SURRENDER_SPEECH.SPEECH6, groupName, groupName))
+			--检查是否胜利了
+			inst:DoTaskInTime(4, function()
+				checkWin()
+			end)
 		end)
 	end
 end
@@ -443,6 +501,8 @@ local function network(inst)
 		inst:ListenForEvent("pkc_giveScoreItem", function(world, data) onGiveScoreItem(data, inst) end, GLOBAL.TheWorld)
 		--猪王被杀
 		inst:ListenForEvent("pkc_kingbekilled", function(world, data) onKingbekilled(data, inst) end, GLOBAL.TheWorld)
+		--监听投降
+		inst:ListenForEvent("pkc_surrender", function(world, data) onSurrender(data, inst) end, GLOBAL.TheWorld)
 		--胜利
 		inst:ListenForEvent("pkc_win", function(world, data) onWin(data, inst) end, GLOBAL.TheWorld)
 		--玩家加入

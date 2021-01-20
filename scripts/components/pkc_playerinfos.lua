@@ -6,6 +6,7 @@
 --Example：
 --PKC_PLAYER_INFOS = {
 --    KU_2312323s1 = {
+--        USERID = KU_2312323s1,
 --        GROUP_ID = 1,
 --        GROUP_COLOR = "",
 --        PLAYER_NAME = "redpig",
@@ -16,6 +17,7 @@
 --        PLAYER_CONTRIBUTION = 100,
 --    },
 --    KU_2312323s2 = {
+--        USERID = KU_2312323s2,
 --        GROUP_ID = 2,
 --        GROUP_COLOR = "",
 --        PLAYER_NAME = "dazhuzhu",

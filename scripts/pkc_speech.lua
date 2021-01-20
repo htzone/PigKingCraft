@@ -69,7 +69,7 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH2 = " 阵营 取得了最后的胜利！！！",
 		},
 		WINDIALOG_WIN_BUTTON = "无敌是多寂寞",
-		WINDIALOG_FAILED_BUTTON = "向黑恶势力低头",
+		WINDIALOG_FAILED_BUTTON = "向大佬们低头",
 		WORLDRESET_TIPS = {
 			SPEECH1 = "注意啦，注意啦 ，世界将在30秒后重置！！！",
 			SPEECH2 = "世界马上重置了，请老老实实待着吧！！！",
@@ -180,7 +180,26 @@ if GetModConfigData("language") == "chinese" then
 		CHAT_QUEUE = {
 			SPEECH1 = "对所有人说",
 			SPEECH2 = "对队伍内说",
-		}
+			SPEECH3 = "[队伍内] ",
+			SPEECH4 = "[所有人] ",
+		},
+		ANNOUNCE_SPEECH = {
+			"小贴士：如果为PVP模式，击杀对面的猪王或是赢得足够高的分数都可以获得比赛的胜利！",
+			"小贴士：按Shift键可以短暂冲刺，按B键可以回城，请善用这两点！",
+			"小贴士：按Y键队伍内聊天，按U键所有人聊天！",
+			"小贴士：按Y键输入 '#投降' 可以发起投降，达到投降最低人数即可投降成功!",
+			"小贴士：通过路牌传送可以很快到达到同组路牌或玩家的附近，减少跑路时间！",
+			"小贴士：善待猪人，猪人们或许能成为你的好帮手！",
+			"小贴士：分组生存对抗，最后剩下的阵营将会是比赛的胜利者！",
+		},
+		SURRENDER_SPEECH = {
+			SPEECH1 = "#投降",
+			SPEECH2 = "#执行结果：无效投票，您已经发起过投降了",
+			SPEECH3 = "#执行结果：发起投降成功 %d / %d， 我们马上就要投降了！！！",
+			SPEECH4 = "#执行结果：发起投降 %d / %d， 最少还差%d个发起才能成功投降",
+			SPEECH5 = "%s 阵营发起了投降，马上就要执行投降操作了！！！",
+			SPEECH6 = "%s 阵营投降成功，%s 阵营已经被消灭了！！！",
+		},
 	}
 	
 	GLOBAL.STRINGS.NAMES.PKC_PIGMAN_BIG = "大猪猪战士" 
@@ -211,8 +230,6 @@ if GetModConfigData("language") == "chinese" then
 	GLOBAL.STRINGS.NAMES.HOMESIGN = "传送牌"
 	GLOBAL.STRINGS.RECIPE_DESC.HOMESIGN = "可以把你传送到其他传送牌附近"
 
-
-	--pkc_pighouse_big
 else
 	GLOBAL.BOSS_NAME = {
 		deerclops = {NAME = "Deerclops"},
@@ -383,9 +400,28 @@ else
 			SPEECH1 = "Be careful! The bearger has come to this world...",
 		},
 		CHAT_QUEUE = {
-			SPEECH1 = "To Every One",
-			SPEECH2 = "To Group",
-		}
+			SPEECH1 = "To Everyone",
+			SPEECH2 = "To Team",
+			SPEECH3 = "[Team] ",
+			SPEECH4 = "[Everyone] ",
+		},
+		ANNOUNCE_SPEECH = {
+			"Tip: You can win the game by killing the hostile pig king or winning enough points!",
+			"Tip：press the 'Shift' key can sprint briefly, press the 'B' key can teleport to the home!",
+			"Tip：Press 'Y' key to chat in the team, press 'U' key to chat with everyone!",
+			"Tip：Press 'Y' to input '#surrender' to initiate a surrender!",
+			"Tip：You can be transmitted to the other signs or players nearby by home sign!",
+			"Tip：Be kind to pig man, pig man may become your good helper!",
+			"Tip：Team survival and confrontation, the last remaining camp will be the winner of the game!",
+		},
+		SURRENDER_SPEECH = {
+			SPEECH1 = "#surrender",
+			SPEECH2 = "#Execution Result: Invalid Vote, You have already initiated a surrender",
+			SPEECH3 = "#Execution result: Surrender Success %d / %d, we will surrender soon!!!",
+			SPEECH4 = "#Execution result: Initiate Surrender %d / %d, at least %d initiators are needed to surrender successfully",
+			SPEECH5 = "%s group initiated the surrender, and the surrender operation will be executed soon!!!",
+			SPEECH6 = "%s group has surrendered, %s was wiped out!!!",
+		},
 	}
 	
 	GLOBAL.STRINGS.NAMES.PKC_PIGMAN_BIG = "(BLU)Pig Man"
