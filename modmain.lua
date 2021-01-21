@@ -112,7 +112,7 @@ modimport("scripts/init/pkc_rules")
 modimport("scripts/init/pkc_announce")
 --玩家积分信息
 modimport("scripts/init/pkc_playerstatus_screen")
-modimport("scripts/init/pkc_wwdxhz")
+--modimport("scripts/init/pkc_wwdxhz")
 --敌对据点
 modimport("scripts/init/pkc_hostilegroup")
 --生物变大

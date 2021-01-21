@@ -177,8 +177,6 @@ function Travelable:MakeInfos()
 		local name = nil
 		if destination:HasTag("player") then
 			name = destination.name
-			print("player name:"..tostring(destination.name))
-			print("player color:"..tostring(getPlayerColorByUserId(destination.userid)))
 		else
 			name = destination.components.writeable and destination.components.writeable:GetText() or "~nil"
 		end

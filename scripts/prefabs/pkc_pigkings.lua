@@ -161,7 +161,6 @@ local function takePigsBackToHome(inst)
 						local homePos = v.components.homeseeker:GetHomePos()
 						if homePos and v:GetPosition():Dist(homePos) > 100 then
 							v.Transform:SetPosition(homePos.x + 1, 0, homePos.z + 1)
-							print("pkc take pig to home...")
 						end
 					end
 				end
