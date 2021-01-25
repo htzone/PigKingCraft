@@ -36,6 +36,9 @@ AddPlayerPostInit(function(l)
     if not l.components.pkc_colourfader then
         l:AddComponent("pkc_colourfader")
     end
+    if l.components and l.components.combat then
+        l.components.combat:SetDamageType(1)
+    end
 end)
 function _G.EntityScript:GetDisplayName()
     local m = self:GetAdjectivedName()

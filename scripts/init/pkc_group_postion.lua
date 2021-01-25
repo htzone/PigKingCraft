@@ -158,6 +158,7 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
 
     -- 世界位置转地图位置
     function MapWidget:WorldPosToMapScreenPos(x, y, z)
+        --local px, _, pz = ThePlayer and ThePlayer:GetPosition():Get() or 0, 0, 0
         local px, _, pz = ThePlayer:GetPosition():Get()
         local dx = x - px
         local dy = z - pz
@@ -183,6 +184,7 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
         local wd = math.sqrt(ox * ox + oy * oy) * self.minimap:GetZoom() / 4.5
         local wa = math.atan2(ox, oy) - angle
         local px, _, pz = ThePlayer:GetPosition():Get()
+        --local px, _, pz = ThePlayer and ThePlayer:GetPosition():Get() or 0, 0, 0
         local wx = px - wd * math.cos(wa)
         local wz = pz + wd * math.sin(wa)
         return wx, 0, wz
@@ -202,7 +204,8 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
         local angle = GLOBAL.TheCamera:GetHeadingTarget() * math.pi / 180
         local wd = math.sqrt(ox * ox + oy * oy) * self.minimap:GetZoom() / 4.5
         local wa = math.atan2(ox, oy) - angle
-        local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
+        local px, _, pz = GLOBAL.ThePlayer and GLOBAL.ThePlayer:GetPosition():Get() or 0, 0, 0
+        --local px, _, pz = GLOBAL.ThePlayer:GetPosition():Get()
         local wx = px - wd * math.cos(wa)
         local wz = pz + wd * math.sin(wa)
         return GLOBAL.Vector3(wx, 0, wz)
@@ -216,15 +219,31 @@ AddClassPostConstruct("screens/mapscreen", function(MapScreen)
     end
 
     local OldOnBecomeInactive = MapScreen.OnBecomeInactive
-    function MapScreen:OnBecomeInactive(...)
+    --function MapScreen:OnBecomeInactive(...)
+    --    --当地图关闭时让图标消失
+    --    self.minimap.nametext:SetString("")
+    --    if self.minimap.mapIcons and next(self.minimap.mapIcons) ~= nil then
+    --        for _, v in pairs(self.minimap.mapIcons) do
+    --            if v then
+    --                v:HideIcon()
+    --            end
+    --        end
+    --    end
+    --    OldOnBecomeInactive(self, ...)
+    --end
+
+    local OldDestroy = MapScreen.OnDestroy
+    function MapScreen:OnDestroy(...)
         --当地图关闭时让图标消失
         self.minimap.nametext:SetString("")
-        for _, v in pairs(self.minimap.mapIcons) do
-            if v then
-                v:HideIcon()
+        if self.minimap.mapIcons and next(self.minimap.mapIcons) ~= nil then
+            for _, v in pairs(self.minimap.mapIcons) do
+                if v then
+                    v:HideIcon()
+                end
             end
         end
-        OldOnBecomeInactive(self, ...)
+        OldDestroy(self, ...)
     end
 end)
 

@@ -12,6 +12,9 @@ local function onAttacked(inst, data)
 		if inst:HasTag("pkc_gohome") then
 			inst:RemoveTag("pkc_gohome")
 		end
+		if inst.sg and inst.sg:HasStateTag("parrying") then
+			return
+		end
 		if data.attacker:HasTag("player") then
 			if math.random() < .7 then
 				if inst.components.grogginess ~= nil then

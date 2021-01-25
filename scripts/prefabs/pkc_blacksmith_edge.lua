@@ -1,7 +1,7 @@
 local a = { Asset("ANIM", "anim/sword_buster.zip"), Asset("ANIM", "anim/swap_sword_buster.zip") }
 local b = { "weaponsparks_fx", "sunderarmordebuff", "superjump_fx", "reticulearc", "reticulearcping" }
 local function c()
-    return Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0))
+    return ThePlayer and Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0)) or Vector3(0, 0, 0)
 end;
 local function d(e, f)
     if f ~= nil then

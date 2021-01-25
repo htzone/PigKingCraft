@@ -28,7 +28,7 @@ return Class(function(self, inst)
 					local winPlayers = data.winPlayers
 					local isWinner = false
 					for userid, _ in pairs(winPlayers) do
-						if ThePlayer.userid == userid then
+						if ThePlayer and ThePlayer.userid == userid then
 							isWinner = true
 							break
 						end

@@ -5,7 +5,6 @@
 --
 
 local TheNet = GLOBAL.TheNet
-local IsServer = TheNet:GetIsServer()
 local require = GLOBAL.require
 
 --取消无敌状态
@@ -78,6 +77,9 @@ AddModRPCHandler("pkc_teleport", "TeleportToBase", function(player, group_id)
 		--如果为随机选队
 		--新加入的玩家只会选择人数最少的队伍，人数相同则随机选择其中一个
 		 group_id = compareGroupPlayerNum(getGroupPlayerNum())
+	end
+	if not player then
+		return
 	end
 	--设置选择的阵营
 	if not player.components.pkc_group then

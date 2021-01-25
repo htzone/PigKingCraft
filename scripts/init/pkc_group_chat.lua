@@ -71,7 +71,7 @@ function chat_queue:OnMessageReceivedForPKC(userid, name, prefab, message, colou
     whisper = not whisper
     if whisper then
         --如果是发起的队伍内会话，则只往聊天消息队列中添加同一队伍的消息
-        if PKC_PLAYER_INFOS[userid] and PKC_PLAYER_INFOS[ThePlayer.userid]
+        if ThePlayer and PKC_PLAYER_INFOS[userid] and PKC_PLAYER_INFOS[ThePlayer.userid]
                 and PKC_PLAYER_INFOS[userid].GROUP_ID == PKC_PLAYER_INFOS[ThePlayer.userid].GROUP_ID then
             self:PushMessageForPKC(self:GetDisplayName(name, prefab), message, colour, whisper, false, profileflair)
         end

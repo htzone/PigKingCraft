@@ -14,12 +14,14 @@ local function h()
     local i = ThePlayer;
     local j = TheWorld.Map;
     local k = Vector3()
-    for l = 7, 0, -.25 do
-        k.x, k.y, k.z = i.entity:LocalToWorldSpace(l, 0, 0)
-        if j:IsPassableAtPoint(k:Get()) and not j:IsGroundTargetBlocked(k) then
-            return k
-        end
-    end ;
+    if i then
+        for l = 7, 0, -.25 do
+            k.x, k.y, k.z = i.entity:LocalToWorldSpace(l, 0, 0)
+            if j:IsPassableAtPoint(k:Get()) and not j:IsGroundTargetBlocked(k) then
+                return k
+            end
+        end ;
+    end
     return k
 end;
 local function m(e, n, k)

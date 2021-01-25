@@ -13,7 +13,7 @@ local function i(g, h)
     h.AnimState:Show("ARM_normal")
 end;
 local function j()
-    return Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0))
+    return ThePlayer and Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0)) or Vector3(0, 0, 0)
 end;
 local function k(g, l)
     if l ~= nil then

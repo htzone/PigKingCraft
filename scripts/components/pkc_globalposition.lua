@@ -46,9 +46,9 @@ local GlobalPosition = Class(function(self, inst)
         self.inittask = nil
         self.globalpositions = TheWorld.net.components.pkc_globalpositions
         self.classified = self.globalpositions:AddServerEntity(self.inst)
-        if isplayer then
-            AddGlobalIcon(inst, self.classified)
-        end
+        --if isplayer then
+        --    AddGlobalIcon(inst, self.classified)
+        --end
         self.inst:StartUpdatingComponent(self)
     end)
 end,

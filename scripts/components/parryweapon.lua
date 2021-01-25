@@ -15,15 +15,16 @@ function a:OnPreParry(d)
         self.onparrystart(self.inst, d)
     end
 end;
-function a:TryParry(d, e, f, g, h)
-    if d.sg then
-        d.sg:PushEvent("try_parry")
+--inst, attacker, damage, weapon, stimuli
+function a:TryParry(inst, attacker, damage, weapon, stimuli)
+    if inst.sg then
+        inst.sg:PushEvent("try_parry")
     end ;
     if self.ontryparry then
-        return self.ontryparry(d, e, f, g, h)
+        return self.ontryparry(inst, attacker, damage, weapon, stimuli)
     end ;
-    local i = e or g;
-    local j = d.Transform:GetRotation() - d:GetAngleToPoint(i.Transform:GetWorldPosition())
+    local i = attacker or weapon;
+    local j = inst.Transform:GetRotation() - inst:GetAngleToPoint(i.Transform:GetWorldPosition())
     if not (math.abs(j) <= 70) then
         return false
     end ;
