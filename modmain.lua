@@ -61,6 +61,15 @@ PrefabFiles = {
     "pkc_ewecushat",
     "pkc_summerbandana",
     "pkc_birchnuthat",
+    "pkc_blacksmith_edge",
+    "pkc_livingstaff",
+    "pkc_healingcircle",
+    "pkc_healingcircle_regenbuff",
+    "pkc_forgedarts",
+    "pkc_weaponsparks_fx",
+    "pkc_infernalstaff",
+    "pkc_forge_fireball_projectile",
+    "pkc_infernalstaff_meteor",
 }
 
 Assets = {
@@ -68,6 +77,12 @@ Assets = {
     Asset("ATLAS", "images/inventoryimages/pkc_ewecushat.xml"),
     Asset("ATLAS", "images/inventoryimages/pkc_summerbandana.xml"),
     Asset("ATLAS", "images/inventoryimages/pkc_birchnuthat.xml"),
+    Asset("ATLAS", "images/inventoryimages/pkc_livingstaff.xml"),
+    Asset("IMAGE", "images/inventoryimages/pkc_livingstaff.tex"),
+    Asset("ATLAS", "images/inventoryimages/pkc_forgedarts.xml"),
+    Asset("IMAGE", "images/inventoryimages/pkc_forgedarts.tex"),
+    Asset("ATLAS", "images/inventoryimages/pkc_infernalstaff.xml"),
+    Asset("IMAGE", "images/inventoryimages/pkc_infernalstaff.tex"),
 }
 --modimport("scripts/newxiugai")
 
@@ -124,8 +139,9 @@ modimport("scripts/init/pkc_group_postion")
 modimport("scripts/init/pkc_group_chat")
 --投降机制
 modimport("scripts/init/pkc_surrender")
+--职业系统
+modimport("scripts/init/pkc_player_career")
 --怪物入侵
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
---人物修改部分

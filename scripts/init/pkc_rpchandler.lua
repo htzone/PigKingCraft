@@ -64,6 +64,9 @@ local function compareGroupPlayerNum(groupPlayerNum)
 		end	
 	end
 	--多个则随机选择其中一个
+	if next(minNumGroup) == nil then
+		return GLOBAL.PKC_GROUP_INFOS["REDPIG"].id
+	end
 	return GLOBAL.PKC_GROUP_INFOS[minNumGroup[math.random(#minNumGroup)]].id
 end
 

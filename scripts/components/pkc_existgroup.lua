@@ -60,6 +60,7 @@ function PKC_EXISTGROUP:OnLoad(data)
 	if data ~= nil then
 		if data.existGroups ~= nil then
 			self.existGroups = json.decode(data.existGroups)
+			self._existGroups:set(data.existGroups)
 		end
 	end
 end
