@@ -117,26 +117,31 @@ local function produceSingleBase(previousPos, groupId)
 	local pighousePrefab = nil
 	local eyetuuretPrefab = nil
 	local homesignPrefab = nil
+	local chestPrefab = nil
 	if groupId == GROUP_BIGPIG_ID then
 		pigking = produceSingleUtil("pkc_bigpig", pos, Vector3(-3, 0, -3))
 		pighousePrefab = "pkc_pighouse_big"
 		eyetuuretPrefab = "pkc_eyeturret_big"
 		homesignPrefab = "pkc_homesign_big"
+		chestPrefab = "pkc_largechest_big"
 	elseif groupId == GROUP_REDPIG_ID then
 		pigking = produceSingleUtil("pkc_redpig", pos, Vector3(-3, 0, -3))
 		pighousePrefab = "pkc_pighouse_red"
 		eyetuuretPrefab = "pkc_eyeturret_red"
 		homesignPrefab = "pkc_homesign_red"
+		chestPrefab = "pkc_largechest_red"
 	elseif groupId == GROUP_LONGPIG_ID then
 		pigking = produceSingleUtil("pkc_longpig", pos, Vector3(-3, 0, -3))
 		pighousePrefab = "pkc_pighouse_long"
 		eyetuuretPrefab = "pkc_eyeturret_long"
 		homesignPrefab = "pkc_homesign_long"
+		chestPrefab = "pkc_largechest_long"
 	elseif groupId == GROUP_CUIPIG_ID then
 		pigking = produceSingleUtil("pkc_cuipig", pos, Vector3(-3, 0, -3))
 		pighousePrefab = "pkc_pighouse_cui"
 		eyetuuretPrefab = "pkc_eyeturret_cui"
 		homesignPrefab = "pkc_homesign_cui"
+		chestPrefab = "pkc_largechest_cui"
 	end
 	
 	--清理
@@ -145,8 +150,8 @@ local function produceSingleBase(previousPos, groupId)
 	--安置建筑
 	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM, true) --猪人房
 	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM, false) --眼球塔
-	pkc_roundSpawnForWriteable(pigking, homesignPrefab, 9, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26, true) --传送牌
-	
+	--pkc_roundSpawnForWriteable(pigking, homesignPrefab, 9, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26, true) --传送牌
+	pkc_roundSpawnForMulti(pigking, {homesignPrefab, chestPrefab}, 8, PKC_SPEECH.GROUP_SIGN.SPEECH26, true)
 	return pos
 end
 

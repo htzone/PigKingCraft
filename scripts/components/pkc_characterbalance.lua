@@ -13,13 +13,23 @@ local function setRunSpeed(player, speed)
     end
 end
 
+--平衡威尔逊
+local function balanceWilson(self)
+    if not self.inst.components.health then
+        self.inst:AddComponent("health")
+    end
+    if not self.inst.components.health:IsDead() then
+        self.inst.components.health:StartRegen(1, 1)
+    end
+end
+
 --平衡老奶奶
 local function balanceWickerbottom(self)
     --self.inst.components.builder:UnlockRecipe("book_sleep")
     if not self.inst.components.sanity then
         self.inst:AddComponent("sanity")
     end
-    self.inst.components.sanity.dapperness = TUNING.DAPPERNESS_MED_LARGE
+    self.inst.components.sanity.dapperness = TUNING.DAPPERNESS_LARGE
 end
 
 --平衡小丑
@@ -28,7 +38,7 @@ local function balancewWes(self)
     if not self.inst.components.sanityaura then
         self.inst:AddComponent("sanityaura")
     end
-    self.inst.components.sanityaura.aura = TUNING.SANITYAURA_MED
+    self.inst.components.sanityaura.aura = TUNING.SANITYAURA_LARGE
 end
 
 local PKC_CHARACTER_BALANCE = Class(function(self, inst)
@@ -52,6 +62,8 @@ function PKC_CHARACTER_BALANCE:Balance()
             balanceWickerbottom(self)
         elseif self.inst.prefab == "wes" then --小丑
             balancewWes(self)
+        elseif self.inst.prefab == "wilson" then --威尔逊
+            balanceWilson(self)
         end
     end
 end

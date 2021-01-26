@@ -149,7 +149,6 @@ local function changeAbigailTarget(inst)
 		if inst.components.combat and inst.components.aura and inst.auratest then
 			local old_auratest = inst.auratest
 			if not old_auratest then
-				print("pkc: old_auratest is nil.")
 				return
 			end
 			local function new_auratest(inst, target)
@@ -198,7 +197,83 @@ for _, v in pairs(tradable_item) do
 end
 
 
+local function PKC_LARGE_CHEST_CREATION(widgetanimbank, widgetpos, slot_x, slot_y, posslot_x, posslot_y)
+	local params = {}
+	params.pkc_largechest_big = {
+		widget = {
+			slotpos = {},
+			animbank = widgetanimbank,
+			animbuild = widgetanimbank,
+			pos = widgetpos,
+			side_align_tip = 160,
+		},
+		type = "chest",
+	}
+	params.pkc_largechest_red = {
+		widget = {
+			slotpos = {},
+			animbank = widgetanimbank,
+			animbuild = widgetanimbank,
+			pos = widgetpos,
+			side_align_tip = 160,
+		},
+		type = "chest",
+	}
+	params.pkc_largechest_cui = {
+		widget = {
+			slotpos = {},
+			animbank = widgetanimbank,
+			animbuild = widgetanimbank,
+			pos = widgetpos,
+			side_align_tip = 160,
+		},
+		type = "chest",
+	}
+	params.pkc_largechest_long = {
+		widget = {
+			slotpos = {},
+			animbank = widgetanimbank,
+			animbuild = widgetanimbank,
+			pos = widgetpos,
+			side_align_tip = 160,
+		},
+		type = "chest",
+	}
 
+	for y = slot_y, 0, -1 do
+		for x = 0, slot_x do
+			table.insert(params.pkc_largechest_big.widget.slotpos, GLOBAL.Vector3(80 * x - 346 * 2 + posslot_x, 80 * y - 100 * 2 + posslot_y, 0))
+			table.insert(params.pkc_largechest_red.widget.slotpos, GLOBAL.Vector3(80 * x - 346 * 2 + posslot_x, 80 * y - 100 * 2 + posslot_y, 0))
+			table.insert(params.pkc_largechest_cui.widget.slotpos, GLOBAL.Vector3(80 * x - 346 * 2 + posslot_x, 80 * y - 100 * 2 + posslot_y, 0))
+			table.insert(params.pkc_largechest_long.widget.slotpos, GLOBAL.Vector3(80 * x - 346 * 2 + posslot_x, 80 * y - 100 * 2 + posslot_y, 0))
+		end
+	end
+
+	local containers = require "containers"
+	containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, params.pkc_largechest_big.widget.slotpos ~= nil and #params.pkc_largechest_big.widget.slotpos or 0)
+
+	local old_widgetsetup = containers.widgetsetup
+	function containers.widgetsetup(container, prefab, ...)
+		local pref = prefab or container.inst.prefab
+		if pref == "pkc_largechest_big"
+				or pref == "pkc_largechest_red"
+				or pref == "pkc_largechest_cui"
+				or pref == "pkc_largechest_long" then
+			local t = params[pref]
+			if t ~= nil then
+				for k, v in pairs(t) do
+					container[k] = v
+				end
+				container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
+			end
+		else
+			return old_widgetsetup(container, prefab, ...)
+		end
+	end
+end
+
+--制造大箱子
+PKC_LARGE_CHEST_CREATION("ui_chest_5x16", GLOBAL.Vector3(360 - (80 * 4.5), 160, 0), 15, 4, 91, 42)
 
 
 

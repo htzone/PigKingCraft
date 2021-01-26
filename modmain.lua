@@ -70,6 +70,7 @@ PrefabFiles = {
     "pkc_infernalstaff",
     "pkc_forge_fireball_projectile",
     "pkc_infernalstaff_meteor",
+    "pkc_largechest",
 }
 
 Assets = {
@@ -145,3 +146,6 @@ modimport("scripts/init/pkc_player_career")
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
+
+
+--minotaurchest

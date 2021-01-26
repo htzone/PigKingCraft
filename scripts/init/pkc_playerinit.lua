@@ -42,10 +42,6 @@ AddPlayerPostInit(function(player)
 		--player:AddComponent("pkc_playerscore")
 		--添加头部显示组件
 		player:AddComponent("pkc_headshow")
-		--玩家复活任务
-		player:AddComponent("pkc_playerrevivetask")
-		--角色平衡
-		player:AddComponent("pkc_characterbalance")
 		--玩家可传送
 		player:AddTag("pkc_travelable")
 		--计时器
@@ -64,6 +60,10 @@ AddPlayerPostInit(function(player)
 			end
 		end)
 		if IsServer then
+			--玩家复活任务
+			player:AddComponent("pkc_playerrevivetask")
+			--角色平衡
+			player:AddComponent("pkc_characterbalance")
 			--出生提示属于哪个阵营（前提是已选择了阵营）
 			player:DoTaskInTime(6, function()
 				for _,v in pairs(GLOBAL.PKC_GROUP_INFOS) do
@@ -97,4 +97,12 @@ function simpleKeyHandler:OnRawKey(key, down, inst)
 		end
 	end
 end
+
+--防止死亡崩溃
+AddStategraphPostInit("wilson", function(sg)
+	local sgDeath = sg.states["death"]
+	sgDeath.onexit = function(inst)
+		--doNothing...
+	end
+end)
 

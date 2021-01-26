@@ -17,11 +17,11 @@
 	--维斯初始物品
 	TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT.WES = {"tophat"}
 	--温蒂初始物品
-	TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT.WENDY = {"abigail_flower", "pkc_livingstaff", "pkc_forgedarts", "pkc_blacksmith_edge", "pkc_infernalstaff"}
+	--TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT.WENDY = {"abigail_flower", "pkc_livingstaff", "pkc_forgedarts", "pkc_blacksmith_edge", "pkc_infernalstaff"}
 	--维斯伤害系数
-	TUNING.WES_DAMAGE_MULT = 0.95
+	TUNING.WES_DAMAGE_MULT = 0.90
 	--温蒂生命值
-	TUNING.WENDY_HEALTH = TUNING.WILSON_HEALTH * 0.8
+	TUNING.WENDY_HEALTH = TUNING.WILSON_HEALTH
 	--阿比阿盖尔生命值
 	TUNING.ABIGAIL_HEALTH = TUNING.WILSON_HEALTH * 4
 	--读触手书消耗的脑残
@@ -102,7 +102,7 @@
 	--回城精神消耗
 	GLOBAL.GOHOME_SANITY_DELTA = 15
 	--回城饥饿消耗
-	GLOBAL.GOHOME_HUNGER_DELTA = 15
+	GLOBAL.GOHOME_HUNGER_DELTA = 10
 	--冲刺饥饿消耗
 	GLOBAL.SPRINT_HUNGER_DELTA = 5
 	--战斗猪人初始攻击力

@@ -188,14 +188,7 @@ local function OnAttacked(inst, data)
         elseif inst:HasTag("guard") then
             inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, attacker:HasTag("pig") and IsGuardPig or IsPig, MAX_TARGET_SHARES)
         elseif not (attacker:HasTag("pig") and attacker:HasTag("guard")) then
-            if not inst.components.pkc_group then
-                --print("pkc_pig..attacker:"..tostring(attacker.prefab))
-                inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, function(dude)
-                    return dude:HasTag("pig") and not dude:HasTag("werepig")
-                            and not dude.components.pkc_group
-                end, MAX_TARGET_SHARES)
-            else
-                --print("pkc_pig..attacker:"..tostring(attacker.prefab))
+            if inst.components.pkc_group then
                 inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST,
                         function(dude)
                             local fn_result = dude:HasTag("pig") and not dude:HasTag("werepig")
@@ -246,14 +239,16 @@ local function NormalRetargetFn(inst)
 	local dist = PIG_TARGET_DIST
 	local invader = nil
 	invader = FindEntity(inst, dist, function(guy)
+        if not inst or not guy then
+            return false
+        end
 		if not inst.components.pkc_group then
 			return guy:HasTag("monster") and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
 		end
-        ----不能以同队作为目标
-        --if guy and guy.components.pkc_group
-        --        and guy:HasTag("pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())) then
-        --    return false
-        --end
+        ----不能以同队的眼球塔作为目标
+        if guy:HasTag("eyeturret") and guy:HasTag("pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())) then
+            return false
+        end
         --
         ----不能以同队的随从为目标
         --if guy and guy.components.follower then
@@ -265,7 +260,7 @@ local function NormalRetargetFn(inst)
         --end
 
         --以敌对成员的随从为目标
-        if guy and guy.components.follower then
+        if guy.components.follower then
             local leader = guy.components.follower.leader
             if leader and leader.components.pkc_group and inst and inst.components.pkc_group
                     and leader.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup() then

@@ -481,6 +481,54 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clea
     end
 end
 
+--环绕安置多个不同物品
+--@RedPig 12-15
+--@param target 作为中心点的物体
+--@param prefab_name prefab名称
+--@param radius	半径
+--@param mode 需要安置的数量
+function pkc_roundSpawnForMulti(target, prefabNames, radius, text, clear)
+    if prefabNames and next(prefabNames) ~= nil then
+        local pos = Vector3(target.Transform:GetWorldPosition())
+        local num = #prefabNames
+        local attempt_angle = (2 * PI) / num
+        local tmp_angles = {}
+        for i = 0, num - 1 do
+            local a = i * attempt_angle
+            if a > PI then
+                a = a - (2 * PI)
+            end
+            table.insert(tmp_angles, a)
+        end
+        local theta = math.random() * 2 * PI
+        for i, attempt in ipairs(tmp_angles) do
+            local check_angle = theta + attempt
+            if check_angle > 2 * PI then
+                check_angle = check_angle - 2 * PI
+            end
+            local offset = Vector3(radius * math.cos(check_angle), 0, -radius * math.sin(check_angle))
+            local tmp_pos = pos + offset
+            local valid_tile = TheWorld.Map:IsAboveGroundAtPoint(tmp_pos.x, tmp_pos.y, tmp_pos.z, false)
+            if valid_tile then
+                local mob = SpawnPrefab(prefabNames[i])
+                if mob then
+                    if mob.components.writeable then
+                        mob.components.writeable:SetText(text)
+                    end
+                    mob.Transform:SetPosition(tmp_pos:Get())
+                    if clear then
+                        clearNear(mob, 2, function(item) return not item:HasTag("pkc_defences") end)
+                    end
+                    if mob:HasTag("pkc_defences") then
+                        mob.ownername = "RedPig"
+                        mob.ownerid = "Fuckyou"
+                    end
+                end
+            end
+        end
+    end
+end
+
 function pkc_roundSpawn(target, prefab_name, radius, num, clear)
     pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "", clear)
 end

@@ -73,17 +73,25 @@ local function IsNearDanger(traveller)
 	--	nil,
 	--	{"monster", "_combat"})
 
+	--local entity = FindEntity(
+	--	traveller,
+	--	10,
+	--	function(target)
+	--		return (target.components.combat ~= nil and target.components.combat.target == traveller)
+	--				or (target.components.pkc_group and traveller.components.pkc_group
+	--				and not traveller.components.pkc_group:isSameGroup(target))
+	--	end,
+	--	nil,
+	--	nil,
+	--	{"monster", "_combat"})
 	local entity = FindEntity(
-		traveller,
-		10,
-		function(target)
-			return (target.components.combat ~= nil and target.components.combat.target == traveller)
-					or (target.components.pkc_group and traveller.components.pkc_group
-					and not traveller.components.pkc_group:isSameGroup(target))
-		end,
-		nil,
-		nil,
-		{"monster", "_combat"})
+			traveller,
+			14,
+			function(target)
+				return target.components.pkc_group and traveller.components.pkc_group
+						and not traveller.components.pkc_group:isSameGroup(target)
+			end,
+			{ "_combat" })
 	return entity ~= nil
 end
 

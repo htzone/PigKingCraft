@@ -86,6 +86,10 @@ local function retargetfn(inst)
             if guy == nil or not inst.components.combat:CanTarget(guy) then
                 return false
             end
+            if guy:HasTag("pkc_pigman") and guy.components.pkc_group
+                    and guy.components.pkc_group:isSameGroup(inst) then
+                return false
+            end
             --以敌对成员的随从为目标
             if guy.components.follower then
                 local leader = guy.components.follower.leader

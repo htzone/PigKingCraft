@@ -237,7 +237,7 @@ local function AutoPicKGroundItemAction(inst)
                     return false
                 end
                 --且不能是有容器的
-                if inventoryItem:GetContainer() ~= nil then
+                if inventoryItem:GetContainer() ~= nil or item:HasTag("backpack") then
                     return false
                 end
                 --且不能是活的会动的

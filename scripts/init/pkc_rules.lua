@@ -143,6 +143,23 @@ AddComponentPostInit("health", function(self, inst)
 	end
 end)
 
+--猪人不共享不必要仇恨
+AddComponentPostInit("combat", function(self, inst)
+	self.OldShareTarget = self.ShareTarget
+	if GLOBAL.TheWorld.ismastersim then
+		function self:ShareTarget(target, ...)
+			if self.inst and self.inst.prefab
+					and self.inst.prefab == "pigman"
+					and not self.inst:HasTag("werepig")
+					and not self.inst:HasTag("guard") then
+				--Do not Share...
+				return
+			end
+			return self:OldShareTarget(target, ...)
+		end
+	end
+end)
+
 --设置游戏中不存在的物品
 local cantExistPrefabs = {
 "pigking", --猪王

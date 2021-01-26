@@ -362,7 +362,7 @@ local function fn(groupId)
 
     inst:AddTag("structure")
 	inst:AddTag("pkc_defences") --标记为防御设施
-	inst:AddTag("pkc_group"..groupId) --队伍标记
+	inst:AddTag("pkc_group"..tostring(groupId)) --队伍标记
     inst:AddTag("pighouse")
 
     MakeSnowCoveredPristine(inst)
