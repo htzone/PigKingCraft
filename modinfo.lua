@@ -1,8 +1,8 @@
 -- This information tells other players more about the mod
-name = "111猪王争霸(PigKingCraft)开发版III"
+name = "111猪王争霸(PigKingCraft)(开发版)III"
 description = [[
 <饥荒分组生存与对抗>
-允许你和你的队友一起对抗其他队伍的成员，最多可分四组，保卫你的猪王，并通过生存和对抗得分赢得这场比赛的胜利。
+允许你和你的队友一起对抗其他队伍的成员，最多可分四组，保卫你的猪王，并通过生存和对抗得分赢得比赛的胜利。
 <重要>
 ★需要在无尽和玩家对战模式下开启该模组。
 ★按Shift键冲刺，C键回城，Y键队伍聊天，U键所有人聊天，按Y输入#投降 即可发起投降。
@@ -17,7 +17,7 @@ You can configure other setting in the module configuration page.↓↓↓
 ]]
 --"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你." 猪王如是说...
 author = "RedPig, 大猪猪"
-version = "3.0.5"
+version = "3.0.6"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
@@ -175,7 +175,7 @@ configuration_options =
 			{description = "5", data = 5, hover = "Eyeturret num near pigking"},
 			{description = "6", data = 6, hover = "Eyeturret num near pigking"},
         },
-        default = 4,
+        default = 6,
     },
 	{
         name = "init_pighouse_num",

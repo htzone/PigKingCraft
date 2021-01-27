@@ -49,7 +49,7 @@ AddComponentPostInit("playerspawner", function(OnPlayerSpawn, inst)
 				--第一次进入游戏
 				makePlayerInvincible(player)
 			else
-				--如果队伍已被消灭，重新选人
+				--如果队伍已被消灭，重新选人(中途退出，回来队伍被消灭了的情况)
 				if not isMyGroupExist(player.components.pkc_group:getChooseGroup()) then
 					player:DoTaskInTime(2, function()
 						if player and player.components.talker then

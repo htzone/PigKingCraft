@@ -36,6 +36,10 @@ end
 --玩家初始化
 AddPlayerPostInit(function(player)
 	if player then
+		if player.MiniMapEntity then
+			player.MiniMapEntity:SetDrawOverFogOfWar(false)
+			player.MiniMapEntity:SetEnabled(false)
+		end
 		--添加分组组件
 		player:AddComponent("pkc_group")
 		--添加玩家得分组件

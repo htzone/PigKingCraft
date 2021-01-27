@@ -157,6 +157,7 @@ function containsKey(checkTable, key)
     return false
 end
 
+--检查table是否包含某值
 function containsValue(checkTable, value)
     for _, v in pairs(checkTable) do
         if v == value then
@@ -470,7 +471,7 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clea
                 end
                 mob.Transform:SetPosition(tmp_pos:Get())
                 if clear then
-                    clearNear(mob, 2, function(item) return not item:HasTag("pkc_defences") end)
+                    clearNear(mob, 2, function(item) return item and not item:HasTag("pkc_defences") end)
                 end
                 if mob:HasTag("pkc_defences") then
                     mob.ownername = "RedPig"
@@ -517,7 +518,7 @@ function pkc_roundSpawnForMulti(target, prefabNames, radius, text, clear)
                     end
                     mob.Transform:SetPosition(tmp_pos:Get())
                     if clear then
-                        clearNear(mob, 2, function(item) return not item:HasTag("pkc_defences") end)
+                        clearNear(mob, 2, function(item) return item and not item:HasTag("pkc_defences") end)
                     end
                     if mob:HasTag("pkc_defences") then
                         mob.ownername = "RedPig"
@@ -698,7 +699,8 @@ function isSameGroup(inst1, inst2)
             and inst1.components.pkc_group:getChooseGroup() == inst2.inst.components.pkc_group:getChooseGroup()
 end
 
-function removeByValue(list, value, removeAll)
+--根据值删除table中的元素
+function pkc_removeByValue(list, value, removeAll)
     local deleteNum, i, max = 0, 1, #list
     while i <= max do
         if list[i] == value then

@@ -47,15 +47,15 @@ local RUN_AWAY_DIST = 5
 local STOP_RUN_AWAY_DIST = 8
 
 --猪人能看到箱子的最大距离
-local SEE_CHEST_DIST = 20
+local SEE_CHEST_DIST = 15
 --猪人能看到地上物品的最大距离
 local SEE_GROUND_ITEM_DIST = 8
 --猪人帮忙采集的最大距离
 local SEE_HARVEST_ITEM_DIST = 15
 --猪人自动采集的最大距离
-local SEE_AUTO_HARVEST_DIST = 20
+local SEE_AUTO_HARVEST_DIST = 15
 --猪人自动施肥最大距离
-local SEE_NEED_MANURE_DIST = 20
+local SEE_NEED_MANURE_DIST = 15
 
 local function ShouldRunAway(inst, target)
     return not inst.components.trader:IsTryingToTradeWithMe(target)

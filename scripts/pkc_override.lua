@@ -4,6 +4,7 @@
 -- Date: 2020/03/13
 --
 
+--重写网络会话
 local whisperTag = "[pkc_w]"
 function Networking_Say(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)
     if message ~= nil and message:utf8len() > MAX_CHAT_INPUT_LENGTH then
@@ -39,3 +40,17 @@ function Networking_Say(guid, userid, name, prefab, message, colour, whisper, is
         end
     end
 end
+
+--重写GetDistanceSqToInst，防止assert崩溃
+local entity_script = EntityScript
+entity_script.GetDistanceSqToInst = function(self, inst)
+    if self:IsValid() and inst:IsValid() then
+        local p1x, p1y, p1z = self.Transform:GetWorldPosition()
+        local p2x, p2y, p2z = inst.Transform:GetWorldPosition()
+        return distsq(p1x, p1z, p2x, p2z)
+    else
+        return 999
+    end
+end
+
+

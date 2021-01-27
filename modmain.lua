@@ -85,13 +85,12 @@ Assets = {
     Asset("ATLAS", "images/inventoryimages/pkc_infernalstaff.xml"),
     Asset("IMAGE", "images/inventoryimages/pkc_infernalstaff.tex"),
 }
---modimport("scripts/newxiugai")
 
 local require = GLOBAL.require
 --自定义工具函数（常用的工具函数放这里）
 require "pkc_utils"
---覆写网络函数
-require "pkc_networking_override"
+--覆写函数
+require "pkc_override"
 --木牌传送
 modimport("scripts/mods/pkc_fasttravel")
 --属性显示
@@ -126,14 +125,13 @@ modimport("scripts/init/pkc_producebase")
 modimport("scripts/init/pkc_rules")
 --自动公告
 modimport("scripts/init/pkc_announce")
---玩家积分信息
+--玩家积分板信息
 modimport("scripts/init/pkc_playerstatus_screen")
 --modimport("scripts/init/pkc_wwdxhz")
 --敌对据点
 modimport("scripts/init/pkc_hostilegroup")
 --生物变大
 modimport("scripts/init/pkc_mobtobig")
---modimport("scripts/init/pkc_studypy")
 --地图分组显示
 modimport("scripts/init/pkc_group_postion")
 --分组会话
@@ -146,6 +144,3 @@ modimport("scripts/init/pkc_player_career")
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
-
-
---minotaurchest

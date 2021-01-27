@@ -4,12 +4,17 @@
 -- Date: 2021/1/20
 --
 
+----该方案未考虑玩家中途离开房间的情况----
+
+--存储玩家投降的列表
 pkc_surrender_list = {}
---{
+--example：{
 --    groupId1 = {userid1, userid2},
 --    groupId2 = {userid1, userid2},
 --    ...
 --}
+
+--获取需要投降的数目（发起超过一定数量才能成功投降）
 local function getNeedValidSurrenderNum(totalGroupPlayerNum)
     if totalGroupPlayerNum == 0 or totalGroupPlayerNum == 1 then
         return 1
@@ -25,33 +30,37 @@ local OldNetworking_Say = GLOBAL.Networking_Say
 GLOBAL.Networking_Say = function(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)
     if message and startWith(message, "#") then
         --命令模式
+        --投降
         if message == PKC_SPEECH.SURRENDER_SPEECH.SPEECH1
                 or message == "#touxiang"
                 or message == "#surrender"
-                or message == "#sur" then
+                or message == "#sur"
+                or message == "#gg" then
             local groupId = getGroupIdByUserId(userid)
-            local group_surrender_list = pkc_surrender_list[groupId] --每个队伍的投降名单
+            local group_surrender_list = pkc_surrender_list[groupId] --获取队伍的投降名单
+
+            --检查是否已经投过票
             if group_surrender_list and next(group_surrender_list) ~= nil then
                 if containsValue(group_surrender_list, userid) then
                     --无效投票
                     message = PKC_SPEECH.SURRENDER_SPEECH.SPEECH2
                     return OldNetworking_Say(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)
                 else
-                    --有效投票
+                    --不是则插入有效投票
                     table.insert(group_surrender_list, userid)
                 end
             else
-                pkc_surrender_list[groupId] = {userid} --没有则初始化一个
+                pkc_surrender_list[groupId] = { userid } --没有则初始化一个
             end
 
             --检查是否投票成功
-            local totalGroupPlayerNum = getGroupPlayerNumByGroupId(groupId)
-            local needValidSurrenderNum = getNeedValidSurrenderNum(totalGroupPlayerNum)
-            local hasSurrenderNum = #(pkc_surrender_list[groupId])
+            local totalGroupPlayerNum = getGroupPlayerNumByGroupId(groupId) --获取队伍的总人数
+            local needValidSurrenderNum = getNeedValidSurrenderNum(totalGroupPlayerNum) --获取需要的有效投票数
+            local hasSurrenderNum = #(pkc_surrender_list[groupId]) --队伍已经投降的人数
             if hasSurrenderNum >= needValidSurrenderNum then
                 --投票成功
                 message = string.format(PKC_SPEECH.SURRENDER_SPEECH.SPEECH3, hasSurrenderNum, totalGroupPlayerNum)
-                GLOBAL.TheWorld:PushEvent("pkc_surrender", {group_id = groupId, user_id = userid})
+                GLOBAL.TheWorld:PushEvent("pkc_surrender", { group_id = groupId, user_id = userid })
             else
                 --仍需投票
                 local remainSurrenderNum = needValidSurrenderNum - hasSurrenderNum
