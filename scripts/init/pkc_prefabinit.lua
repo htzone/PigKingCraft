@@ -76,7 +76,7 @@ local function grow(inst)
 		if inst.components.pkc_group then
 			local level = getPigkingLevel(inst.components.pkc_group:getChooseGroup())
 			local scale = 1 + 0.05 * level
-			local damage = GLOBAL.PKC_PIGMAN_DAMAGE + (0.1 * GLOBAL.PKC_PIGMAN_DAMAGE) * level
+			local damage = GLOBAL.PKC_PIGMAN_DAMAGE + (0.05 * GLOBAL.PKC_PIGMAN_DAMAGE) * level
 			local health = GLOBAL.PKC_PIGMAN_HEALTH + (0.1 * GLOBAL.PKC_PIGMAN_HEALTH) * level
 			local attack_period = GLOBAL.PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
 			inst.Transform:SetScale(scale, scale, scale)
@@ -275,5 +275,40 @@ end
 --制造大箱子
 PKC_LARGE_CHEST_CREATION("ui_chest_5x16", GLOBAL.Vector3(360 - (80 * 4.5), 160, 0), 15, 4, 91, 42)
 
+--放置队伍专属的眼球塔
+AddPrefabPostInit("eyeturret_item", function(inst)
+	if not GLOBAL.TheWorld.ismastersim then
+		return
+	end
+	if inst.components.deployable then
+		local oldDeploy = inst.components.deployable.ondeploy
+		inst.components.deployable.ondeploy = function(inst, pt, deployer)
+			if deployer and deployer.components.pkc_group then
+				local turret = SpawnPrefab("eyeturret")
+				local groupId = deployer.components.pkc_group:getChooseGroup()
+				if groupId == GROUP_BIGPIG_ID then
+					turret = SpawnPrefab("pkc_eyeturret_big")
+				elseif groupId == GROUP_REDPIG_ID then
+					turret = SpawnPrefab("pkc_eyeturret_red")
+				elseif groupId == GROUP_LONGPIG_ID then
+					turret = SpawnPrefab("pkc_eyeturret_long")
+				elseif groupId == GROUP_CUIPIG_ID then
+					turret = SpawnPrefab("pkc_eyeturret_cui")
+				end
+				if turret ~= nil then
+					turret.Physics:SetCollides(false)
+					turret.Physics:Teleport(pt.x, 0, pt.z)
+					turret.Physics:SetCollides(true)
+					turret:syncanim("place")
+					turret:syncanimpush("idle_loop", true)
+					turret.SoundEmitter:PlaySound("dontstarve/common/place_structure_stone")
+					inst:Remove()
+				end
+			else
+				return oldDeploy(inst, pt, deployer)
+			end
+		end
+	end
+end)
 
 

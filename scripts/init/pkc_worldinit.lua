@@ -158,8 +158,8 @@ end
 
 --监听死亡
 local function onEntityDied(data, inst)
-	if data and data.inst and data.afflicter and not data.inst.pkc_hasKilled then
-		data.inst.pkc_hasKilled = true
+	if data and data.inst and data.afflicter and not data.inst.pkc_hasBeKilled then
+		data.inst.pkc_hasBeKilled = true
 		--击杀者必须有队伍才能得分
 		if data.afflicter.components.pkc_group then
 			local killer_group_id = data.afflicter.components.pkc_group:getChooseGroup()

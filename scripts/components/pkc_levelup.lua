@@ -8,7 +8,7 @@ local _G = _G or GLOBAL
 local function checkLevelUp(self, currentScore)
 	local needLevelUpScore = WIN_SCORE / self.level_num
 	local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
-	if currentLevel ~= self.level and currentLevel > self.level then
+	if currentLevel > self.level then
 		self.inst:PushEvent("pkc_pigkingLevelUp", { pigking = self.inst, level = currentLevel})
 		self.level = currentLevel
 	end
@@ -17,14 +17,13 @@ end
 local PKC_LEVEL_UP = Class(function(self, inst)
 	self.inst = inst 
 	self.currentScore = nil
-	self.level_num = 10
+	self.level_num = #(PIGKING_LEVEL_CONSTANT)
 	self.level = 1
 	
 end)
 
 function PKC_LEVEL_UP:init()
 	self.inst:DoPeriodicTask(10, function()
-		local needLevelUpScore = WIN_SCORE / self.level_num
 		if self.inst:HasTag("pkc_group1") then
 			checkLevelUp(self, _G.GROUP_SCORE.GROUP1_SCORE)
 		elseif self.inst:HasTag("pkc_group2") then

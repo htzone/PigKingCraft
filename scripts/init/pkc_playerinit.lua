@@ -2,9 +2,10 @@
 --@description 玩家初始化
 --@author 大猪猪，redpig
 --@date 2016-10-23
+
 local TheNet = GLOBAL.TheNet
-local IsServer = TheNet:GetIsServer()
 local TheInput = GLOBAL.TheInput
+local IsServer = TheNet:GetIsServer()
 
 --当玩家被攻击时有一定几率虚弱
 local function onAttacked(inst, data)
@@ -48,10 +49,6 @@ AddPlayerPostInit(function(player)
 		player:AddComponent("pkc_headshow")
 		--玩家可传送
 		player:AddTag("pkc_travelable")
-		--计时器
-		if not player.components.timer then
-			player:AddComponent("timer")
-		end
 		player.runTag = true
 		--处理按键
 		if not GLOBAL.TheNet:IsDedicated() then
@@ -64,6 +61,10 @@ AddPlayerPostInit(function(player)
 			end
 		end)
 		if IsServer then
+			--计时器
+			if not player.components.timer then
+				player:AddComponent("timer")
+			end
 			--玩家复活任务
 			player:AddComponent("pkc_playerrevivetask")
 			--角色平衡

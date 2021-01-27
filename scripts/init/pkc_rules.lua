@@ -232,24 +232,28 @@ GLOBAL.ACTIONS.DEPLOY.fn = function(act)
 	if GLOBAL.TheWorld.ismastersim == false then return old_DEPLOY(act) end
     local pos = act:GetActionPoint()
 	if act and act.doer and pos and act.invobject and act.invobject.prefab then
-		if string.find(act.invobject.prefab, "wall_") then
-			if ifBuildWallNearPigking(act) then
-				act.doer:DoTaskInTime(0, function ()	
-					if act.doer and act.doer.components.talker then
-						act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH5)
-					end
-				end)
-				return false
-			end
-		end
 		if act.doer.components.pkc_group then
+			if string.find(act.invobject.prefab, "wall_") then
+				if ifBuildWallNearPigking(act) then
+					act.doer:DoTaskInTime(0, function ()
+						if act.doer and act.doer.components.talker then
+							act.doer.components.talker:Say(GLOBAL.PKC_SPEECH.PIGKING_PROTECT.SPEECH5)
+						end
+					end)
+					return false
+				end
+			end
+			local groupId = act.doer.components.pkc_group:getChooseGroup()
 			act.doer:DoTaskInTime(.5, function()
 				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, 0)
 				for _, obj in pairs(ents) do
+					local tag = "pkc_group"..tostring(groupId)
 					obj.saveTags = {}
-					obj:AddTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup())
-					obj.saveTags["pkc_group"..act.doer.components.pkc_group:getChooseGroup()] = 1
-					obj.pkc_group_id = act.doer.components.pkc_group:getChooseGroup()
+					if not obj:HasTag(tag) then
+						obj:AddTag(tag)
+					end
+					obj.saveTags[tag] = 1
+					obj.pkc_group_id = groupId
 				end
 			end)
 		end

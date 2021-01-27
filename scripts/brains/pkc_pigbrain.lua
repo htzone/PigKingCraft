@@ -84,7 +84,7 @@ local function FindFoodAction(inst)
 
     if inst.components.inventory ~= nil and inst.components.eater ~= nil then
         local target = inst.components.inventory:FindItem(function(item)
-            return inst.components.eater:CanEat(item) and item.pkc_isplayergive
+            return inst.components.eater:CanEat(item) and (item.pkc_isplayergive or item.prefab == "petals")
         end)
         if target ~= nil then
             return BufferedAction(inst, target, ACTIONS.EAT)

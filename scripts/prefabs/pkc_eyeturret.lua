@@ -70,45 +70,35 @@ local function triggerlight(inst)
 end
 
 local function retargetfn(inst)
-	--[[
-    local playertargets = {}
-    for i, v in ipairs(AllPlayers) do
-		if inst and v and inst.components.pkc_group and v.components.pkc_group 
-		and inst.components.pkc_group:getChooseGroup() == v.components.pkc_group:getChooseGroup() then
-			if v.components.combat.target ~= nil then
-				playertargets[v.components.combat.target] = true
-			end
-		end
-    end
-	]]--
     return FindEntity(inst, 20,
         function(guy)
-            if guy == nil or not inst.components.combat:CanTarget(guy) then
+            if guy == nil or inst == nil or not inst.components.combat:CanTarget(guy) then
                 return false
             end
-            if guy:HasTag("pkc_pigman") and guy.components.pkc_group
-                    and guy.components.pkc_group:isSameGroup(inst) then
+            if guy.components.pkc_group and guy.components.pkc_group:isSameGroup(inst) then
                 return false
             end
             --以敌对成员的随从为目标
             if guy.components.follower then
                 local leader = guy.components.follower.leader
-                if leader and leader.components.pkc_group and inst and inst.components.pkc_group
+                if leader and leader.components.pkc_group and inst.components.pkc_group
                         and leader.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup() then
                     return true
                 end
             end
-            --以不是疯猪的敌对成员为目标
-            return not guy:HasTag("werepig") --为了防止刷疯猪
-				and guy.components.pkc_group
-				and not (guy.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup())
+            --以敌对成员为目标
+            return guy.components.pkc_group
+				and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()
         end,
         { "_combat" }, --see entityreplica.lua
-        { "INLIMBO", "eyeturret" }
+        { "INLIMBO" }
     )
 end
 
 local function shouldKeepTarget(inst, target)
+    if inst.components.pkc_group and inst.components.pkc_group:isSameGroup(target) then
+        return false
+    end
     return target ~= nil
         and target:IsValid()
         and target.components.health ~= nil

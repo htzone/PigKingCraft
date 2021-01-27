@@ -81,6 +81,8 @@ end
 
 --礼物列表
 local giftsTable = {
+	--turf_carpetfloor = 200,
+	--turf_checkerfloor = 200,
 	redgem = 30,
 	bluegem = 30,
 	pigskin = 30,
@@ -103,14 +105,13 @@ local giftsTable = {
 	durian = 50,
 	dragonfruit = 50,
 	wormlight = 30,
-	--turf_carpetfloor = 200,
-	--turf_checkerfloor = 200,
 	horn = 20,
 	krampus_sack = 10,
 	nightmarefuel = 100,
 	healingsalve = 150,
 	bandage = 100,
-	eyeturret_item = 10,
+	eyeturret_item = 20,
+	sleepbomb = 30,
 }
 
 --扔礼物
@@ -153,14 +154,16 @@ local function takePigsBackToHome(inst)
 			local groupTag = "pkc_group" .. tostring(inst.components.pkc_group:getChooseGroup())
 			local x, y, z = inst.Transform:GetWorldPosition()
 			local pigs = TheSim:FindEntities(x, y, z, 800, { "pkc_pigman", groupTag })
-			for _, v in ipairs(pigs) do
-				if v and v.components.follower and v.components.follower.leader == nil then
-					if v.components.homeseeker
-							and v.components.homeseeker.home
-							and v.components.homeseeker.home:IsValid() then
-						local homePos = v.components.homeseeker:GetHomePos()
-						if homePos and v:GetPosition():Dist(homePos) > 100 then
-							v.Transform:SetPosition(homePos.x + 1, 0, homePos.z + 1)
+			if pigs and next(pigs) ~= nil then
+				for _, v in ipairs(pigs) do
+					if v and v.components.follower and v.components.follower.leader == nil then
+						if v.components.homeseeker
+								and v.components.homeseeker.home
+								and v.components.homeseeker.home:IsValid() then
+							local homePos = v.components.homeseeker:GetHomePos()
+							if homePos and v:GetPosition():Dist(homePos) > 100 then
+								v.Transform:SetPosition(homePos.x + 1, 0, homePos.z + 1)
+							end
 						end
 					end
 				end
@@ -242,15 +245,7 @@ end
 
 --死亡
 local function death_fn(inst)
---	if inst and inst.components.maprevealer then
---		--local beKilledKing = inst.components.pkc_group:getChooseGroup() or 0
---		--TheWorld:PushEvent("pkc_kingbekilled", {inst = inst, king = beKilledKing})
---		inst.components.maprevealer:Stop()
---		if inst.icon ~= nil then
---			inst.icon:Remove()
---			inst.icon = nil
---		end
---	end
+	--doNoting
 end
 
 --显示猪王保护范围
@@ -287,11 +282,12 @@ end
 --升级附近的猪人
 local function upgradeNearPigman(inst, level)
 	local x, y, z = inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x, y, z, 100, {"pkc_pigman"})
+	local pigGroupTag = "pkc_group"..inst.components.pkc_group:getChooseGroup()
+	local ents = TheSim:FindEntities(x, y, z, 600, {"pkc_pigman", pigGroupTag})
 	for _, pigman in pairs(ents) do
-		if pigman and not pigman:HasTag("burnt") then
+		if pigman and pigman:IsValid() and not pigman:HasTag("burnt") then
 			local scale = 1 + 0.05 * level
-			local damage = PKC_PIGMAN_DAMAGE + (0.1 * PKC_PIGMAN_DAMAGE) * level
+			local damage = PKC_PIGMAN_DAMAGE + (0.05 * PKC_PIGMAN_DAMAGE) * level
 			local health = PKC_PIGMAN_HEALTH + (0.1 * PKC_PIGMAN_HEALTH) * level
 			local attack_period = PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
 			pigman.Transform:SetScale(scale, scale, scale)
@@ -317,7 +313,7 @@ end
 local function onLevelUp(inst, data)
 	if inst and data.pigking and data.level then
 		if PIGKING_LEVEL_CONSTANT[data.level] then
-			inst.Transform:SetScale(0.8 + 0.1 * data.level, 0.8 + 0.1 * data.level, 0.8 + 0.1 * data.level)
+			inst.Transform:SetScale(0.8 + 0.07 * data.level, 0.8 + 0.07 * data.level, 0.8 + 0.07 * data.level)
 			showRangeIndicator(inst, PIGKING_LEVEL_CONSTANT[data.level].RANGE_SCALE)
 			inst:DoTaskInTime(0, function()
 				if inst then
@@ -345,8 +341,6 @@ local function onLevelUp(inst, data)
 							upgradeNearPigman(inst, data.level)
 						end
 					end
-					--print("pigking max health:"..inst.components.health.maxhealth)
-					--print("pigking current health:"..inst.components.health.currenthealth)
 				end
 		end)
 		end
@@ -481,7 +475,7 @@ local function fn(group_id, build, name)
 	
 	--猪王升级
 	inst:AddComponent("pkc_levelup")
-	inst.components.pkc_levelup:setLevelNum(10)
+	inst.components.pkc_levelup:setLevelNum(#(PIGKING_LEVEL_CONSTANT))
 	inst.components.pkc_levelup:init()
 	--监听猪王升级
 	inst:ListenForEvent("pkc_pigkingLevelUp", onLevelUp)

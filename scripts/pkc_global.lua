@@ -31,7 +31,7 @@
 	--防止玩家恶意破坏开关
 	GLOBAL.PKC_PREVENT_BAD_BOY = GetModConfigData("prevent_bad_boy")
 	--物品自动清理超过时间(秒)
-	GLOBAL.PKC_AUTO_DELETE_TIME = 60
+	GLOBAL.PKC_AUTO_DELETE_TIME = 100
 	--世界自动清理间隔时间(天)
 	GLOBAL.PKC_WORLD_DELETE_INTERVAL = 5
 	--世界自动清理超过时间(天)
@@ -45,13 +45,13 @@
 	--玩家死亡初始自动复活时间（秒）
 	GLOBAL.PLAYER_REVIVE_TIME = 10
 	--玩家传送所需时间（秒）
-	GLOBAL.PLAYER_TELEPORT_TIME = 15
+	GLOBAL.PLAYER_TELEPORT_TIME = 10
 	--木牌传送所需时间（秒）
 	GLOBAL.SIGN_TELEPORT_TIME = 10
 	--猪王财产最大保护范围（码）
 	GLOBAL.PIGKING_RANGE = 50
 	--冲刺冷却时间
-	GLOBAL.PKC_SPRINT_COOLDOWN = 10
+	GLOBAL.PKC_SPRINT_COOLDOWN = 9
 	--冲刺速度
 	GLOBAL.PKC_SPRINT_SPEED = 2.7
 	--生物变大
