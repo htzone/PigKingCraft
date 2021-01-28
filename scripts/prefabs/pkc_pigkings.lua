@@ -230,7 +230,7 @@ local function attacked_fn(inst, data)
 			and player.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
 			then
 				player:DoTaskInTime(0, function ()	
-					if player and player.components.talker then
+					if player and player:IsValid() and player.components.talker then
 						player.components.talker:Say(PKC_SPEECH.PIGKING.SPEECH2)
 					end
 				end)

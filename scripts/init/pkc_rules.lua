@@ -184,8 +184,11 @@ local function OnBuildNew(doer, prod)
 			doer:DoTaskInTime(0, function()
 				if prod then
 					prod.saveTags = {}
-					prod:AddTag("pkc_group"..doer.components.pkc_group:getChooseGroup())
-					prod.saveTags["pkc_group"..doer.components.pkc_group:getChooseGroup()] = 1
+					local group_tag = "pkc_group"..tostring(doer.components.pkc_group:getChooseGroup())
+					if not prod:HasTag(group_tag) then
+						prod:AddTag(group_tag)
+					end
+					prod.saveTags[group_tag] = 1
 					prod.pkc_group_id = doer.components.pkc_group:getChooseGroup()
 					if not prod:HasTag("sign") then --路牌不用加
 						prod.ownername = doer.name
@@ -366,7 +369,6 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 		local ents = GLOBAL.TheSim:FindEntities(x, y, z, GLOBAL.PIGKING_RANGE)
 		local hasEnemyPigKingNear = false
 		for _,obj in pairs(ents) do
-			--if obj and obj:HasTag("king") and obj.components.pkc_group and obj.components.pkc_group:getChooseGroup() ~= act.doer.components.pkc_group:getChooseGroup() then
 			if obj and obj:HasTag("king") and not obj:HasTag("pkc_group"..act.doer.components.pkc_group:getChooseGroup()) then
 				if obj.pkc_group_id and getPigkingRange(obj.pkc_group_id) > act.target:GetPosition():Dist(obj:GetPosition()) then
 					hasEnemyPigKingNear = true
@@ -387,6 +389,7 @@ GLOBAL.ACTIONS.HAMMER.fn = function(act)
 					end)
 					return false
 				else
+					--可以砸猪人房
 					return old_HAMMER(act)
 				end
 			end
@@ -1240,6 +1243,7 @@ local function customDropEverything(self, ondeath, keepequip)
 	end
 end
 
+--死亡随机掉落
 AddComponentPostInit("inventory", function(self, inst)
 	if GLOBAL.TheWorld.ismastersim then
 		self.OldDropEverything = self.DropEverything
@@ -1250,6 +1254,79 @@ AddComponentPostInit("inventory", function(self, inst)
 				end
 			end
 			return self:OldDropEverything(ondeath, keepequip)
+		end
+	end
+end)
+
+--防止吴迪撞自己队伍的东西
+AddComponentPostInit("tackler", function(self, inst)
+	if GLOBAL.TheWorld.ismastersim then
+		local oldCheckCollision = self.CheckCollision
+		self.CheckCollision = function(self, ...)
+			if self.inst and self.inst.components.pkc_group then
+				local group_tag = "pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())
+				if not containsValue(self.no_collide_tags, group_tag) then
+					table.insert(self.no_collide_tags, group_tag)
+				end
+			end
+			return oldCheckCollision(self, ...)
+		end
+	end
+end)
+
+--猪人房被砸时提示玩家
+local function remindPlayerOnDestroy(inst)
+	if not inst.isUnderAttack and inst.pkc_group_id then
+		local groupId = inst.pkc_group_id
+		local groupTag = "pkc_group"..tostring(groupId)
+		local pigking = FindEntity(inst, getPigkingRange(groupId), nil, {"king", "pig", groupTag})
+		if pigking ~= nil then
+			for _, player in pairs(AllPlayers) do
+				if player and player.components.pkc_group
+						and player.components.pkc_group:getChooseGroup() == inst.pkc_group_id then
+					player:DoTaskInTime(0, function ()
+						if player and player:IsValid() and player.components.talker then
+							if type(inst.prefab) == "string" and string.find(inst.prefab, "pkc_pighouse") then
+								player.components.talker:Say(PKC_SPEECH.PIGHOUSE.SPEECH1)
+							else
+								player.components.talker:Say(PKC_SPEECH.STRUCTURE.SPEECH1)
+							end
+						end
+					end)
+				end
+			end
+		end
+		inst.isUnderAttack = true
+		inst:DoTaskInTime(math.random(3, 6), function()
+			inst.isUnderAttack = false
+		end)
+	end
+end
+
+--当家里建筑物被摧毁时提醒玩家
+AddComponentPostInit("workable", function(self, inst)
+	if GLOBAL.TheWorld.ismastersim then
+		local oldWorkedBy = self.WorkedBy
+		self.WorkedBy = function(self, worker, ...)
+			--不是建筑，则执行原有逻辑
+			if not self.inst or not self.inst:HasTag("structure") then
+				return oldWorkedBy(self, worker, ...)
+			end
+			--提醒玩家
+			if self.inst and self.inst.pkc_group_id then
+				local groupId = self.inst.pkc_group_id
+				if worker then
+					if worker.components and worker.components.pkc_group and worker.components.pkc_group:getChooseGroup() == groupId then
+						oldWorkedBy(self, worker, ...) --自己队伍的则不提示
+					elseif worker.components and worker.components.pkc_group
+							and worker.components.pkc_group:getChooseGroup() ~= groupId then --当不是自己队伍的破坏时，进行提醒
+						remindPlayerOnDestroy(self.inst)
+					elseif worker:HasTag("monster") then --当怪物摧毁时，进行提醒
+						remindPlayerOnDestroy(self.inst)
+					end
+				end
+			end
+			return oldWorkedBy(self, worker, ...)
 		end
 	end
 end)

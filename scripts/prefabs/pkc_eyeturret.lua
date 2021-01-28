@@ -110,6 +110,30 @@ local function ShareTargetFn(dude)
     return dude:HasTag("eyeturret") or dude
 end
 
+--家里眼球塔被攻击时提示玩家
+local function remindPlayerOnAttacked(inst)
+    if not inst.isUnderAttack then
+        local groupId = inst.components.pkc_group:getChooseGroup()
+        local groupTag = "pkc_group"..tostring(groupId)
+        local pigking = FindEntity(inst, 20, nil, {"king", "pig", groupTag})
+        if pigking ~= nil then
+            for _, player in pairs(AllPlayers) do
+                if player and player.components.pkc_group and player.components.pkc_group:isSameGroup(inst) then
+                    player:DoTaskInTime(0, function ()
+                        if player and player:IsValid() and player.components.talker then
+                            player.components.talker:Say(PKC_SPEECH.EYETURRET.SPEECH1)
+                        end
+                    end)
+                end
+            end
+        end
+        inst.isUnderAttack = true
+        inst:DoTaskInTime(math.random(4, 8), function()
+            inst.isUnderAttack = false
+        end)
+    end
+end
+
 local function OnAttacked(inst, data)
     local attacker = data ~= nil and data.attacker or nil
     if attacker ~= nil then
@@ -119,6 +143,8 @@ local function OnAttacked(inst, data)
 			return (dude:HasTag("eyeturret") or dude:HasTag("pig")) and dude.components.pkc_group and dude.components.pkc_group:getChooseGroup() == inst.components.pkc_group:getChooseGroup()
 		end, 
 		30)
+        --家里眼球塔被攻击时提示玩家
+        remindPlayerOnAttacked(inst)
     end
 end
 

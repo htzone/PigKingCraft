@@ -196,7 +196,7 @@ for _, v in pairs(tradable_item) do
 	AddPrefabPostInit(v, addTradableAttr)
 end
 
-
+--制造大箱子
 local function PKC_LARGE_CHEST_CREATION(widgetanimbank, widgetpos, slot_x, slot_y, posslot_x, posslot_y)
 	local params = {}
 	params.pkc_largechest_big = {
@@ -271,8 +271,6 @@ local function PKC_LARGE_CHEST_CREATION(widgetanimbank, widgetpos, slot_x, slot_
 		end
 	end
 end
-
---制造大箱子
 PKC_LARGE_CHEST_CREATION("ui_chest_5x16", GLOBAL.Vector3(360 - (80 * 4.5), 160, 0), 15, 4, 91, 42)
 
 --放置队伍专属的眼球塔

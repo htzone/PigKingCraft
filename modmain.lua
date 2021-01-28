@@ -129,7 +129,7 @@ modimport("scripts/init/pkc_announce")
 modimport("scripts/init/pkc_playerstatus_screen")
 --modimport("scripts/init/pkc_wwdxhz")
 --敌对据点
-modimport("scripts/init/pkc_hostilegroup")
+modimport("scripts/init/pkc_hostile_point")
 --生物变大
 modimport("scripts/init/pkc_mobtobig")
 --地图分组显示

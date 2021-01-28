@@ -716,3 +716,15 @@ function pkc_removeByValue(list, value, removeAll)
     end
     return deleteNum
 end
+
+local function pkc_printArray(array)
+    local str = ""
+    for i = 1, #array do
+        if i == 1 then
+            str = tostring(array[i])
+        else
+            str = str.." "..tostring(array[i])
+        end
+    end
+    print(str)
+end

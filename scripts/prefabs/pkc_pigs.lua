@@ -102,7 +102,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
         if inst and inst.components.follower then
             inst:DoTaskInTime(0, function()
                 inst.AnimState:PlayAnimation("idle_angry")
-                inst.components.talker:Say("猪人讨厌粑粑！！！")
+                inst.components.talker:Say(PKC_SPEECH.PIG_MAN_TALK.SPEECH1)
                 inst.components.follower:StopFollowing()
             end)
         end
@@ -333,9 +333,9 @@ local function SetNormalPig(inst)
     inst.components.sleeper:SetSleepTest(NormalShouldSleep)
     inst.components.sleeper:SetWakeTest(DefaultWakeTest)
 
-    inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 2)
-    inst.components.lootdropper:AddRandomLoot("pigskin", 1)
+    inst.components.lootdropper:SetLoot({"meat", "pigskin"})
+    --inst.components.lootdropper:AddRandomLoot("meat", 2)
+    --inst.components.lootdropper:AddRandomLoot("pigskin", 1)
     inst.components.lootdropper.numrandomloot = 1
 
     inst.components.health:SetMaxHealth(PKC_PIGMAN_HEALTH)
@@ -536,7 +536,7 @@ local function SetWerePig(inst)
     inst.components.sleeper:SetSleepTest(WerepigSleepTest)
     inst.components.sleeper:SetWakeTest(WerepigWakeTest)
 
-    inst.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
+    inst.components.lootdropper:SetLoot({ "meat", "pigskin", "pigskin" })
     inst.components.lootdropper.numrandomloot = 0
 
     inst.components.health:SetMaxHealth(2 * TUNING.WEREPIG_HEALTH)

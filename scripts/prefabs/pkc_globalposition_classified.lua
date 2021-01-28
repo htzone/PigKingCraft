@@ -22,7 +22,7 @@ local function fn()
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst:ListenForEvent("useriddirty", function()
-            if TheWorld.net.components.pkc_globalpositions then
+            if TheWorld.net and TheWorld.net.components.pkc_globalpositions then
                 TheWorld.net.components.pkc_globalpositions:AddClientEntity(inst)
             end
         end)

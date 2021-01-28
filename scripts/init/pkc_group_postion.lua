@@ -94,17 +94,19 @@ AddClassPostConstruct("widgets/mapwidget", function(MapWidget)
 
         local p = self:GetWorldMousePosition()
         local mindistsq, gpc = math.huge, nil
-        for _, v in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
-            if v then
-                local userid = v.userid:value()
-                local x, y, z = v.Transform:GetWorldPosition()
-                if isSameGroup(ThePlayer and ThePlayer.userid or nil, userid) then
-                    showMapIcon(self, userid, x, y, z)
-                end
-                local dq = GLOBAL.distsq(p.x, p.z, x, z)
-                if dq < mindistsq then
-                    mindistsq = dq
-                    gpc = v
+        if GLOBAL.TheWorld.net then
+            for _, v in pairs(GLOBAL.TheWorld.net.components.pkc_globalpositions.positions) do
+                if v then
+                    local userid = v.userid:value()
+                    local x, y, z = v.Transform:GetWorldPosition()
+                    if isSameGroup(ThePlayer and ThePlayer.userid or nil, userid) then
+                        showMapIcon(self, userid, x, y, z)
+                    end
+                    local dq = GLOBAL.distsq(p.x, p.z, x, z)
+                    if dq < mindistsq then
+                        mindistsq = dq
+                        gpc = v
+                    end
                 end
             end
         end

@@ -99,7 +99,7 @@ if GetModConfigData("language") == "chinese" then
 		},
 		PIGKING = {
 			SPEECH1 = "猪猪爱你们哟！",
-			SPEECH2 = "猪王正在遭受攻击！！！",
+			SPEECH2 = "我们家的猪王正在被攻击！！！",
 			SPEECH3 = "麻麻，我好像升级了！！！",
 			CHAT = {
 			"猪猪爱你们哟！",
@@ -110,11 +110,23 @@ if GetModConfigData("language") == "chinese" then
 			"记得保护我哦！",
 			},
 		},
+		EYETURRET = {
+			SPEECH1 = "我们家的眼球塔正在被攻击！！！",
+		},
+		PIGHOUSE = {
+			SPEECH1 = "我们家的猪人房正在被砸！！！",
+		},
+		STRUCTURE = {
+			SPEECH1 = "我们家的建筑正在被攻击！！！",
+		},
 		PIGCLICK = {
 			--"我们需要升级猪王获得更多的土地！",
 			--"我们需要升级猪王获得更强的猪人战士！",
 			--"获得足够的分数可以升级猪王！",
 			"用金子可以雇佣猪人！！！",
+		},
+		PIG_MAN_TALK = {
+			SPEECH1 = "猪人讨厌粑粑！！！",
 		},
 		GO_HOME = {
 			SPEECH1 = "准备回城！",
@@ -326,7 +338,7 @@ else
 		},
 		PIGKING = {
 			SPEECH1 = "Im happy today!",
-			SPEECH2 = "Our pigking is under attack!!!",
+			SPEECH2 = "Our pig king is under attack!!!",
 			SPEECH3 = "Level Up! I become a bigger pig!",
 			CHAT = {
 			"Im happy today!",
@@ -336,11 +348,23 @@ else
 			"I need cooked food.",
 			},
 		},
+		EYETURRET = {
+			SPEECH1 = "Our eye turret is under attack!!",
+		},
+		PIGHOUSE = {
+			SPEECH1 = "Our pig house is under attack!!",
+		},
+		STRUCTURE = {
+			SPEECH1 = "Our base is under attack!!",
+		},
 		PIGCLICK = {
 			--"Upgrading your pigking means more lands!",
 			--"Upgrading your pigking means more powerful pigmans!",
 			--"Give enough points to Upgrad your pigking!",
-			"pigs like golds!!!",
+			"You can hire pig man by gold!!!",
+		},
+		PIG_MAN_TALK = {
+			SPEECH1 = "I hate poop!!!",
 		},
 		GO_HOME = {
 			SPEECH1 = "Home Teleport!",
