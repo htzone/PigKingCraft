@@ -237,7 +237,7 @@ local function fn(groupId)
     inst.entity:AddLight()
     inst.entity:AddNetwork()
 
-    MakeObstaclePhysics(inst, 1)
+    --MakeObstaclePhysics(inst, 1)
 
     inst.Transform:SetFourFaced()
 

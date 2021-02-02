@@ -213,11 +213,21 @@ configuration_options =
     },
     {
         name = "is_fast_hand",
-        label = "是否开快速采集(FastHandSwitch)",
+        label = "快速采集开关(FastHandSwitch)",
         options =
         {
-            {description = "否(OFF)", data = false, hover = "OFF" },
-            {description = "是(ON)", data = true, hover = "ON"},
+            {description = "关闭(OFF)", data = false, hover = "OFF" },
+            {description = "打开(ON)", data = true, hover = "ON"},
+        },
+        default = true,
+    },
+    {
+        name = "monster_point_switch",
+        label = "怪物据点开关(MonsterPointSwitch)",
+        options =
+        {
+            {description = "关闭(OFF)", data = false, hover = "OFF" },
+            {description = "打开(ON)", data = true, hover = "ON"},
         },
         default = true,
     },

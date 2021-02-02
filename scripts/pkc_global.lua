@@ -30,6 +30,8 @@
 	GLOBAL.PKC_PIGHOUSE_NUM = GetModConfigData("init_pighouse_num")
 	--防止玩家恶意破坏开关
 	GLOBAL.PKC_PREVENT_BAD_BOY = GetModConfigData("prevent_bad_boy")
+	--怪物据点
+	GLOBAL.PKC_MONSTER_POINT = GetModConfigData("monster_point_switch")
 	--物品自动清理超过时间(秒)
 	GLOBAL.PKC_AUTO_DELETE_TIME = 100
 	--世界自动清理间隔时间(天)
@@ -66,6 +68,8 @@
 	GLOBAL.GROUP_LONGPIG_ID= 3	
 	--崔猪猪势力
 	GLOBAL.GROUP_CUIPIG_ID = 4
+	--猪人守卫生命值
+	GLOBAL.TUNING.PIG_GUARD_HEALTH = 400
 
 	if not GLOBAL.STRINGS.CHARACTERS.WEBBER then
 		GLOBAL.STRINGS.CHARACTERS.WEBBER = {DESCRIBE = {}}

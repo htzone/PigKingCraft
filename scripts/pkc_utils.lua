@@ -67,6 +67,15 @@ function pkc_teleportToPoint(inst, pos)
     end
 end
 
+--将所有玩家传送到指定点
+function pkc_teleportAllPlayerToInst(inst)
+    for _,player in pairs(AllPlayers) do
+        if player then
+            pkc_teleport(player, inst, 2)
+        end
+    end
+end
+
 --传送物体
 function pkc_teleport(inst, destination, offset)
     local mOffset = offset or 0
@@ -96,7 +105,7 @@ end
 
 --去掉首尾的空格
 function trim(str)
-    return (str:gsub("^%s*(.-)%s*$", "%1"))
+    return str and (str:gsub("^%s*(.-)%s*$", "%1")) or str
 end
 
 --根据groupId来获取对应的name
@@ -266,7 +275,7 @@ end
 --@param max_dist 离目标最大的距离（可以不写）
 --@param max_trying_times 最大放置尝试次数（可以不写）
 --@param fx_name 放置特效（可以不写）
-function pkc_trySpawn(target, prefab_name, min_dist, max_dist, max_trying_times, fx_name)
+function pkc_trySpawnNear(target, prefab_name, min_dist, max_dist, max_trying_times, fx_name)
     if min_dist == nil or max_dist == nil then
         min_dist = 15
         max_dist = 35
@@ -444,6 +453,9 @@ end
 --@param radius	半径
 --@param mode 需要安置的数量
 function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clear)
+    if num == 0 or num == nil then
+        return
+    end
     local pos = Vector3(target.Transform:GetWorldPosition())
     local attempt_angle = (2 * PI) / num
     local tmp_angles = {}
@@ -532,6 +544,37 @@ end
 
 function pkc_roundSpawn(target, prefab_name, radius, num, clear)
     pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "", clear)
+end
+
+--根据地皮类型来放置Prefab
+function pkc_spawnPrefabByTileTable(prefabName, tileTable, tryMaxTimes, checkFn, clear)
+    local validTile = tileTable[prefabName]
+    if not validTile then
+        return nil
+    end
+    local b = nil
+    local size_x, size_y = TheWorld.Map:GetSize()
+    local tryTimes = 0
+    while tryTimes < tryMaxTimes do
+        local pt = Vector3(math.random(-size_x, size_x), 0, math.random(-size_y, size_y))
+        local isAboveGround = TheWorld.Map:IsAboveGroundAtPoint(pt.x, pt.y, pt.z, false)
+        if isAboveGround then
+            local tile = TheWorld.Map:GetTileAtPoint(pt.x, pt.y, pt.z)
+            local canSpawn = (tile == validTile)
+            if canSpawn and not checkFn or checkFn(pt) then
+                b = SpawnPrefab(prefabName)
+                if b and b:IsValid() and b.Transform then
+                    b.Transform:SetPosition(pt:Get())
+                    if clear then
+                        clearNear(b, 2)
+                    end
+                end
+                break
+            end
+        end
+        tryTimes = tryTimes + 1
+    end
+    return b
 end
 
 --判断在一定范围内有没有海

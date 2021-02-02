@@ -71,6 +71,8 @@ PrefabFiles = {
     "pkc_forge_fireball_projectile",
     "pkc_infernalstaff_meteor",
     "pkc_largechest",
+    "pkc_pigtorch",
+    "pkc_pigguard",
 }
 
 Assets = {
@@ -84,6 +86,8 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/pkc_forgedarts.tex"),
     Asset("ATLAS", "images/inventoryimages/pkc_infernalstaff.xml"),
     Asset("IMAGE", "images/inventoryimages/pkc_infernalstaff.tex"),
+    Asset("ATLAS", "images/pkc_status_bgs.xml"),
+    Asset("IMAGE", "images/pkc_status_bgs.tex"),
 }
 
 local require = GLOBAL.require
@@ -121,6 +125,8 @@ modimport("scripts/init/pkc_rpchandler")
 modimport("scripts/init/pkc_choosegroup")
 --基地生成
 modimport("scripts/init/pkc_producebase")
+--敌对据点生成
+modimport("scripts/init/pkc_hostile_group")
 --规则设定
 modimport("scripts/init/pkc_rules")
 --自动公告
@@ -128,8 +134,6 @@ modimport("scripts/init/pkc_announce")
 --玩家积分板信息
 modimport("scripts/init/pkc_playerstatus_screen")
 --modimport("scripts/init/pkc_wwdxhz")
---敌对据点
-modimport("scripts/init/pkc_hostile_point")
 --生物变大
 modimport("scripts/init/pkc_mobtobig")
 --地图分组显示
@@ -144,3 +148,8 @@ modimport("scripts/init/pkc_player_career")
 --modimport("scripts/init/pkc_monster_invasion")
 --商店系统
 --modimport("scripts/init/pkc_shop_system")
+
+--ancient_altar 远古遗迹
+--winona_catapult 投石机
+--sewing_tape 胶带
+--winona 薇诺娜

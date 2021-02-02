@@ -29,18 +29,18 @@ local GlobalPosition = Class(function(self, inst)
     self.classified = nil
     self.inittask = nil
 
-    local isplayer = inst:HasTag("player")
-    if isplayer then
-        AddMapRevealer(inst)
-        self.respawnedfromghostfn = function()
-            self:SetMapSharing(true)
-        end
-        self.becameghostfn = function()
-            self:SetMapSharing(false)
-        end
-        self.inst:ListenForEvent("ms_respawnedfromghost", self.respawnedfromghostfn)
-        self.inst:ListenForEvent("ms_becameghost", self.becameghostfn)
-    end
+    --local isplayer = inst:HasTag("player")
+    --if isplayer then
+    --    AddMapRevealer(inst)
+    --    self.respawnedfromghostfn = function()
+    --        self:SetMapSharing(true)
+    --    end
+    --    self.becameghostfn = function()
+    --        self:SetMapSharing(false)
+    --    end
+    --    self.inst:ListenForEvent("ms_respawnedfromghost", self.respawnedfromghostfn)
+    --    self.inst:ListenForEvent("ms_becameghost", self.becameghostfn)
+    --end
 
     self.inittask = self.inst:DoTaskInTime(0, function()
         self.inittask = nil
@@ -70,9 +70,9 @@ function GlobalPosition:OnRemoveEntity()
         self.inst.MiniMapEntity:SetEnabled(true)
     end
 
-    if self.inst.components.maprevealer then
-        self:SetMapSharing(false)
-    end
+    --if self.inst.components.maprevealer then
+    --    self:SetMapSharing(false)
+    --end
 
     if self.respawnedfromghostfn then
         self.inst:RemoveEventCallback("ms_respawnedfromghost", self.respawnedfromghostfn)
@@ -91,11 +91,11 @@ end
 GlobalPosition.OnRemoveFromEntity = GlobalPosition.OnRemoveEntity
 
 function GlobalPosition:SetMapSharing(enabled)
-    if enabled then
-        self.inst.components.maprevealer:Start()
-    else
-        self.inst.components.maprevealer:Stop()
-    end
+    --if enabled then
+    --    self.inst.components.maprevealer:Start()
+    --else
+    --    self.inst.components.maprevealer:Stop()
+    --end
 end
 
 return GlobalPosition

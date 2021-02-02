@@ -74,8 +74,10 @@ local function commonBuild(previousPos)
 	local ground = TheWorld
 	for _, node in ipairs(ground.topology.nodes) do
 		if ground.Map:IsPassableAtPoint(node.x, 0, node.y) then
-			if node.tags ~= nil and table.contains( node.tags, "lunacyarea" ) then
-				-- do nothing 基地不要生成在月岛
+			if node.tags ~= nil
+					and (table.contains(node.tags, "not_mainland")
+					or table.contains(node.tags, "lunacyarea")) then
+				-- do nothing 基地不要生成在岛屿
 			else
 				table.insert(centers, {x = node.x, z = node.y})
 			end

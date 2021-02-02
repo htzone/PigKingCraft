@@ -390,7 +390,7 @@ local function fn(group_id, build, name)
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 	
-    MakeObstaclePhysics(inst, 2, .5)
+    MakeObstaclePhysics(inst, 0.5, .2)
 
     inst.MiniMapEntity:SetPriority(5)
     inst.MiniMapEntity:SetIcon("pigking.png")

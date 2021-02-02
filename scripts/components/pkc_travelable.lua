@@ -385,8 +385,10 @@ function Travelable:Travel(traveller, index)
 		local cost_sanity = 0
 		local xi, _, zi = self.inst.Transform:GetWorldPosition()
 		local xf, _, zf = destination.Transform:GetWorldPosition()
-		local dist = math.sqrt((xi - xf) ^ 2 + (zi - zf) ^ 2)
-
+		local dist = 0
+		if xi and zi and xf and zf then
+			dist = math.sqrt((xi - xf) ^ 2 + (zi - zf) ^ 2)
+		end
 		if destination and destination:HasTag("pkc_travelable") then
 			table.insert(self.travellers, traveller)
 

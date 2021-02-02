@@ -269,7 +269,7 @@ local function NormalRetargetFn(inst)
         end
 
         --以怪物或敌对成员为目标，且不能为灵魂
-		return (guy:HasTag("monster")
+		return (guy:HasTag("monster") or guy:HasTag("pkc_hostile")
 		or  (guy.components.pkc_group and guy.components.pkc_group:getChooseGroup() ~= inst.components.pkc_group:getChooseGroup()))
 		and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
 	end)
