@@ -13,6 +13,7 @@ local initToBigTable = {
     "pigguard",
     "penguin",
     "walrus",
+    "pkc_pigguard",
 }
 
 local mobToBigTable  = {

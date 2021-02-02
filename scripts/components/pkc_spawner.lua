@@ -4,9 +4,12 @@
 -- Date: 2021/2/1
 --
 local weightTable = {
-	[0] = 75,
+	[0] = 30,
+	[1] = 20,
+	[2] = 20,
 	[3] = 100,
-	[4] = 25,
+	[4] = 20,
+	[5] = 10,
 }
 
 local PKC_SPAWNER = Class(function(self, inst)

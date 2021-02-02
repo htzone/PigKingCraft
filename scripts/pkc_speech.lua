@@ -138,8 +138,8 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH7 = "按C键可以回城哦！！！",
 		},
 		GROUP_SIGN = {
-			SPEECH1 = " \n \n \n本队已有传送牌数量为：%d，最多为%d",
-			SPEECH2 = "本队传送牌数量已达到限制\n最多数量为：",
+			SPEECH1 = " \n \n \n本队已有传送牌数量为：%d \n 目前允许的最大数目为：%d",
+			SPEECH2 = "本队传送牌数量已达到限制\n目前允许的最大数目为：%d \n请升级猪王以解锁更多",
 			SPEECH3 = "这是敌方队伍的传送牌！",
 			SPEECH4 = "没有可传送的目的地",
 			SPEECH5 = "没有可传送的目的地",
@@ -166,8 +166,8 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH26 = "家",
 		},
 		GROUP_PIGHOUSE = {
-			SPEECH1 = " \n \n \n猪王附近已有猪房数量为：",
-			SPEECH2 = "猪王附近猪房数量已达到限制\n最多数量为：",
+			SPEECH1 = " \n \n \n猪王附近已有猪房数量为：%d \n目前允许的最大数目为：%d",
+			SPEECH2 = "猪王附近猪房数量已达最大限制\n目前允许的最大数目为：%d\n请升级猪王以解锁更多",
 		},
 		PREVENT_BADBOY = {
 			SPEECH1 = "不是我建造的 \n 需要活过10天才能砸！",
@@ -215,6 +215,9 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH4 = "󰀕执行结果：发起投降 %d / %d， 最少还差%d个发起才能成功投降",
 			SPEECH5 = "%s 阵营发起了投降，马上就要执行投降操作了！！！",
 			SPEECH6 = "%s 阵营投降成功，%s 阵营已经被消灭了！！！",
+		},
+		MONSTER_POINT = {
+			SPEECH1 = "",
 		},
 	}
 	
@@ -376,8 +379,8 @@ else
 			SPEECH7 = "Press the 'B' key or 'C' key to teleport Home!!!",
 		},
 		GROUP_SIGN = {
-			SPEECH1 = " \n \n \nThe number of Our Team's Signs is: %d, Max num is:%d",
-			SPEECH2 = "The number of Signs has reached the maximum: ",
+			SPEECH1 = " \n \n \nThe number of Our Team's Signs is: %d \n Max num is:%d",
+			SPEECH2 = "The number of Signs has reached the maximum: %d \n Upgrade pig king to unlock more",
 			SPEECH3 = "This is the enemy's Teleport Sign",
 			SPEECH4 = "No destination",
 			SPEECH5 = "No destination",
@@ -404,8 +407,8 @@ else
 			SPEECH26 = "Home",
 		},
 		GROUP_PIGHOUSE = {
-			SPEECH1 = " \n \n \nThe number of Pighouse is：",
-			SPEECH2 = "The number of PigHouse has reached the maximum：",
+			SPEECH1 = " \n \n \nThe number of pig house is：%d \n The max number allowed is %d at present",
+			SPEECH2 = "The number of pig house has reached the maximum：%d \n Upgrade pig king to unlock more",
 		},
 		PREVENT_BADBOY = {
 			SPEECH1 = "It's not my structure \n I need to survival for 10 day!",
@@ -449,6 +452,9 @@ else
 			SPEECH4 = "󰀕Execution result: Initiate Surrender %d / %d, at least %d initiators are needed to surrender successfully",
 			SPEECH5 = "%s group initiated the surrender, and the surrender operation will be executed soon!!!",
 			SPEECH6 = "%s group has surrendered, %s was wiped out!!!",
+		},
+		MONSTER_POINT = {
+			SPEECH1 = "",
 		},
 	}
 	

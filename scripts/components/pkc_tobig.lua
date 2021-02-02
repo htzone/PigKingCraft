@@ -50,8 +50,15 @@ function PKC_TOBIG:growTo(scale)
 					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
 					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)
 					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
-				end		
-		    else
+				end
+			elseif self.inst.prefab == "pkc_pigguard" then
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2, 1000)
+				if self.inst.components.combat then
+					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
+					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)
+					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
+				end
+			else
 				self.inst.components.health.maxhealth = self.inst.components.health.maxhealth * self.scale * 1.2
 				if self.inst.components.combat then
 					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)

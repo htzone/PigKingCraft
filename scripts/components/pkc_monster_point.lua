@@ -58,7 +58,7 @@ end
 local function updateWorld(world)
     if world.needPoint and TheWorld.state.cycles >= 0 then
         world:DoTaskInTime(1, function()
-            pkc_announce("世界异变开始了...")
+            --pkc_announce("世界异变开始了...")
             for i = 1, 100 do
                 local mob = pkc_spawnPrefabByTileTable("pkc_pigtorch", PREFAB_TO_TILE_TABLE, 20, canSpawn, true)
                 if mob then

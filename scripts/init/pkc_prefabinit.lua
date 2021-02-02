@@ -9,7 +9,7 @@ local IsServer = TheNet:GetIsServer()
 
 --获取当前的猪王等级
 local function getPigkingLevel(pigkingId)
-	local needLevelUpScore = GLOBAL.WIN_SCORE / 10
+	local needLevelUpScore = GLOBAL.WIN_SCORE / #(GLOBAL.PIGKING_LEVEL_CONSTANT)
 	local currentLevel = 1
 	if pigkingId ==  GLOBAL.GROUP_BIGPIG_ID then
 		local currentScore = GLOBAL.GROUP_SCORE.GROUP1_SCORE
@@ -309,4 +309,33 @@ AddPrefabPostInit("eyeturret_item", function(inst)
 	end
 end)
 
+AddPrefabPostInit("pighouse", function(inst)
+	if not GLOBAL.TheWorld.ismastersim then
+		return
+	end
+	inst:DoTaskInTime(0.1, function()
+		if inst and not inst:HasTag("burnt") then
+			local randomVal = math.random()
+			if randomVal < 0.8 then
+				local x, y, z = inst.Transform:GetWorldPosition()
+				if x and y and z then
+					local b = SpawnPrefab("pkc_pigtorch")
+					if b and b:IsValid() and b.Transform then
+						b.Transform:SetPosition(x, y, z)
+					end
+					inst:Remove()
+				end
+			end
+		end
+	end)
+	--local x, y, z = inst.Transform:GetWorldPosition()
+	--local tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
+	--print("pkc ground index:"..tostring(tile))
+	--for i, v in pairs(GROUND) do
+	--	if tile == v then
+	--		print("pkc ground:"..tostring(i))
+	--		break
+	--	end
+	--end
+end)
 

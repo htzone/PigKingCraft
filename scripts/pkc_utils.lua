@@ -760,7 +760,7 @@ function pkc_removeByValue(list, value, removeAll)
     return deleteNum
 end
 
-local function pkc_printArray(array)
+function pkc_printArray(array)
     local str = ""
     for i = 1, #array do
         if i == 1 then
@@ -770,4 +770,106 @@ local function pkc_printArray(array)
         end
     end
     print(str)
+end
+
+--根据id获取各队伍的猪王保护半径
+function getPigkingRange(pigkingId)
+    local needLevelUpScore = WIN_SCORE / #(PIGKING_LEVEL_CONSTANT)
+    local pigkigRange = 20
+    if pigkingId ~= nil then
+        if pigkingId == GROUP_BIGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP1_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigkigRange = PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+            end
+        elseif pigkingId == GROUP_REDPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP2_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigkigRange = PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+            end
+        elseif pigkingId == GROUP_LONGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP3_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigkigRange = PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+            end
+        elseif pigkingId == GROUP_CUIPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP4_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigkigRange = PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
+            end
+        end
+    end
+    return pigkigRange ~= nil and pigkigRange or 20
+end
+
+--获取猪王附近允许建造的猪房数量
+function getPigHouseNum(pigkingId)
+    local needLevelUpScore = WIN_SCORE / #(PIGKING_LEVEL_CONSTANT)
+    local pigHouseNum = PKC_INIT_PIGHOUSE_NUM
+    if pigkingId ~= nil then
+        if pigkingId == GROUP_BIGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP1_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigHouseNum = PIGKING_LEVEL_CONSTANT[currentLevel].PIGHOUSE_NUM
+            end
+        elseif pigkingId == GROUP_REDPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP2_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigHouseNum = PIGKING_LEVEL_CONSTANT[currentLevel].PIGHOUSE_NUM
+            end
+        elseif pigkingId == GROUP_LONGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP3_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigHouseNum = PIGKING_LEVEL_CONSTANT[currentLevel].PIGHOUSE_NUM
+            end
+        elseif pigkingId == GROUP_CUIPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP4_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                pigHouseNum = PIGKING_LEVEL_CONSTANT[currentLevel].PIGHOUSE_NUM
+            end
+        end
+    end
+    return pigHouseNum ~= nil and pigHouseNum or PKC_INIT_PIGHOUSE_NUM
+end
+
+--获取传送木牌的限制数量
+function getHomeSignNum(pigkingId)
+    local needLevelUpScore = WIN_SCORE / #(PIGKING_LEVEL_CONSTANT)
+    local homeSignNum = PKC_INIT_GROUPHOMESIGN_NUM
+    if pigkingId ~= nil then
+        if pigkingId == GROUP_BIGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP1_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                homeSignNum = PIGKING_LEVEL_CONSTANT[currentLevel].HOMESING_NUM
+            end
+        elseif pigkingId == GROUP_REDPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP2_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                homeSignNum = PIGKING_LEVEL_CONSTANT[currentLevel].HOMESING_NUM
+            end
+        elseif pigkingId == GROUP_LONGPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP3_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                homeSignNum = PIGKING_LEVEL_CONSTANT[currentLevel].HOMESING_NUM
+            end
+        elseif pigkingId == GROUP_CUIPIG_ID then
+            local currentScore = GROUP_SCORE.GROUP4_SCORE
+            local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
+            if PIGKING_LEVEL_CONSTANT[currentLevel] then
+                homeSignNum = PIGKING_LEVEL_CONSTANT[currentLevel].HOMESING_NUM
+            end
+        end
+    end
+    return homeSignNum ~= nil and homeSignNum or PKC_INIT_GROUPHOMESIGN_NUM
 end

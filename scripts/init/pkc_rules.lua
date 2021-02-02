@@ -4,43 +4,6 @@
 -- Date: 2016/11/05
 --
 
---GLOBAL.Recipe("homesign", {Ingredient("boards", 4)}, RECIPETABS.TOWN, TECH.SCIENCE_ONE, "homesign_placer")
-
---根据id获取各队伍的猪王保护半径, 暂时这样，哎呀，真TM懒 _(:3 」∠)_
---TODO 应该把各猪王的等级信息放在一个全局变量中的
-local function getPigkingRange(pigkingId)
-	local needLevelUpScore = GLOBAL.WIN_SCORE / 10
-	local pigkigRange = 20
-	if pigkingId ~= nil then
-		if pigkingId ==  GLOBAL.GROUP_BIGPIG_ID then
-			local currentScore = GLOBAL.GROUP_SCORE.GROUP1_SCORE
-			local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
-			if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
-				pigkigRange = GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
-			end
-		elseif pigkingId ==  GLOBAL.GROUP_REDPIG_ID then
-			local currentScore = GLOBAL.GROUP_SCORE.GROUP2_SCORE
-			local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
-			if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
-				pigkigRange = GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
-			end
-		elseif pigkingId ==  GLOBAL.GROUP_LONGPIG_ID then
-			local currentScore = GLOBAL.GROUP_SCORE.GROUP3_SCORE
-			local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
-			if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
-				pigkigRange = GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
-			end
-		elseif pigkingId ==  GLOBAL.GROUP_CUIPIG_ID then
-			local currentScore = GLOBAL.GROUP_SCORE.GROUP4_SCORE
-			local currentLevel = math.floor(currentScore / needLevelUpScore) + 1
-			if GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel] then
-				pigkigRange = GLOBAL.PIGKING_LEVEL_CONSTANT[currentLevel].PIGKING_RANGE
-			end
-		end
-	end
-	return pigkigRange ~= nil and pigkigRange or 20
-end
-
 --移除燃烧属性
 local function removeBurnable(inst)
 	if GLOBAL.TheWorld.ismastersim then
@@ -656,13 +619,15 @@ end
 local function canBuilHomeSign(act)
 	local pt = act:GetActionPoint()
 	local groupId = act.doer.components.pkc_group:getChooseGroup()
-	local homeSigns = GLOBAL.TheSim:FindEntities(pt.x, pt.y, pt.z, 1000, {"pkc_travelable", "pkc_group"..groupId})
-	if homeSigns ~= nil and #homeSigns > (GLOBAL.PKC_GROUPHOMESIGN_NUM - 1) then
+	local homeSigns = GLOBAL.TheSim:FindEntities(pt.x, pt.y, pt.z, 1000, {"pkc_travelable", "sign", "pkc_group"..groupId})
+	local allowHomeSignNum = getHomeSignNum(groupId)
+	if homeSigns ~= nil and #homeSigns >= allowHomeSignNum then
+		GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2, allowHomeSignNum))
 		return false
 	end
 	if homeSigns ~= nil and #homeSigns ~= 0 then
 		GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH1,
-				#homeSigns + 1, GLOBAL.PKC_GROUPHOMESIGN_NUM))
+				(#homeSigns + 1), allowHomeSignNum))
 	end
 	return true
 end
@@ -683,11 +648,13 @@ local function canBuildPigHouse(act)
 	end
 	if hasOurPigKingNear then
 		local pighouses = GLOBAL.TheSim:FindEntities(pt.x, pt.y, pt.z, GLOBAL.PIGKING_RANGE, {"pighouse", "pkc_group"..groupId})
-		if pighouses ~= nil and #pighouses > (GLOBAL.PKC_MAX_PIGHOUSE_NUM - 1) then
+		local allowPigHouseNum = getPigHouseNum(groupId)
+		if pighouses ~= nil and #pighouses >= allowPigHouseNum then
+			GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2, allowPigHouseNum))
 			return false
 		end
 		if pighouses ~= nil and #pighouses ~= 0 then
-			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH1..(#pighouses + 1))
+			GLOBAL.pkc_talk(act.doer, string.format(GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH1, (#pighouses + 1), allowPigHouseNum))
 		end
 		return true
 	end
@@ -707,14 +674,12 @@ GLOBAL.ACTIONS.BUILD.fn = function(act)
 
 	if act.recipe == "homesign" then --建造路牌
 		if not canBuilHomeSign(act) then
-			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_SIGN.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_GROUPHOMESIGN_NUM))
 			return false
 		end
 	end
 
 	if act.recipe == "pighouse" then --建造猪房
 		if not canBuildPigHouse(act) then
-			GLOBAL.pkc_talk(act.doer, GLOBAL.PKC_SPEECH.GROUP_PIGHOUSE.SPEECH2..GLOBAL.pkc_numToString(GLOBAL.PKC_MAX_PIGHOUSE_NUM))
 			return false
 		end
 	end
@@ -953,25 +918,25 @@ local function buildOverried(self, recname, pt, rotation, skin)
 		if recname and recname == "pighouse" then
 			if self.inst and self.inst.components.pkc_group then
 				if self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_BIGPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_pighouse_big", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_big", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_REDPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_pighouse_red", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_red", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_LONGPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_pighouse_long", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_long", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_CUIPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_pighouse_cui", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_pighouse_cui", recipe.chooseskin or skin, nil, self.inst.userid)
 				end
 			end
 		elseif recname and recname == "homesign" then
 			if self.inst and self.inst.components.pkc_group then
 				if self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_BIGPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_homesign_big", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_homesign_big", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_REDPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_homesign_red", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_homesign_red", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_LONGPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_homesign_long", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_homesign_long", recipe.chooseskin or skin, nil, self.inst.userid)
 				elseif self.inst.components.pkc_group:getChooseGroup() == GLOBAL.GROUP_CUIPIG_ID then
-					prod = GLOBAL.SpawnPrefab("pkc_homesign_cui", skin, nil, self.inst.userid)
+					prod = GLOBAL.SpawnPrefab("pkc_homesign_cui", recipe.chooseskin or skin, nil, self.inst.userid)
 				end
 			end
 		else

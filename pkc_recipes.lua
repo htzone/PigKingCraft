@@ -13,7 +13,7 @@ if armor_bramble then
 end
 local researchlab4 = GLOBAL.AllRecipes["researchlab4"]
 if researchlab4 then
-    researchlab4.ingredients = { Ingredient("goldnugget", 10), Ingredient("boards", 4), Ingredient("tophat", 1) }
+    researchlab4.ingredients = { Ingredient("goldnugget", 20), Ingredient("boards", 4), Ingredient("tophat", 2) }
 end
 local sleepbomb = GLOBAL.AllRecipes["sleepbomb"]
 if sleepbomb then

@@ -304,7 +304,11 @@ local function SetGuardPig(inst)
     inst.components.sleeper:SetSleepTest(GuardShouldSleep)
     inst.components.sleeper:SetWakeTest(GuardShouldWake)
 
-    inst.components.lootdropper:SetLoot({"meat", "pigskin"})
+    --inst.components.lootdropper:SetLoot({"meat", "pigskin"})
+    inst.components.lootdropper:SetLoot({})
+    inst.components.lootdropper:AddRandomLoot("meat", 1)
+    inst.components.lootdropper:AddRandomLoot("pigskin", 2)
+    inst.components.lootdropper.numrandomloot = 1
 
     inst.components.trader:Enable()
     inst.components.talker:StopIgnoringAll("becamewerepig")

@@ -333,7 +333,7 @@ local function MakeWindowSnow()
     return inst
 end
 
-local loot_table = {"boards","boards","cutstone","cutstone","pigskin","pigskin",}
+local loot_table = {"boards","cutstone","pigskin",}
 
 local function fn(groupId)
     local inst = CreateEntity()
