@@ -75,12 +75,11 @@ local function grow(inst)
 	if inst and inst.Transform then
 		if inst.components.pkc_group then
 			local level = getPigkingLevel(inst.components.pkc_group:getChooseGroup())
-			local scale = 1 + 0.05 * level
-			local damage = GLOBAL.PKC_PIGMAN_DAMAGE + (0.05 * GLOBAL.PKC_PIGMAN_DAMAGE) * level
+			local scale = 1 + 0.025 * level
+			local damage = GLOBAL.PKC_PIGMAN_DAMAGE + (0.025 * GLOBAL.PKC_PIGMAN_DAMAGE) * level
 			local health = GLOBAL.PKC_PIGMAN_HEALTH + (0.1 * GLOBAL.PKC_PIGMAN_HEALTH) * level
-			local attack_period = GLOBAL.PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
+			local attack_period = GLOBAL.PKC_PIGMAN_ATTACKPERIOD - 0.01 * level
 			inst.Transform:SetScale(scale, scale, scale)
-			--inst:AddTag("pkc_level"..level)
 			inst.pkc_level = level
 			if inst.components.combat then
 				 inst.components.combat:SetDefaultDamage(damage)
@@ -293,7 +292,7 @@ AddPrefabPostInit("eyeturret_item", function(inst)
 				elseif groupId == GROUP_CUIPIG_ID then
 					turret = SpawnPrefab("pkc_eyeturret_cui")
 				end
-				if turret ~= nil then
+				if turret ~= nil and turret.Physics and turret.SoundEmitter then
 					turret.Physics:SetCollides(false)
 					turret.Physics:Teleport(pt.x, 0, pt.z)
 					turret.Physics:SetCollides(true)
@@ -316,7 +315,7 @@ AddPrefabPostInit("pighouse", function(inst)
 	inst:DoTaskInTime(0.1, function()
 		if inst and not inst:HasTag("burnt") then
 			local randomVal = math.random()
-			if randomVal < 0.8 then
+			if randomVal < 0.5 then
 				local x, y, z = inst.Transform:GetWorldPosition()
 				if x and y and z then
 					local b = SpawnPrefab("pkc_pigtorch")

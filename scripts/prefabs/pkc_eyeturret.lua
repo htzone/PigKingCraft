@@ -238,6 +238,13 @@ local function fn(groupId)
     inst.entity:AddNetwork()
 
     --MakeObstaclePhysics(inst, 1)
+    local phys = inst.entity:AddPhysics()
+    phys:SetMass(0)
+    phys:SetCollisionGroup(COLLISION.OBSTACLES)
+    phys:ClearCollisionMask()
+    phys:CollidesWith(COLLISION.ITEMS)
+    phys:CollidesWith(COLLISION.GIANTS)
+    phys:SetCapsule(0, 0)
 
     inst.Transform:SetFourFaced()
 

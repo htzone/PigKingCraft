@@ -283,11 +283,11 @@ end
 local function upgradeNearPigman(inst, level)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local pigGroupTag = "pkc_group"..inst.components.pkc_group:getChooseGroup()
-	local ents = TheSim:FindEntities(x, y, z, 600, {"pkc_pigman", pigGroupTag})
+	local ents = TheSim:FindEntities(x, y, z, 800, {"pkc_pigman", pigGroupTag})
 	for _, pigman in pairs(ents) do
 		if pigman and pigman:IsValid() and not pigman:HasTag("burnt") then
-			local scale = 1 + 0.05 * level
-			local damage = PKC_PIGMAN_DAMAGE + (0.05 * PKC_PIGMAN_DAMAGE) * level
+			local scale = 1 + 0.025 * level
+			local damage = PKC_PIGMAN_DAMAGE + (0.025 * PKC_PIGMAN_DAMAGE) * level
 			local health = PKC_PIGMAN_HEALTH + (0.1 * PKC_PIGMAN_HEALTH) * level
 			local attack_period = PKC_PIGMAN_ATTACKPERIOD - 0.02 * level
 			pigman.Transform:SetScale(scale, scale, scale)

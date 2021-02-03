@@ -17,7 +17,7 @@ You can configure other setting in the module configuration page.↓↓↓
 ]]
 --"在这个世界上别太依赖任何人，因为当你在黑暗中挣扎的时候，连你的影子也会离开你." 猪王如是说...
 author = "RedPig, 大猪猪"
-version = "3.0.7"
+version = "3.0.9"
 
 -- This is the URL name of the mod's thread on the forum; the part after the index.php? and before the first & in the URL
 -- Example:
