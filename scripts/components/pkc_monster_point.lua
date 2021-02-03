@@ -55,19 +55,30 @@ local function canSpawn(pt)
     return true
 end
 
+local function spawnPigGuardPoints()
+    local mobs = {}
+    for i = 1, PIG_GUARD_POINT_NUM do
+        local mob = pkc_spawnPrefabByTileTable("pkc_pigtorch", PREFAB_TO_TILE_TABLE, 20, canSpawn, true)
+        if mob then
+            mob:AddComponent("pkc_spawner")
+            mob.components.pkc_spawner:startSpawn("pkc_pigtorch")
+            table.insert(mobs, mob)
+        end
+    end
+    print("pkc pigguard point size:"..tostring(#mobs))
+end
+
 local function updateWorld(world)
     if world.needPoint and TheWorld.state.cycles >= 0 then
         world:DoTaskInTime(1, function()
-            --pkc_announce("世界异变开始了...")
-            for i = 1, 100 do
-                local mob = pkc_spawnPrefabByTileTable("pkc_pigtorch", PREFAB_TO_TILE_TABLE, 20, canSpawn, true)
-                if mob then
-                    mob:AddComponent("pkc_spawner")
-                    mob.components.pkc_spawner:startSpawn("pkc_pigtorch")
-                end
-            end
+            pkc_announce("世界异变开始了...")
+            --安置野猪据点
+            spawnPigGuardPoints()
             --world:DoTaskInTime(2, function()
-            --    pkc_teleportAllPlayerToInst(mob)
+            --    if mobs and next(mobs) ~= nil then
+            --        local mob = table.remove(mobs)
+            --        pkc_teleportAllPlayerToInst(mob)
+            --    end
             --end)
         end)
         world.needPoint = false

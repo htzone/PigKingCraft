@@ -338,3 +338,12 @@ AddPrefabPostInit("pighouse", function(inst)
 	--end
 end)
 
+AddPrefabPostInit("pigguard", function(inst)
+	if not GLOBAL.TheWorld.ismastersim then
+		return
+	end
+	if inst then
+		inst:AddTag("pkc_hostile")
+	end
+end)
+

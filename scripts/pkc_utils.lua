@@ -439,7 +439,9 @@ local function clearNear(inst, radius, fn)
         local x, y, z = inst.Transform:GetWorldPosition()
         local ents = TheSim:FindEntities(x, y, z, radius)
         for _, obj in ipairs(ents) do
-            if obj and obj ~= inst and not obj:HasTag("burnt") and (fn == nil or fn(obj)) then
+            if obj and obj ~= inst and obj:IsValid()
+                    and not obj:HasTag("burnt") and not obj:HasTag("FX")
+                    and (fn == nil or fn(obj)) then
                 obj:Remove()
             end
         end

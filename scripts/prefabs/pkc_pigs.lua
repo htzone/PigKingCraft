@@ -245,8 +245,8 @@ local function NormalRetargetFn(inst)
 		if not inst.components.pkc_group then
 			return guy:HasTag("monster") and guy:HasTag("_combat") and not guy:HasTag("playerghost") and not guy:HasTag("INLIMBO")
 		end
-        ----不能以同队的眼球塔作为目标
-        if guy:HasTag("eyeturret") and guy:HasTag("pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())) then
+        ----不能以同队的作为目标
+        if (guy:HasTag("eyeturret") or guy:HasTag("pkc_pigman")) and guy:HasTag("pkc_group"..tostring(inst.components.pkc_group:getChooseGroup())) then
             return false
         end
         --
@@ -313,7 +313,7 @@ local function SetNormalPig(inst)
 	if inst.pkc_group_id ~= nil and inst.components.pkc_group then
 		inst.components.pkc_group:setChooseGroup(inst.pkc_group_id)
 	end
-	
+
     inst:RemoveTag("werepig")
     inst:RemoveTag("guard")
     inst:SetBrain(normalbrain)
