@@ -244,11 +244,18 @@ local function GuardRetargetFn(inst)
         if not guy then
             return false
         end
-        if guy:HasTag("guard") and guy:HasTag("pig") then
+        if guy:HasTag("player") then
+            return true
+        end
+        if guy.components.follower and guy.components.follower.leader
+                and guy.components.follower.leader:HasTag("player") then
+            return true
+        end
+        if (guy:HasTag("guard") and guy:HasTag("pig")) or guy:HasTag("monster") or guy:HasTag("playerghost") then
             return false
         end
-        return guy:HasTag("monster") or guy:HasTag("player") or guy:HasTag("character")
-    end, {"_combat"}, RETARGET_GUARD_LIMBO_CANT_TAGS)
+        return guy:HasTag("character")
+    end, {"_combat"})
     return invader
 end
 
@@ -286,6 +293,7 @@ local function SetGuardPig(inst)
     inst:RemoveTag("werepig")
     inst:AddTag("guard")
     inst:AddTag("pkc_hostile")
+    inst:AddTag("monster")
     inst:SetBrain(guardbrain)
     inst:SetStateGraph("SGpig")
     inst.AnimState:SetBuild(inst.build)
@@ -306,8 +314,10 @@ local function SetGuardPig(inst)
 
     --inst.components.lootdropper:SetLoot({"meat", "pigskin"})
     inst.components.lootdropper:SetLoot({})
-    inst.components.lootdropper:AddRandomLoot("meat", 1)
-    inst.components.lootdropper:AddRandomLoot("pigskin", 2)
+    inst.components.lootdropper:AddRandomLoot("meat", 25)
+    inst.components.lootdropper:AddRandomLoot("pigskin", 50)
+    inst.components.lootdropper:AddRandomLoot("thulecite_pieces", 25)
+    inst.components.lootdropper:AddRandomLoot("deerclops_eyeball", 1)
     inst.components.lootdropper.numrandomloot = 1
 
     inst.components.trader:Enable()

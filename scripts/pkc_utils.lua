@@ -301,7 +301,7 @@ function pkc_trySpawnNear(target, prefab_name, min_dist, max_dist, max_trying_ti
                 end
                 return b
             else
-                b = pkc_trySpawn(target, prefab_name, min_dist, max_dist, max_trying_times - 1)
+                b = pkc_trySpawnNear(target, prefab_name, min_dist, max_dist, max_trying_times - 1)
             end
         end
     end
@@ -434,7 +434,7 @@ function pkc_spawnat(inst, prefname, offset, mode, fn)
 end
 
 --清理猪王附近的东西
-local function clearNear(inst, radius, fn)
+function clearNear(inst, radius, fn)
     if inst and inst.Transform then
         local x, y, z = inst.Transform:GetWorldPosition()
         local ents = TheSim:FindEntities(x, y, z, radius)
@@ -551,6 +551,36 @@ end
 --根据地皮类型来放置Prefab
 function pkc_spawnPrefabByTileTable(prefabName, tileTable, tryMaxTimes, checkFn, clear)
     local validTile = tileTable[prefabName]
+    if not validTile then
+        return nil
+    end
+    local b = nil
+    local size_x, size_y = TheWorld.Map:GetSize()
+    local tryTimes = 0
+    while tryTimes < tryMaxTimes do
+        local pt = Vector3(math.random(-size_x, size_x), 0, math.random(-size_y, size_y))
+        local isAboveGround = TheWorld.Map:IsAboveGroundAtPoint(pt.x, pt.y, pt.z, false)
+        if isAboveGround then
+            local tile = TheWorld.Map:GetTileAtPoint(pt.x, pt.y, pt.z)
+            local canSpawn = (tile == validTile)
+            if canSpawn and not checkFn or checkFn(pt) then
+                b = SpawnPrefab(prefabName)
+                if b and b:IsValid() and b.Transform then
+                    b.Transform:SetPosition(pt:Get())
+                    if clear then
+                        clearNear(b, 2)
+                    end
+                end
+                break
+            end
+        end
+        tryTimes = tryTimes + 1
+    end
+    return b
+end
+
+--根据地皮类型来放置Prefab
+function pkc_spawnPrefabByTile(prefabName, validTile, tryMaxTimes, checkFn, clear)
     if not validTile then
         return nil
     end
@@ -736,6 +766,14 @@ function getPlayerColorByUserId(userid)
         end
     end
     return DEFAULT_PLAYER_COLOUR
+end
+
+function getPlayerByUserId(userid)
+    for _, player in pairs(AllPlayers) do
+        if player and player.userid == userid then
+            return player
+        end
+    end
 end
 
 function isSameGroup(inst1, inst2)

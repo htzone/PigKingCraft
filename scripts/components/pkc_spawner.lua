@@ -4,11 +4,11 @@
 -- Date: 2021/2/1
 --
 local weightTable = {
-	[0] = 30,
+	[0] = 10,
 	[1] = 20,
 	[2] = 20,
-	[3] = 100,
-	[4] = 20,
+	[3] = 80,
+	[4] = 60,
 	[5] = 10,
 }
 
@@ -19,11 +19,12 @@ local PKC_SPAWNER = Class(function(self, inst)
 	end
 end)
 
-function PKC_SPAWNER:startSpawn(prefabName)
+function PKC_SPAWNER:startSpawn(prefabName, radius)
+	radius = radius or 4
 	self.inst:DoTaskInTime(.1, function()
 		if self.inst then
 			local num = pkc_weightedChoose(weightTable)
-			pkc_roundSpawn(self.inst, prefabName, 4, num, true)
+			pkc_roundSpawn(self.inst, prefabName, radius, num, true)
 		end
 	end)
 end

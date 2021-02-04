@@ -9,7 +9,7 @@ GLOBAL.GAME_SCORE = {
 	--击杀
 	KILL = {
 		PLAYER = 50, --玩家
-		KING = 1000, --猪王首领
+		KING = 2000, --猪王首领
 		pkc_pigman_big = 10, --战斗猪人
 		pkc_pigman_red = 10,
 		pkc_pigman_cui = 10,
@@ -31,7 +31,7 @@ GLOBAL.GAME_SCORE = {
 		mossling = 25, --小鸭
 		bearger = 1000, --巨熊
 		dragonfly = 2000, --龙蝇
-		beequeen = 2000, --蜂后
+		beequeen = 1000, --蜂后
 		minotaur = 1000, --远古犀牛
 		worm = 20, --远古虫子
 		slurper = 10, --缀食者
@@ -49,7 +49,8 @@ GLOBAL.GAME_SCORE = {
 		koalefant_winter = 10, --冬象
 		beefalo = 10, --牛
 		malbatross = 500,-- 不知道什么鸟 就叫海鸥吧
-		
+		pkc_leifking = 500, --树精长老
+		pkc_bunnymanking = 500, --兔人国王
 	},
 	
 	--贡献
@@ -98,7 +99,7 @@ GLOBAL.GAME_SCORE = {
 		walrus_tusk = 50,--海象牙
 		slurper_pelt = 50, --缀食者之皮
 		deerclops_eyeball = 100, --巨鹿眼球
-		minotaurhorn = 1000, --远古守护者角
+		minotaurhorn = 100, --远古守护者角
 		bearger_fur = 20, --熊皮
 		goose_feather = 30, --鹿鸭羽毛
 		dragon_scales = 30,  --蜻蜓鳞片

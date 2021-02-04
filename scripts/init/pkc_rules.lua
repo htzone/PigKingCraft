@@ -1072,7 +1072,7 @@ local function readBookTenttaclesFn(inst, reader)
 				local ents = GLOBAL.TheSim:FindEntities(pos.x, pos.y, pos.z, 40)
 				local hasPigKingNear = false
 				for _,obj in pairs(ents) do
-					if obj and obj:HasTag("king") then
+					if obj and (obj:HasTag("king") or obj:HasTag("multiplayer_portal")) then
 						hasPigKingNear = true
 						break
 					end

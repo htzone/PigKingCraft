@@ -73,6 +73,8 @@ PrefabFiles = {
     "pkc_largechest",
     "pkc_pigtorch",
     "pkc_pigguard",
+    "pkc_leifking",
+    "pkc_bunnymanking",
 }
 
 Assets = {

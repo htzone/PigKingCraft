@@ -477,6 +477,11 @@ local function fn(group_id, build, name)
 	inst:AddComponent("pkc_levelup")
 	inst.components.pkc_levelup:setLevelNum(#(PIGKING_LEVEL_CONSTANT))
 	inst.components.pkc_levelup:init()
+
+	--猪王回san光环
+	inst:AddComponent("sanityaura")
+	inst.components.sanityaura.aura = TUNING.SANITYAURA_LARGE
+
 	--监听猪王升级
 	inst:ListenForEvent("pkc_pigkingLevelUp", onLevelUp)
 	

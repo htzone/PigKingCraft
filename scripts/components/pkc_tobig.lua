@@ -24,39 +24,44 @@ function PKC_TOBIG:growTo(scale)
 					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
 				end
 			elseif self.inst.prefab == "spider_warrior" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,650)
+				local mobScale = math.min(self.scale, 1.5)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2,650)
 				if self.inst.components.combat then --蜘蛛战士的伤害
-					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
-					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)
-					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
+					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + mobScale * 0.5)
+					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + mobScale * 0.5)
+					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + mobScale * 0.5)
 				end				
 			elseif self.inst.prefab == "merm" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,600)			
+				local mobScale = math.min(self.scale, 1.5)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2,600)
 				if self.inst.components.combat then --鱼人
-					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.2)
-					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.2)
-					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.2)
+					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + mobScale * 0.2)
+					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + mobScale * 0.2)
+					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + mobScale * 0.2)
 				end			
 			elseif self.inst.prefab == "mermguard" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,700)			
+				local mobScale = math.min(self.scale, 1.5)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2,700)
 				if self.inst.components.combat then --鱼人战士伤害
-					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.2)
-					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.2)
-					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.2)
+					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + mobScale * 0.2)
+					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + mobScale * 0.2)
+					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + mobScale * 0.2)
 				end		
 			elseif self.inst.prefab == "spider_moon" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,750)			
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,750)
 				if self.inst.components.combat then --月岛蜘蛛的伤害
 					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
 					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)
 					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
 				end
 			elseif self.inst.prefab == "pkc_pigguard" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2, 1000)
+				local mobScale = math.min(self.scale, 1.5)
+				self.inst.Transform:SetScale(currentscale * mobScale, currentscale * mobScale, currentscale * mobScale)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2, 1000)
 				if self.inst.components.combat then
-					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
-					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)
-					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + self.scale * 0.5)
+					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + mobScale * 0.5)
+					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + mobScale * 0.5)
+					self.inst.components.combat.hitrange = self.inst.components.combat.hitrange * (0.5 + mobScale * 0.5)
 				end
 			else
 				self.inst.components.health.maxhealth = self.inst.components.health.maxhealth * self.scale * 1.2

@@ -272,7 +272,7 @@ local function transferProperty(killedId, killerId, clearKing)
 			end
 			if obj:HasTag("pkc_defences") and not obj:HasTag("burnt") and obj.Transform then
 				obj:DoTaskInTime(math.random(3), function()
-					if obj.Transform then
+					if obj and obj.Transform then
 						local currentscale = obj.Transform:GetScale()
 						local collapse = GLOBAL.SpawnPrefab("collapse_small")
 						if collapse then
@@ -280,7 +280,10 @@ local function transferProperty(killedId, killerId, clearKing)
 							collapse.Transform:SetScale(currentscale*1,currentscale*1,currentscale*1)
 						end
 					end
-					obj:Remove()
+					if obj and not obj:HasTag("FX") then
+						obj:Remove()
+					end
+
 				end)
 			else
 				if killerId then
@@ -478,6 +481,10 @@ end
 local function onPlayerLeft(inst, player)
 	inst:DoTaskInTime(0, function()
 	end)
+end
+
+local function spawnAncientAltar()
+	
 end
 
 local function network(inst)

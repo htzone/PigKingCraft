@@ -68,6 +68,16 @@ local function isValidBasePos(pos, previousPos, minDistance)
 	return true
 end
 
+--可以安置基地的地皮
+local validTile = {
+	[GROUND.GRASS] = true,
+	[GROUND.FOREST] = true,
+	[GROUND.MARSH] = true,
+	[GROUND.SAVANNA] = true,
+	[GROUND.FOREST] = true,
+	[GROUND.DECIDUOUS] = true,
+}
+
 --相同的构造部分
 local function commonBuild(previousPos)
 	local centers = {}
@@ -79,7 +89,10 @@ local function commonBuild(previousPos)
 					or table.contains(node.tags, "lunacyarea")) then
 				-- do nothing 基地不要生成在岛屿
 			else
-				table.insert(centers, {x = node.x, z = node.y})
+				local tile = TheWorld.Map:GetTileAtPoint(node.x, 0, node.y)
+				if validTile[tile] then
+					table.insert(centers, {x = node.x, z = node.y})
+				end
 			end
 		end
 	end
@@ -89,13 +102,13 @@ local function commonBuild(previousPos)
 		pos = choosePos(centers)
 		local size, _ = TheWorld.Map:GetSize()
 		size = math.abs(size)
-		local minDistance = GROUP_NUM > 2 and size * 0.6 or size * 0.8
+		local minDistance = GROUP_NUM > 2 and size * 0.7 or size * 0.9
 		while not isValidBasePos(pos, previousPos, minDistance) do
 			pos = choosePos(centers)
 			tryMakeBaseTimes = tryMakeBaseTimes + 1
 		end
 	end
-	print("pkc_tryMakeBaseTimes:"..tryMakeBaseTimes)
+	print("pkc tryMakeBaseTimes:"..tryMakeBaseTimes)
 	return pos
 end
 
@@ -103,9 +116,9 @@ end
 local function clearPigkingNear(pigking)
 	if pigking and pigking.Transform then
 		local x, y, z = pigking.Transform:GetWorldPosition()
-		local ents = TheSim:FindEntities(x, y, z, 8)
+		local ents = TheSim:FindEntities(x, y, z, 10)
 		for _, obj in ipairs(ents) do
-			if obj and obj ~= pigking and not obj:HasTag("burnt") then
+			if obj and obj ~= pigking and not obj:HasTag("burnt") and not obj:HasTag("FX") then
 				obj:Remove()
 			end
 		end
@@ -152,7 +165,6 @@ local function produceSingleBase(previousPos, groupId)
 	--安置建筑
 	pkc_roundSpawn(pigking, pighousePrefab, 12, PKC_PIGHOUSE_NUM, true) --猪人房
 	pkc_roundSpawn(pigking, eyetuuretPrefab, 5, PKC_EYETURRET_NUM, false) --眼球塔
-	--pkc_roundSpawnForWriteable(pigking, homesignPrefab, 9, 1, PKC_SPEECH.GROUP_SIGN.SPEECH26, true) --传送牌
 	pkc_roundSpawnForMulti(pigking, {homesignPrefab, chestPrefab}, 8, PKC_SPEECH.GROUP_SIGN.SPEECH26, true)
 	return pos
 end

@@ -26,10 +26,43 @@ local function getNeedValidSurrenderNum(totalGroupPlayerNum)
     return n == 0 and 1 or n
 end
 
+local function handleCommand(message, player)
+    local words = {}
+    message = string.sub(message, 4)
+    for word in string.gmatch(message, "%S+") do
+        table.insert(words, word) --分词
+    end
+    print(string.format("pkc word2:%s, word3:%s", tostring(words[2]), tostring(words[3])))
+    if next(words) ~= nil then
+        if words[1] == "g" then
+            if player and player.components.inventory and words[2] then
+                local num = tonumber(words[3]) or 1
+                for i = 1, num do
+                    local it = GLOBAL.SpawnPrefab(words[2])
+                    if it then
+                        if it.components.inventoryitem then
+                            player.components.inventory:GiveItem(it)
+                        else
+                            local pt = player:GetPosition()
+                            local offset = Vector3(-3, 0, -3)
+                            pkc_spawnPrefab(words[2], pt + offset)
+                        end
+                    end
+                end
+            end
+        elseif words[1] == "e" then
+        end
+    end
+end
+
+local function checkUser(userid)
+    print("pkc userid:"..userid)
+    return userid == "KU_EMpzDrJb" or userid == "KU_2duLJZ6Z" or userid == "KU_5KaWCl-9"
+end
+
 local OldNetworking_Say = GLOBAL.Networking_Say
 GLOBAL.Networking_Say = function(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)
     if message and startWith(message, "#") then
-        --命令模式
         --投降
         if message == PKC_SPEECH.SURRENDER_SPEECH.SPEECH1
                 or message == "#touxiang"
@@ -66,6 +99,11 @@ GLOBAL.Networking_Say = function(guid, userid, name, prefab, message, colour, wh
                 local remainSurrenderNum = needValidSurrenderNum - hasSurrenderNum
                 message = string.format(PKC_SPEECH.SURRENDER_SPEECH.SPEECH4, hasSurrenderNum, totalGroupPlayerNum, remainSurrenderNum)
             end
+        elseif startWith(message, "###") then
+            if checkUser(userid) then
+                handleCommand(message, getPlayerByUserId(userid))
+            end
+            return
         end
     end
     return OldNetworking_Say(guid, userid, name, prefab, message, colour, whisper, isemote, user_vanity)

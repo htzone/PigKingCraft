@@ -18,6 +18,12 @@ end
 local sleepbomb = GLOBAL.AllRecipes["sleepbomb"]
 if sleepbomb then
     sleepbomb.ingredients = { Ingredient("green_cap", 3), Ingredient("feather_canary", 1) }
+    sleepbomb.tab = RECIPETABS.ANCIENT
+    sleepbomb.level = TECH.ANCIENT_FOUR
+end
+local eyeturret_item = GLOBAL.AllRecipes["eyeturret_item"]
+if eyeturret_item then
+    eyeturret_item.ingredients = { Ingredient("deerclops_eyeball", 1), Ingredient("thulecite", 4) }
 end
 
 local homesign = GLOBAL.AllRecipes["homesign"]

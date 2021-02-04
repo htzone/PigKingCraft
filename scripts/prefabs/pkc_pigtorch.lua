@@ -27,6 +27,7 @@ local loot =
     "log",
     "log",
     "log",
+    "cutstone", "cutstone", "cutstone",
     "poop",
 }
 
@@ -106,8 +107,8 @@ local function fn()
 
     inst:AddTag("structure")
     inst:AddTag("wildfireprotected")
-    inst:AddTag("_combat")
     inst:AddTag("pkc_hostile")
+    inst:AddTag("pigtorch")
 
     --MakeSnowCoveredPristine(inst)
 

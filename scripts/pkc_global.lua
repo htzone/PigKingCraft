@@ -32,6 +32,8 @@
 	GLOBAL.PKC_PREVENT_BAD_BOY = GetModConfigData("prevent_bad_boy")
 	--怪物据点
 	GLOBAL.PKC_MONSTER_POINT = GetModConfigData("monster_point_switch")
+	--出生点安置Boss
+	GLOBAL.PKC_PORTAL_SPAWN_BOSS = GetModConfigData("portal_spawn_boss")
 	--物品自动清理超过时间(秒)
 	GLOBAL.PKC_AUTO_DELETE_TIME = 100
 	--世界自动清理间隔时间(天)
@@ -68,12 +70,26 @@
 	GLOBAL.GROUP_LONGPIG_ID= 3	
 	--崔猪猪势力
 	GLOBAL.GROUP_CUIPIG_ID = 4
+
 	--猪人守卫生命值
-	GLOBAL.TUNING.PIG_GUARD_HEALTH = 250
+	GLOBAL.TUNING.PIG_GUARD_HEALTH = 300
 	--猪人守卫攻击力
 	GLOBAL.TUNING.PIG_GUARD_DAMAGE = 30
-	--猪人守卫据点数目
-	GLOBAL.PIG_GUARD_POINT_NUM = 100
+	--猪人守卫据点每次安置的数目
+	GLOBAL.PIG_GUARD_PER_POINT_NUM = 30
+	--猪人守卫最大数目
+	GLOBAL.PIG_GUARD_MAX_POINT_NUM = 150
+
+	--兔人boss
+	GLOBAL.BUNNYMAN_KING_HEALTH = 10000 --兔人boss生命值
+	GLOBAL.BUNNYMAN_HYPONSIS_COOLDOWN = 8 --催眠冷却时间
+	GLOBAL.BUNNYMAN_LIGHTING_COOLDOWN = 8 --落雷冷却时间
+	GLOBAL.BUNNYMAN_HYPONSIS_RANGE = 20 --催眠范围
+	GLOBAL.BUNNYMAN_LIGHTING_RANGE = 8 --落雷范围
+
+	--树人boss
+	GLOBAL.LEIF_HEALTH = 10000
+	GLOBAL.LEIF_EARTHQUACK_COOLDOWN = 6 --大地颤怒冷却时间
 
 	if not GLOBAL.STRINGS.CHARACTERS.WEBBER then
 		GLOBAL.STRINGS.CHARACTERS.WEBBER = {DESCRIBE = {}}
@@ -93,7 +109,7 @@
 		local desc_pur = "那是紫色军团的头盔！"
 
 		GLOBAL.STRINGS.PIG_TALK_FIND_CONTAINER = {"找个东西装一下吧！", "箱子满了我就不能放了", "找个地方放一下", "主人们有更多的箱子么", "我拿了点东西回来"}
-		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "还是我来收拾烂摊子吧！", "捡起来放箱子吧！", "发现可疑物！", "看我发现了什么！" }
+		GLOBAL.STRINGS.PIG_TALK_FIND_GROUND_ITEM = { "主人们太懒了！", "还是我来收拾烂摊子吧！", "捡起来放箱子吧！", "发现可疑物！", "看我发现了什么！" , "砸到花花草草就不好了！"}
 		GLOBAL.STRINGS.PIG_TALK_HARVEST_ITEM = { "大丰收啊！", "猪人喜欢劳动！", "要是我能偷偷吃点就好了！", "绝对不能吃！这是主人们的", "又到了收获的季节", "我是勤劳的猪人" }
 		GLOBAL.STRINGS.PIG_TALK_FERTILIZER_ITEM = { "植物需要施肥！", "猪人喜欢劳动！", "用我的便便滋润它！", "给你表演个魔术" }
 		GLOBAL.STRINGS.PIG_FIND_POOP_ITEM = { "哪里有便便？", "找坨便便！", "需要屎来滋润它", "怎么办，庄稼枯萎了！" }

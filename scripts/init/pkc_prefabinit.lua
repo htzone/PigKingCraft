@@ -308,6 +308,7 @@ AddPrefabPostInit("eyeturret_item", function(inst)
 	end
 end)
 
+--将一部分猪人房变成猪人守卫图腾（减少野外猪人房的数量）
 AddPrefabPostInit("pighouse", function(inst)
 	if not GLOBAL.TheWorld.ismastersim then
 		return
@@ -327,23 +328,26 @@ AddPrefabPostInit("pighouse", function(inst)
 			end
 		end
 	end)
-	--local x, y, z = inst.Transform:GetWorldPosition()
-	--local tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
-	--print("pkc ground index:"..tostring(tile))
-	--for i, v in pairs(GROUND) do
-	--	if tile == v then
-	--		print("pkc ground:"..tostring(i))
-	--		break
-	--	end
-	--end
 end)
 
+--添加猪人守卫标签
 AddPrefabPostInit("pigguard", function(inst)
 	if not GLOBAL.TheWorld.ismastersim then
 		return
 	end
 	if inst then
 		inst:AddTag("pkc_hostile")
+		inst:AddTag("monster")
+	end
+end)
+
+--远古遗迹不可拆
+AddPrefabPostInit("ancient_altar", function(inst)
+	if not GLOBAL.TheWorld.ismastersim then
+		return
+	end
+	if inst and inst.components.workable then
+		inst.components.workable:SetWorkable(false)
 	end
 end)
 

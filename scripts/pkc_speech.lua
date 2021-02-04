@@ -14,6 +14,8 @@ if GetModConfigData("language") == "chinese" then
 		dragonfly = {NAME = "龙蝇"},
 		minotaur = {NAME = "远古犀牛"},
 		malbatross = {NAME = "邪天翁"},
+		pkc_leifking = {NAME = "树精长老"},
+		pkc_bunnymanking = {NAME = "兔人国王"},
 	}
 	
 	--语气词
@@ -51,7 +53,7 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH2 = "可惜，不能这么做！",
 			SPEECH3 = "可惜，和平时期不能这么做！",
 			SPEECH4 = "离敌人建筑太近了，我不能这么做！",
-			SPEECH5 = "离猪王太近，我不能这么做！",
+			SPEECH5 = "离得太近，我不能这么做！",
 		},
 		GRAVESTONE_TIPS = {
 			SPEECH1 = "沉睡的地方",
@@ -186,9 +188,6 @@ if GetModConfigData("language") == "chinese" then
 		COUNT_POINTS = {
 			SPEECH1 = "请勿离开房间，猪王们正在拼命地统计分数...",
 		},
-		MONSTER_POINT = {
-			SPEECH1 = "不好了，巨熊降临，世界的平衡即将被打破啦！！！",
-		},
 		CHAT_QUEUE = {
 			SPEECH1 = "对所有人说",
 			SPEECH2 = "对队伍内说",
@@ -203,8 +202,8 @@ if GetModConfigData("language") == "chinese" then
 			"猪王争霸：通过路牌传送可以很快到达到同组路牌或玩家的附近，减少跑路时间！",
 			"猪王争霸：善待猪人，猪人们或许能成为你的好帮手！",
 			"猪王争霸：分组生存对抗，最后剩下的阵营将会是比赛的胜利者！",
-			"猪王争霸：按Y键输入 '#投降' 或 '#sur' 可以发起投降，达到投降最低人数即可成功投降！",
-			"猪王争霸：月圆之夜请小心家里的猪哦！！！",
+			"猪王争霸：按Y键输入 '#投降' 或 '#gg' 可以发起投降，达到投降最低人数即可成功投降！",
+			"猪王争霸：如果是月圆之夜请小心家里的猪哦！",
 			"猪王争霸：给猪人粑粑可以让其放弃跟随你！",
 			"猪王争霸：死亡会随机掉落，死的次数越多复活需要的时间就会越久！",
 		},
@@ -217,7 +216,8 @@ if GetModConfigData("language") == "chinese" then
 			SPEECH6 = "%s 阵营投降成功，%s 阵营已经被消灭了！！！",
 		},
 		MONSTER_POINT = {
-			SPEECH1 = "",
+			SPEECH1 = "世界异变开始了...",
+			SPEECH2 = "不好了，%s 从混沌之门里边出来了！！！",
 		},
 	}
 	
@@ -257,6 +257,8 @@ else
 		dragonfly = {NAME = "Dragonfly"},
 		minotaur = {NAME = "Minotaur"},
 		malbatross = {NAME = "Malbatross"},
+		pkc_leifking = {NAME = "Leif King"},
+		pkc_bunnymanking = {NAME = "Bunny man King"},
 	}
 
 	GLOBAL.MODAL_WORDS = {
@@ -291,7 +293,7 @@ else
 			SPEECH2 = "Sorry, I  cant  do  that!",
 			SPEECH3 = "Sorry, I  cant  do  that in peaceful days!",
 			SPEECH4 = "It's so close to enemy pigking that I cant do this!",
-			SPEECH5 = "It's so close to pigking that I cant do this!",
+			SPEECH5 = "It's so close and I cant do this!",
 		},
 		GRAVESTONE_TIPS = {
 			SPEECH1 = "He's  already  asleep!",
@@ -427,9 +429,6 @@ else
 		COUNT_POINTS = {
 			SPEECH1 = "Please dont leave the game, Pigking is counting your points...",
 		},
-		MONSTER_POINT = {
-			SPEECH1 = "Be careful! The bearger has come to this world...",
-		},
 		CHAT_QUEUE = {
 			SPEECH1 = "To Everyone",
 			SPEECH2 = "To Team",
@@ -454,7 +453,8 @@ else
 			SPEECH6 = "%s group has surrendered, %s was wiped out!!!",
 		},
 		MONSTER_POINT = {
-			SPEECH1 = "",
+			SPEECH1 = "The world is changing...",
+			SPEECH2 = "Incredibly, %s has come to this world!!!",
 		},
 	}
 	
