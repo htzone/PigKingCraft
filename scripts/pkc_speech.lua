@@ -16,6 +16,8 @@ if GetModConfigData("language") == "chinese" then
 		malbatross = {NAME = "邪天翁"},
 		pkc_leifking = {NAME = "树精长老"},
 		pkc_bunnymanking = {NAME = "兔人国王"},
+		pkc_mermking = {NAME = "鱼人国王"},
+		pkc_rockyking = {NAME = "石虾国王"},
 	}
 	
 	--语气词
@@ -218,6 +220,7 @@ if GetModConfigData("language") == "chinese" then
 		MONSTER_POINT = {
 			SPEECH1 = "世界异变开始了...",
 			SPEECH2 = "不好了，%s 从混沌之门里边出来了！！！",
+			SPEECH3 = "不好了，怪物们又开始蠢蠢欲动了...",
 		},
 	}
 	
@@ -258,7 +261,9 @@ else
 		minotaur = {NAME = "Minotaur"},
 		malbatross = {NAME = "Malbatross"},
 		pkc_leifking = {NAME = "Leif King"},
-		pkc_bunnymanking = {NAME = "Bunny man King"},
+		pkc_bunnymanking = {NAME = "Bunny Man King"},
+		pkc_mermking = {NAME = "Merm King"},
+		pkc_rockyking = {NAME = "Rocky King"},
 	}
 
 	GLOBAL.MODAL_WORDS = {
@@ -455,6 +460,7 @@ else
 		MONSTER_POINT = {
 			SPEECH1 = "The world is changing...",
 			SPEECH2 = "Incredibly, %s has come to this world!!!",
+			SPEECH3 = "Incredibly，The world is changing...",
 		},
 	}
 	

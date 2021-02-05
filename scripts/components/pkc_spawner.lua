@@ -19,12 +19,16 @@ local PKC_SPAWNER = Class(function(self, inst)
 	end
 end)
 
-function PKC_SPAWNER:startSpawn(prefabName, radius)
+function PKC_SPAWNER:startSpawn(prefabName, radius, num, clear, actionFn)
 	radius = radius or 4
+	clear = clear ~= nil and clear or true
 	self.inst:DoTaskInTime(.1, function()
 		if self.inst then
-			local num = pkc_weightedChoose(weightTable)
-			pkc_roundSpawn(self.inst, prefabName, radius, num, true)
+			local spawnNum = num or pkc_weightedChoose(weightTable)
+			local mobs = pkc_roundSpawn(self.inst, prefabName, radius, spawnNum, clear)
+			if actionFn ~= nil and mobs then
+				actionFn(mobs)
+			end
 		end
 	end)
 end

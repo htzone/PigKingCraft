@@ -47,9 +47,9 @@ local RUN_AWAY_DIST = 5
 local STOP_RUN_AWAY_DIST = 8
 
 --猪人能看到箱子的最大距离
-local SEE_CHEST_DIST = 15
+local SEE_CHEST_DIST = 20
 --猪人能看到地上物品的最大距离
-local SEE_GROUND_ITEM_DIST = 8
+local SEE_GROUND_ITEM_DIST = 15
 --猪人帮忙采集的最大距离
 local SEE_HARVEST_ITEM_DIST = 15
 --猪人自动采集的最大距离

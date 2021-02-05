@@ -187,7 +187,7 @@ local tradable_item = {
 	"poop",
 }
 local function addTradableAttr(item)
-	if item then
+	if item and not item.components.tradable then
 		item:AddComponent("tradable")
 	end
 end
@@ -348,6 +348,158 @@ AddPrefabPostInit("ancient_altar", function(inst)
 	end
 	if inst and inst.components.workable then
 		inst.components.workable:SetWorkable(false)
+	end
+end)
+
+--远程武器效果修改
+AddComponentPostInit("weapon", function(self, inst)
+	self.OriginalLaunchProjectile = self.LaunchProjectile
+	if GLOBAL.TheWorld.ismastersim == false then return; end
+
+	function self:LaunchProjectile(attacker, target)
+		if attacker:HasTag("pkc_hostile_boss") then
+			if attacker.prefab == "pkc_mermking" then
+				if self.projectile then
+					if self.onprojectilelaunch then
+						self.onprojectilelaunch(self.inst, attacker, target)
+					end
+					local proj = SpawnPrefab(self.projectile)
+					if proj then
+						inst:AddTag("projectile")
+						proj.persists = false
+						proj:AddComponent("projectile")
+						proj.components.projectile:SetSpeed(25)
+						proj.components.projectile:SetHoming(false)
+						proj.components.projectile:SetHitDist(0.8)
+						proj.components.projectile:SetOnHitFn(function()
+							local x1, y1, z1 = proj.Transform:GetWorldPosition()
+							local ents = TheSim:FindEntities(x1, y1, z1, 5)
+							for _,obj in pairs(ents) do
+								if obj and not obj:HasTag("pkc_hostile")
+										and not obj:HasTag("merm")
+										and not obj:HasTag("tentacle")
+										and obj.components.freezable then
+									obj.components.freezable:AddColdness(2)
+									obj.components.freezable:SpawnShatterFX()
+								end
+							end
+							proj:Remove()
+						end)
+						proj.components.projectile:SetOnMissFn(proj.Remove)
+						proj.components.projectile:SetOnThrownFn(function() proj:ListenForEvent("entitysleep", proj.Remove) end)
+						local currentscale = proj.Transform:GetScale()
+						proj.Transform:SetScale(currentscale*1,currentscale*8,currentscale*1)
+						proj:DoPeriodicTask(.1, function()
+							if proj then
+								local x, y, z = proj.Transform:GetWorldPosition()
+								local fx = SpawnPrefab("icespike_fx_"..math.random(1,4))
+								local currentscale = fx.Transform:GetScale()
+								fx.Transform:SetScale(currentscale*1.5,currentscale*4,currentscale*1.5)
+								fx.Transform:SetPosition(x, y, z)
+							end
+						end)
+
+						proj:DoTaskInTime(1, function()
+							proj:Remove()
+						end)
+						-----------------------
+						if proj.components.projectile then
+							proj.Transform:SetPosition(attacker.Transform:GetWorldPosition() )
+							proj.components.projectile:Throw(self.inst, target, attacker)
+						elseif proj.components.complexprojectile then
+							proj.Transform:SetPosition( attacker.Transform:GetWorldPosition() )
+							proj.components.complexprojectile:Launch(Vector3( target.Transform:GetWorldPosition() ), attacker, self.inst)
+						end
+					end
+				end
+				return nil
+			elseif attacker.prefab == "pkc_pigguardking" then
+				if self.projectile then
+					if self.onprojectilelaunch then
+						self.onprojectilelaunch(self.inst, attacker, target)
+					end
+
+					local proj = SpawnPrefab(self.projectile)
+					--------------------------
+					if proj then
+						proj.AnimState:SetBank("monkey_projectile")
+						proj.AnimState:SetBuild("monkey_projectile")
+						proj.AnimState:PlayAnimation("idle")
+						local currentscale = proj.Transform:GetScale()
+						proj.Transform:SetScale(currentscale*1.5,currentscale*1.5,currentscale*1.5)
+						inst:AddTag("projectile")
+						proj.persists = false
+						proj:AddComponent("projectile")
+						proj.components.projectile:SetSpeed(18)
+						proj.components.projectile:SetHoming(false)
+						proj.components.projectile:SetHitDist(0.3)
+						proj.components.projectile.range = POOP_BOMB_DIST
+						proj.components.projectile:SetOnThrownFn(function() proj:ListenForEvent("entitysleep", proj.Remove) end)
+						proj.components.projectile:SetOnHitFn(OnHit_piggurad)
+						proj.components.projectile:SetOnMissFn(OnMiss_piggurad)
+
+						-----------------------
+						if proj.components.projectile then
+							proj.Transform:SetPosition(attacker.Transform:GetWorldPosition() )
+							proj.components.projectile:Throw(self.inst, target, attacker)
+						elseif proj.components.complexprojectile then
+							proj.Transform:SetPosition( attacker.Transform:GetWorldPosition() )
+							proj.components.complexprojectile:Launch(Vector3( target.Transform:GetWorldPosition() ), attacker, self.inst)
+						end
+					end
+				end
+				return nil
+			end
+
+		end
+
+		return self:OriginalLaunchProjectile(attacker, target)
+	end
+end)
+
+local RETARGET_MUST_TAGS = { "_combat", "_health" }
+local RETARGET_CANT_TAGS = { "prey" }
+local function retargetfn(inst)
+	return FindEntity(
+			inst,
+			TUNING.TENTACLE_ATTACK_DIST,
+			function(guy)
+				if guy:HasTag("pkc_hostile") then
+					return false
+				end
+				return guy.prefab ~= inst.prefab
+						and guy.entity:IsVisible()
+						and not guy.components.health:IsDead()
+						and (guy.components.combat.target == inst or
+						guy:HasTag("character") or
+						guy:HasTag("monster") or
+						guy:HasTag("animal"))
+			end,
+			RETARGET_MUST_TAGS,
+			RETARGET_CANT_TAGS)
+end
+
+local function shouldKeepTarget(inst, target)
+	local oldKeepTargetFn = inst.components.combat.keeptargetfn
+	if target:HasTag("pkc_hostile") then
+		return false
+	end
+	return oldKeepTargetFn and oldKeepTargetFn(inst, target)
+end
+
+--更改触手仇恨
+AddPrefabPostInit("tentacle", function(inst)
+	if inst then
+		if inst.components.combat then
+			inst.components.combat:SetRetargetFunction(GetRandomWithVariance(2, 0.5), retargetfn)
+			local oldKeepTargetFn = inst.components.combat.keeptargetfn
+			inst.components.combat:SetKeepTargetFunction(function(inst, target)
+				if target:HasTag("pkc_hostile") then
+					return false
+				end
+				return oldKeepTargetFn and oldKeepTargetFn(inst, target)
+			end)
+		end
 	end
 end)
 

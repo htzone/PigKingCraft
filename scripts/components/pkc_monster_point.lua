@@ -30,8 +30,8 @@
 --GROUND.DIR
 
 PREFAB_TO_TILE_TABLE = {
-    rocky = GROUND.ROCKY, --岩石
-    merm = GROUND.MARSH, --沼泽
+    pkc_rockyking = GROUND.ROCKY, --岩石
+    pkc_mermking = GROUND.MARSH, --沼泽
     pigman = GROUND.DECIDUOUS, --桦树林
     pkc_bunnymanking = GROUND.SAVANNA, --稀树草原
     pigguard = GROUND.GRASS, --草原
@@ -166,8 +166,9 @@ local function spawnPigGuardPoints(tile2NodePoints)
 end
 
 local function teleportPlayerTo(inst, mob)
-    inst:DoTaskInTime(1, function()
-        pkc_teleportAllPlayerToInst(mob)
+    inst:DoTaskInTime(5, function()
+        local boss = pkc_findFirstPrefabByTag("pkc_hostile_boss")
+        pkc_teleportAllPlayerToInst(boss)
     end)
 end
 
@@ -207,31 +208,93 @@ local function canSpawnPKCBoss(pt)
 end
 
 local function spawnPKCBossByPrefabName(bossPrefabName, tile2NodePoints)
-    local tile = PREFAB_TO_TILE_TABLE[bossPrefabName]
-    if tile and tile2NodePoints[tile] then
-        local points = tile2NodePoints[tile]
-        local boss = spawnPrefabByPoints(bossPrefabName, points, 1,
-                20, true, nil, canSpawnPKCBoss)
-        return boss
+    local hasBoss = pkc_findFirstPrefabByTag(bossPrefabName)
+    if not hasBoss then
+        local tile = PREFAB_TO_TILE_TABLE[bossPrefabName]
+        if tile and tile2NodePoints[tile] then
+            local points = tile2NodePoints[tile]
+            local boss = spawnPrefabByPoints(bossPrefabName, points, 1,
+                    20, true, nil, canSpawnPKCBoss)
+            return boss
+        end
     end
+    return nil
 end
 
-local function spawnPKCBoss(world, tile2NodePoints)
-    world:DoTaskInTime(.1, function()
-        spawnPKCBossByPrefabName("pkc_leifking", tile2NodePoints)
-        local boss = spawnPKCBossByPrefabName("pkc_bunnymanking", tile2NodePoints)
-        teleportPlayerTo(world, boss)
-    end)
+local function spawnPKCBoss(tile2NodePoints)
+    --树精长老
+    local leifking = spawnPKCBossByPrefabName("pkc_leifking", tile2NodePoints)
+
+    --兔人国王
+    local bunnymanking = spawnPKCBossByPrefabName("pkc_bunnymanking", tile2NodePoints)
+    if bunnymanking then
+        bunnymanking:AddComponent("pkc_spawner")
+        bunnymanking.components.pkc_spawner:startSpawn("bunnyman", 3, 4, false, function(mobs)
+            for _, v in ipairs(mobs) do
+                if v then
+                    v:AddComponent("pkc_hostile")
+                    v.components.pkc_hostile:SetLeader(bunnymanking)
+                    v.components.pkc_hostile:SetMaxHealth(300)
+                    v.components.pkc_hostile:SetLoot({ "thulecite_pieces", "thulecite_pieces", "carrot" })
+                    --睡不睡觉
+                    if v.components.sleeper then
+                        v.components.sleeper:SetSleepTest(function(inst) return false  end)
+                        v.components.sleeper:SetWakeTest(function(inst) return true  end)
+                    end
+                end
+            end
+        end)
+    end
+
+    --鱼人国王
+    local mermking = spawnPKCBossByPrefabName("pkc_mermking", tile2NodePoints)
+    if mermking then
+        mermking:AddComponent("pkc_spawner")
+        mermking.components.pkc_spawner:startSpawn("mermguard", 3, 4, false, function(mobs)
+            for _, v in ipairs(mobs) do
+                if v then
+                    v:AddComponent("pkc_hostile")
+                    v.components.pkc_hostile:SetLeader(mermking)
+                    v.components.pkc_hostile:SetMaxHealth(500)
+                    v.components.pkc_hostile:SetLoot({ "thulecite_pieces", "thulecite_pieces", "pondfish", "froglegs"})
+                    --睡不睡觉
+                    if v.components.sleeper then
+                        v.components.sleeper:SetSleepTest(function(inst) return false  end)
+                        v.components.sleeper:SetWakeTest(function(inst) return true  end)
+                    end
+                end
+            end
+        end)
+    end
+
+    --石虾国王
+    local rockyking = spawnPKCBossByPrefabName("pkc_rockyking", tile2NodePoints)
+    if rockyking then
+        rockyking:AddComponent("pkc_spawner")
+        rockyking.components.pkc_spawner:startSpawn("pkc_rocky", 3, 4, false, function(mobs)
+            for _, v in ipairs(mobs) do
+                if v then
+                    v:AddComponent("pkc_hostile")
+                    v.components.pkc_hostile:SetLeader(rockyking)
+                    v.components.pkc_hostile:SetMaxHealth(1000)
+                    v.components.pkc_hostile:SetLoot({ "thulecite_pieces", "thulecite_pieces", "thulecite_pieces", "rocks", "rocks", "rocks"})
+                    if v.components.sleeper then
+                        v.components.sleeper:SetSleepTest(function(inst) return false  end)
+                        v.components.sleeper:SetWakeTest(function(inst) return true  end)
+                    end
+                end
+            end
+        end)
+    end
 end
 
 local function updateWorld(world)
+    if not TheWorld.ismastersim then
+        return
+    end
     local showDay = TheWorld.state.cycles + 2
     if showDay ~= 0 and showDay % 5 == 0 then
         world.needPointPigGuard = true
-    end
-    if not world.pointFirstTrigger and world.needPointPigGuard then --首次触发运行
-        pkc_announce(PKC_SPEECH.MONSTER_POINT.SPEECH1)
-        world.pointFirstTrigger = true
     end
 
     --安置大门boss
@@ -240,18 +303,31 @@ local function updateWorld(world)
         world.needPointPortalBoss = true
     end
 
+    --安置怪物boss
     if not world.needPointPKCBoss and showDay >= 2 then
         local tile2NodePoints = getTileToNodeData()
-        --安置怪物boss
-        spawnPKCBoss(world, tile2NodePoints)
+        world:DoTaskInTime(.1, function()
+            spawnPKCBoss(tile2NodePoints)
+        end)
         world.needPointPKCBoss = true
     end
 
-    --安置猪人守卫
+    --if showDay >=2 then
+    --    teleportPlayerTo(world)
+    --end
+
+    --安置怪物据点
     if world.needPointPigGuard then
-        world:DoTaskInTime(1, function()
+        world:DoTaskInTime(.1, function()
+            if world.pointFirstTrigger then
+                pkc_announce(PKC_SPEECH.MONSTER_POINT.SPEECH3)
+            end
+            if not world.pointFirstTrigger then --首次触发运行
+                pkc_announce(PKC_SPEECH.MONSTER_POINT.SPEECH1)
+                world.pointFirstTrigger = true
+            end
             local tile2NodePoints = getTileToNodeData()
-            --安置野猪据点
+            spawnPKCBoss(tile2NodePoints)
             spawnPigGuardPoints(tile2NodePoints)
         end)
         world.needPointPigGuard = false

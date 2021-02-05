@@ -27,6 +27,37 @@ local prefabs =
     "livinglog",
 }
 
+local function _BasicWakeCheck(inst)
+    return (inst.components.combat ~= nil and inst.components.combat.target ~= nil)
+            or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning())
+            or (inst.components.freezable ~= nil and inst.components.freezable:IsFrozen())
+            or GetClosestInstWithTag("player", inst, SLEEP_DIST_FROMTHREAT) ~= nil
+end
+
+local function ShouldSleep(inst)
+    local homePos = inst.components.knownlocations:GetLocation("home")
+    return homePos ~= nil
+            and inst:GetDistanceSqToPoint(homePos:Get()) < SLEEP_DIST_FROMHOME_SQ
+            and not _BasicWakeCheck(inst)
+end
+
+local function ShouldWake(inst)
+    local homePos = inst.components.knownlocations:GetLocation("home")
+    return (homePos ~= nil and
+            inst:GetDistanceSqToPoint(homePos:Get()) >= SLEEP_DIST_FROMHOME_SQ)
+            or _BasicWakeCheck(inst)
+end
+
+local function onTimerDone(inst, data)
+    if data.name == "Earthquake" then
+        inst.canearthquake = true
+    end
+end
+
+local function RememberKnownLocation(inst)
+    inst.components.knownlocations:RememberLocation("home", inst:GetPosition())
+end
+
 local function SetLeifScale(inst, scale)
     inst._scale = scale ~= 1 and scale or nil
 
@@ -46,7 +77,7 @@ end
 
 local function onpreloadfn(inst, data)
     if data ~= nil and data.leifscale ~= nil then
-        SetLeifScale(inst, data.leifscale)
+        --SetLeifScale(inst, data.leifscale)
     end
 end
 
@@ -110,17 +141,22 @@ local function retargetfn(inst)
 end
 
 local function keepTargetOverride(inst, target)
+    local home = inst.components.homeseeker and inst.components.homeseeker.home
+    if home then
+        return home:GetDistanceSqToInst(target) < 50*50
+                and home:GetDistanceSqToInst(inst) < 50*50
+    end
     return inst.components.combat:CanTarget(target)
 end
 
 local loot = {
     "livinglog", "livinglog", "livinglog", "livinglog", "livinglog", "livinglog", "monstermeat",
-    "thulecite",  "thulecite",
+    "eyeturret_item",
     "eyeturret_item",
     "redgem",
     "greengem",
     "bluegem",
-    "purplegem",}
+}
 
 local function common_fn(build)
     local inst = CreateEntity()
@@ -145,6 +181,9 @@ local function common_fn(build)
     inst:AddTag("largecreature")
     inst:AddTag("pkc_hostile")
     inst:AddTag("pkc_hostile_boss")
+    inst:AddTag("monster")
+    inst:AddTag("pkc_leifking")
+    inst:AddTag("_named")
 
     inst.AnimState:SetBank("leif")
     inst.AnimState:SetBuild(build)
@@ -156,6 +195,7 @@ local function common_fn(build)
         return inst
     end
 
+    inst:RemoveTag("_named")
     local color = .5 + math.random() * .5
     inst.AnimState:SetMultColour(color, color, color, 1)
 
@@ -168,7 +208,8 @@ local function common_fn(build)
     ------------------------------------------
 
     inst:AddComponent("locomotor") -- locomotor must be constructed before the stategraph
-    inst.components.locomotor.walkspeed = 1.5
+    inst.components.locomotor.walkspeed= 2
+    inst.components.locomotor.runspeed = 4
 
     ------------------------------------------
     inst:SetStateGraph("pkc_SGleifking")
@@ -186,19 +227,40 @@ local function common_fn(build)
     MakeHugeFreezableCharacter(inst, "marker")
     ------------------
     inst:AddComponent("health")
-    inst.components.health:SetMaxHealth(TUNING.LEIF_HEALTH)
+    inst.components.health:SetMaxHealth(PKC_LEIF_HEALTH)
+    inst.components.health:StartRegen(200, 100)
 
     ------------------
 
     inst:AddComponent("combat")
-    inst.components.combat:SetDefaultDamage(TUNING.LEIF_DAMAGE)
-    inst.components.combat.playerdamagepercent = TUNING.LEIF_DAMAGE_PLAYER_PERCENT
+    --inst.components.combat:SetDefaultDamage(TUNING.LEIF_DAMAGE)
+    --inst.components.combat.playerdamagepercent = TUNING.LEIF_DAMAGE_PLAYER_PERCENT
     inst.components.combat.hiteffectsymbol = "marker"
-    inst.components.combat:SetRange(3)
-    inst.components.combat:SetAttackPeriod(TUNING.LEIF_ATTACK_PERIOD)
+    --inst.components.combat:SetRange(3)
+    --inst.components.combat:SetAttackPeriod(TUNING.LEIF_ATTACK_PERIOD)
+    inst.components.combat:SetDefaultDamage(150)
+    inst.components.combat:SetAttackPeriod(2.2)
+    inst.components.combat:SetAreaDamage(2, 1)
+    inst.components.combat:SetRange(4, 5)
     inst.components.combat:SetRetargetFunction(3, retargetfn)
     inst.components.combat:SetKeepTargetFunction(keepTargetOverride)
 
+    function inst.components.combat:DoAreaAttack(target, range, weapon, validfn, stimuli)
+        local hitcount = 0
+        local x, y, z = target.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, range, { "_combat" }, {"pkc_hostile"})
+        for i, ent in ipairs(ents) do
+            if ent ~= target and
+                    ent ~= self.inst and
+                    self:IsValidTarget(ent) and
+                    (validfn == nil or validfn(ent)) then
+                self.inst:PushEvent("onareaattackother", { target = target, weapon = weapon, stimuli = stimuli })
+                ent.components.combat:GetAttacked(self.inst, self:CalcDamage(ent, weapon, self.areahitdamagepercent), weapon, stimuli)
+                hitcount = hitcount + 1
+            end
+        end
+        return hitcount
+    end
     ------------------------------------------
     MakeHauntableIgnite(inst)
     ------------------------------------------
@@ -216,95 +278,35 @@ local function common_fn(build)
     inst:AddComponent("inspectable")
     inst.components.inspectable:RecordViews()
     ------------------------------------------
+    inst:AddComponent("named")
+    inst.components.named:SetName(BOSS_NAME.pkc_leifking.NAME)
 
     inst:SetBrain(brain)
 
     inst:ListenForEvent("attacked", OnAttacked)
 
-    inst.SetLeifScale = SetLeifScale
-
-    return inst
-end
-
-local function _BasicWakeCheck(inst)
-    return (inst.components.combat ~= nil and inst.components.combat.target ~= nil)
-            or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning())
-            or (inst.components.freezable ~= nil and inst.components.freezable:IsFrozen())
-            or GetClosestInstWithTag("player", inst, SLEEP_DIST_FROMTHREAT) ~= nil
-end
-
-local function ShouldSleep(inst)
-    local homePos = inst.components.knownlocations:GetLocation("home")
-    return homePos ~= nil
-            and inst:GetDistanceSqToPoint(homePos:Get()) < SLEEP_DIST_FROMHOME_SQ
-            and not _BasicWakeCheck(inst)
-end
-
-local function ShouldWake(inst)
-    local homePos = inst.components.knownlocations:GetLocation("home")
-    return (homePos ~= nil and
-            inst:GetDistanceSqToPoint(homePos:Get()) >= SLEEP_DIST_FROMHOME_SQ)
-            or _BasicWakeCheck(inst)
-end
-
-local function onTimerDone(inst, data)
-    if data.name == "Earthquake" then
-        inst.canearthquake = true
+    if inst.components.sleeper ~= nil then
+        inst.components.sleeper:SetSleepTest(ShouldSleep)
+        inst.components.sleeper:SetWakeTest(ShouldWake)
     end
-end
 
-local function RememberKnownLocation(inst)
-    inst.components.knownlocations:RememberLocation("home", inst:GetPosition())
+    --技能学了么
+    inst:AddComponent("timer")
+    inst.canearthquake = false
+    inst:ListenForEvent("timerdone", onTimerDone)
+
+    --回家
+    inst:AddComponent("knownlocations")
+    inst:DoTaskInTime(.3, RememberKnownLocation)
+
+    local currentscale = inst.Transform:GetScale()
+    inst.Transform:SetScale(currentscale*2,currentscale*2,currentscale*2)
+    --inst.SetLeifScale = SetLeifScale
+    return inst
 end
 
 local function normal_fn()
     local mob = common_fn("leif_lumpy_build")
-    local currentscale = mob.Transform:GetScale()
-    mob.Transform:SetScale(currentscale*2,currentscale*2,currentscale*2)
-
-    if mob.components.sleeper ~= nil then
-        mob.components.sleeper:SetSleepTest(ShouldSleep)
-        mob.components.sleeper:SetWakeTest(ShouldWake)
-    end
-
-    --血多厚
-    mob.components.health:SetMaxHealth(LEIF_HEALTH)
-    mob.components.health:StartRegen(200, 100)
-
-    --战斗力强不强
-    mob.components.combat:SetDefaultDamage(150)
-    mob.components.combat:SetAttackPeriod(2.2)
-    mob.components.combat:SetAreaDamage(2, 1)
-    mob.components.combat:SetRange(4, 5)
-    mob.components.locomotor.walkspeed= 2
-    mob.components.locomotor.runspeed = 4
-
-    function mob.components.combat:DoAreaAttack(target, range, weapon, validfn, stimuli)
-        local hitcount = 0
-        local x, y, z = target.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, range, { "_combat" }, {"pkc_hostile"})
-        for i, ent in ipairs(ents) do
-            if ent ~= target and
-                    ent ~= self.inst and
-                    self:IsValidTarget(ent) and
-                    (validfn == nil or validfn(ent)) then
-                self.inst:PushEvent("onareaattackother", { target = target, weapon = weapon, stimuli = stimuli })
-                ent.components.combat:GetAttacked(self.inst, self:CalcDamage(ent, weapon, self.areahitdamagepercent), weapon, stimuli)
-                hitcount = hitcount + 1
-            end
-        end
-        return hitcount
-    end
-
-    --技能学了么
-    mob:AddComponent("timer")
-    mob.canearthquake = false
-    mob:ListenForEvent("timerdone", onTimerDone)
-
-    --回家
-    mob:AddComponent("knownlocations")
-    mob:DoTaskInTime(0, RememberKnownLocation)
-
     return mob
 end
 

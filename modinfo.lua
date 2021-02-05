@@ -239,6 +239,6 @@ configuration_options =
             {description = "否(No)", data = false, hover = "No." },
             {description = "是(Yes)", data = true, hover = "Yes, spawn boss on day 12."},
         },
-        default = true,
+        default = false,
     },
 }

@@ -102,7 +102,6 @@ local giftsTable = {
 	feather_robin_winter = 50,
 	feather_canary = 100,
 	stinger = 100,
-	durian = 50,
 	dragonfruit = 50,
 	wormlight = 30,
 	horn = 20,
@@ -506,7 +505,7 @@ local function caculDistBetweenPigKingAndPlayer(inst)
 	inst:DoPeriodicTask(3, function()
 		local player = TheSim:FindFirstEntityWithTag("player")
 		if player then
-			local dist = inst:GetPosition():Dist(player:GetPosition()) 
+			local dist = inst:GetPosition():Dist(player:GetPosition())
 			if dist then
 				print("-----dist: "..dist)
 			else

@@ -51,6 +51,8 @@ GLOBAL.GAME_SCORE = {
 		malbatross = 500,-- 不知道什么鸟 就叫海鸥吧
 		pkc_leifking = 500, --树精长老
 		pkc_bunnymanking = 500, --兔人国王
+		pkc_rockyking = 500, --石虾国王
+		pkc_mermking = 500, --鱼人国王
 	},
 	
 	--贡献
@@ -63,8 +65,8 @@ GLOBAL.GAME_SCORE = {
 		nitre = 2,--硝石
 		log = 1,--木头
 		marble = 2, --大理石
-		thulecite_pieces = 2, --铥矿碎片
-		spidergland = 2, -- 蜘蛛腺体
+		thulecite_pieces = 20, --铥矿碎片
+		spidergland = 4, -- 蜘蛛腺体
 		silk = 2, --蜘蛛丝
 		pigskin = 5, --猪皮
 		goldnugget = 2, --金子
@@ -72,6 +74,7 @@ GLOBAL.GAME_SCORE = {
 		houndstooth = 2, --犬牙
 		charcoal = 1,--木炭
 		cutreeds = 4,--采下的芦苇
+		poop = 1, --大便
 		
 		--中级原材料
 		tentaclespots = 10, --触手皮

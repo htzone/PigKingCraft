@@ -75,6 +75,9 @@ PrefabFiles = {
     "pkc_pigguard",
     "pkc_leifking",
     "pkc_bunnymanking",
+    "pkc_mermking",
+    "pkc_rockyking",
+    "pkc_rocky",
 }
 
 Assets = {

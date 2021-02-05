@@ -440,7 +440,7 @@ function clearNear(inst, radius, fn)
         local ents = TheSim:FindEntities(x, y, z, radius)
         for _, obj in ipairs(ents) do
             if obj and obj ~= inst and obj:IsValid()
-                    and not obj:HasTag("burnt") and not obj:HasTag("FX")
+                    and not obj:HasTag("burnt") and not obj:HasTag("FX") and not obj.components.inventoryitem
                     and (fn == nil or fn(obj)) then
                 obj:Remove()
             end
@@ -455,8 +455,9 @@ end
 --@param radius	半径
 --@param mode 需要安置的数量
 function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clear)
+    local mobs = {}
     if num == 0 or num == nil then
-        return
+        return mobs
     end
     local pos = Vector3(target.Transform:GetWorldPosition())
     local attempt_angle = (2 * PI) / num
@@ -491,9 +492,11 @@ function pkc_roundSpawnForWriteable(target, prefab_name, radius, num, text, clea
                     mob.ownername = "RedPig"
                     mob.ownerid = "Fuckyou"
                 end
+                table.insert(mobs, mob)
             end
         end
     end
+    return mobs
 end
 
 --环绕安置多个不同物品
@@ -545,7 +548,7 @@ function pkc_roundSpawnForMulti(target, prefabNames, radius, text, clear)
 end
 
 function pkc_roundSpawn(target, prefab_name, radius, num, clear)
-    pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "", clear)
+    return pkc_roundSpawnForWriteable(target, prefab_name, radius, num, "", clear)
 end
 
 --根据地皮类型来放置Prefab

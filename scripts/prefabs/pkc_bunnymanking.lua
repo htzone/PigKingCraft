@@ -208,6 +208,14 @@ local function NormalRetargetFn(inst)
 end
 
 local function NormalKeepTargetFn(inst, target)
+    if target:HasTag("pkc_hostile") then
+        return false
+    end
+    local home = inst.components.homeseeker and inst.components.homeseeker.home
+    if home then
+        return home:GetDistanceSqToInst(target) < 50*50
+                and home:GetDistanceSqToInst(inst) < 50*50
+    end
     return not (target.sg ~= nil and target.sg:HasStateTag("hiding")) and inst.components.combat:CanTarget(target)
 end
 
@@ -258,11 +266,11 @@ end
 
 local loot = {
     "eyeturret_item",
+    "eyeturret_item",
+    "redgem",
     "redgem",
     "orangegem",
-    "bluegem",
-    "purplegem",
-    "thulecite",  "thulecite",
+    "orangegem",
     "meat", "meat", "meat", "meat",
     "carrot", "carrot", "carrot", "carrot", "carrot", "carrot", "carrot", "carrot",
 }
@@ -292,6 +300,8 @@ local function fn()
     inst:AddTag("scarytoprey")
     inst:AddTag("pkc_hostile")
     inst:AddTag("pkc_hostile_boss")
+    inst:AddTag("monster")
+    inst:AddTag("pkc_bunnymanking")
 
     inst.AnimState:SetBank("manrabbit")
     inst.AnimState:PlayAnimation("idle_loop", true)
@@ -353,9 +363,9 @@ local function fn()
 
     MakeMediumBurnableCharacter(inst, "manrabbit_torso")
 
+    --叫什么
     inst:AddComponent("named")
-    inst.components.named.possiblenames = STRINGS.BUNNYMANNAMES
-    inst.components.named:PickNewName()
+    inst.components.named:SetName(BOSS_NAME.pkc_bunnymanking.NAME)
 
     ------------------------------------------
     inst:AddComponent("follower")
@@ -368,6 +378,7 @@ local function fn()
     ------------------------------------------
 
     inst:AddComponent("inventory")
+    inst:AddComponent("leader")
 
     ------------------------------------------
 
@@ -379,7 +390,7 @@ local function fn()
     ------------------------------------------
 
     inst:AddComponent("knownlocations")
-    RememberKnownLocation(inst)
+    inst:DoTaskInTime(.1, RememberKnownLocation)
     ------------------------------------------
 
     inst:AddComponent("trader")

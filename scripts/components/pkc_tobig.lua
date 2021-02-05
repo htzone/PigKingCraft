@@ -25,7 +25,7 @@ function PKC_TOBIG:growTo(scale)
 				end
 			elseif self.inst.prefab == "spider_warrior" then
 				local mobScale = math.min(self.scale, 1.5)
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2,650)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * mobScale * 1.2,400)
 				if self.inst.components.combat then --蜘蛛战士的伤害
 					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + mobScale * 0.5)
 					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + mobScale * 0.5)
