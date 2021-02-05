@@ -32,7 +32,6 @@ local function handleCommand(message, player)
     for word in string.gmatch(message, "%S+") do
         table.insert(words, word) --分词
     end
-    print(string.format("pkc word2:%s, word3:%s", tostring(words[2]), tostring(words[3])))
     if next(words) ~= nil then
         if words[1] == "g" then
             if player and player.components.inventory and words[2] then

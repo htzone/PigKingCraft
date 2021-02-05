@@ -27,7 +27,7 @@ local loot =
     "log",
     "log",
     "log",
-    "cutstone", "cutstone", "cutstone",
+    "cutstone",
     "poop",
 }
 

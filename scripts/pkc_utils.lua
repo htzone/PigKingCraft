@@ -440,7 +440,9 @@ function clearNear(inst, radius, fn)
         local ents = TheSim:FindEntities(x, y, z, radius)
         for _, obj in ipairs(ents) do
             if obj and obj ~= inst and obj:IsValid()
-                    and not obj:HasTag("burnt") and not obj:HasTag("FX") and not obj.components.inventoryitem
+                    and not obj:HasTag("burnt") and not obj:HasTag("FX")
+                    and not obj:HasTag("structure") and not obj:HasTag("multiplayer_portal")
+                    and not obj.components.inventoryitem
                     and (fn == nil or fn(obj)) then
                 obj:Remove()
             end

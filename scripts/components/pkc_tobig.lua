@@ -17,7 +17,7 @@ function PKC_TOBIG:growTo(scale)
 		self.inst.Transform:SetScale(currentscale * self.scale, currentscale * self.scale, currentscale * self.scale)
 		if self.inst.components.health then
 			if self.inst.prefab == "spider" then
-				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,180)
+				self.inst.components.health.maxhealth = math.min(self.inst.components.health.maxhealth * self.scale * 1.2,160)
 				if self.inst.components.combat then --蜘蛛的伤害
 					self.inst.components.combat.defaultdamage = self.inst.components.combat.defaultdamage * (0.8 + self.scale * 0.5)
 					self.inst.components.combat.attackrange = self.inst.components.combat.attackrange * (0.5 + self.scale * 0.5)

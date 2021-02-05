@@ -489,6 +489,9 @@ end
 
 --更改触手仇恨
 AddPrefabPostInit("tentacle", function(inst)
+	if not GLOBAL.TheWorld.ismastersim then
+		return
+	end
 	if inst then
 		if inst.components.combat then
 			inst.components.combat:SetRetargetFunction(GetRandomWithVariance(2, 0.5), retargetfn)
