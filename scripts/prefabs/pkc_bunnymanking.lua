@@ -34,6 +34,18 @@ local brain = require("brains/pkc_bunnykingbrain")
 local MAX_TARGET_SHARES = 5
 local SHARE_TARGET_DIST = 30
 
+local function onsave(inst, data)
+    data.isSecondState = inst.isSecondState
+end
+
+local function onload(inst, data)
+    if data ~= nil then
+        if data.isSecondState ~= nil then
+            inst.isSecondState = data.isSecondState
+        end
+    end
+end
+
 local function OnHealthDelta1(inst, data)
     if inst.components.health:GetPercent() < .5 then
         if not inst.isSecondState then
@@ -211,10 +223,10 @@ local function NormalKeepTargetFn(inst, target)
     if target:HasTag("pkc_hostile") then
         return false
     end
-    local home = inst.components.homeseeker and inst.components.homeseeker.home
-    if home then
-        return home:GetDistanceSqToInst(target) < 50*50
-                and home:GetDistanceSqToInst(inst) < 50*50
+    local homePos = inst.components.knownlocations and inst.components.knownlocations:GetLocation("home") or nil
+    if homePos then
+        return target:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
+                and inst:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
     end
     return not (target.sg ~= nil and target.sg:HasStateTag("hiding")) and inst.components.combat:CanTarget(target)
 end
@@ -287,7 +299,7 @@ local function fn()
 
     inst.AnimState:SetBuild("manrabbit_build")
 
-    MakeCharacterPhysics(inst, 50, .5)
+    MakeCharacterPhysics(inst, 100, .5)
 
     inst.DynamicShadow:SetSize(1.5, .75)
     inst.Transform:SetFourFaced()
@@ -314,10 +326,6 @@ local function fn()
 
     inst.AnimState:SetClientsideBuildOverride("insane", "manrabbit_build", "manrabbit_beard_build")
 
-    --trader (from trader component) added to pristine state for optimization
-    inst:AddTag("trader")
-
-    --Sneak these into pristine state for optimization
     inst:AddTag("_named")
 
     inst:AddComponent("talker")
@@ -338,8 +346,8 @@ local function fn()
     inst.components.talker.ontalk = ontalk
 
     inst:AddComponent("locomotor") -- locomotor must be constructed before the stategraph
-    inst.components.locomotor.runspeed = TUNING.PIG_RUN_SPEED * 2.2 -- account for them being stopped for part of their anim
-    inst.components.locomotor.walkspeed = TUNING.PIG_WALK_SPEED * 1.9 -- account for them being stopped for part of their anim
+    inst.components.locomotor.walkspeed= 1
+    inst.components.locomotor.runspeed = 2
 
     -- boat hopping setup
     inst.components.locomotor:SetAllowPlatformHopping(true)
@@ -357,73 +365,6 @@ local function fn()
     inst:AddComponent("combat")
     inst.components.combat.hiteffectsymbol = "manrabbit_torso"
     inst.components.combat.panic_thresh = TUNING.BUNNYMAN_PANIC_THRESH
-
-    inst.components.combat.GetBattleCryString = battlecry
-    inst.components.combat.GetGiveUpString = giveupstring
-
-    MakeMediumBurnableCharacter(inst, "manrabbit_torso")
-
-    --叫什么
-    inst:AddComponent("named")
-    inst.components.named:SetName(BOSS_NAME.pkc_bunnymanking.NAME)
-
-    ------------------------------------------
-    inst:AddComponent("follower")
-    inst.components.follower.maxfollowtime = TUNING.PIG_LOYALTY_MAXTIME
-    ------------------------------------------
-    inst:AddComponent("health")
-    inst.components.health:StartRegen(TUNING.BUNNYMAN_HEALTH_REGEN_AMOUNT, TUNING.BUNNYMAN_HEALTH_REGEN_PERIOD)
-    inst:ListenForEvent("healthdelta", OnHealthDelta1)
-
-    ------------------------------------------
-
-    inst:AddComponent("inventory")
-    inst:AddComponent("leader")
-
-    ------------------------------------------
-
-    inst:AddComponent("lootdropper")
-    inst.components.lootdropper:SetLoot(loot)
-    --inst.components.lootdropper:SetLootSetupFn(LootSetupFunction)
-    --LootSetupFunction(inst.components.lootdropper)
-
-    ------------------------------------------
-
-    inst:AddComponent("knownlocations")
-    inst:DoTaskInTime(.1, RememberKnownLocation)
-    ------------------------------------------
-
-    inst:AddComponent("trader")
-    inst.components.trader:SetAcceptTest(ShouldAcceptItem)
-    inst.components.trader.onaccept = OnGetItemFromPlayer
-    inst.components.trader.onrefuse = OnRefuseItem
-    inst.components.trader.deleteitemonaccept = false
-
-    ------------------------------------------
-
-    inst:AddComponent("sanityaura")
-    inst.components.sanityaura.aurafn = CalcSanityAura
-
-    ------------------------------------------
-
-    inst:AddComponent("sleeper")
-
-    ------------------------------------------
-    MakeMediumFreezableCharacter(inst, "pig_torso")
-
-    ------------------------------------------
-
-    inst:AddComponent("inspectable")
-    inst.components.inspectable.getstatus = GetStatus
-    ------------------------------------------
-
-    inst:ListenForEvent("attacked", OnAttacked)
-    inst:ListenForEvent("newcombattarget", OnNewTarget)
-
-    inst.components.sleeper:SetResistance(2)
-    inst.components.sleeper.sleeptestfn = NocturnalSleepTest
-    inst.components.sleeper.waketestfn = NocturnalWakeTest
-
     inst.components.combat:SetDefaultDamage(100)
     inst.components.combat:SetAttackPeriod(TUNING.BUNNYMAN_ATTACK_PERIOD)
     inst.components.combat:SetAreaDamage(2.5, 1)
@@ -446,17 +387,67 @@ local function fn()
         end
         return hitcount
     end
+    --inst.components.combat.GetBattleCryString = battlecry
+    --inst.components.combat.GetGiveUpString = giveupstring
+    --MakeMediumBurnableCharacter(inst, "manrabbit_torso")
 
-    --inst.components.locomotor.runspeed = TUNING.BUNNYMAN_RUN_SPEED
-    --inst.components.locomotor.walkspeed = TUNING.BUNNYMAN_WALK_SPEED
+    --叫什么
+    inst:AddComponent("named")
+    inst.components.named:SetName(BOSS_NAME.pkc_bunnymanking.NAME)
 
-    inst.components.locomotor.walkspeed= 1
-    inst.components.locomotor.runspeed = 2
-
+    ------------------------------------------
+    inst:AddComponent("follower")
+    inst.components.follower.maxfollowtime = TUNING.PIG_LOYALTY_MAXTIME
+    ------------------------------------------
+    inst:AddComponent("health")
     inst.components.health:SetMaxHealth(BUNNYMAN_KING_HEALTH)
-    inst.components.health:StartRegen(400, 100)
+    inst.components.health:StartRegen(500, 200)
+    inst:ListenForEvent("healthdelta", OnHealthDelta1)
 
-    MakeHauntablePanic(inst)
+    ------------------------------------------
+
+    inst:AddComponent("inventory")
+    inst:AddComponent("leader")
+
+    ------------------------------------------
+
+    inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetLoot(loot)
+    --inst.components.lootdropper:SetLootSetupFn(LootSetupFunction)
+    --LootSetupFunction(inst.components.lootdropper)
+
+    ------------------------------------------
+
+    inst:AddComponent("knownlocations")
+    inst:DoTaskInTime(.1, RememberKnownLocation)
+    ------------------------------------------
+
+    --inst:AddComponent("trader")
+    --inst.components.trader:SetAcceptTest(ShouldAcceptItem)
+    --inst.components.trader.onaccept = OnGetItemFromPlayer
+    --inst.components.trader.onrefuse = OnRefuseItem
+    --inst.components.trader.deleteitemonaccept = false
+
+    inst:AddComponent("sleeper")
+    inst.components.sleeper:SetSleepTest(function(inst) return false  end)
+    inst.components.sleeper:SetWakeTest(function(inst) return true  end)
+    --inst.components.sleeper:SetResistance(2)
+    --inst.components.sleeper.sleeptestfn = NocturnalSleepTest
+    --inst.components.sleeper.waketestfn = NocturnalWakeTest
+
+    ------------------------------------------
+    MakeMediumFreezableCharacter(inst, "pig_torso")
+
+    ------------------------------------------
+
+    inst:AddComponent("inspectable")
+    inst.components.inspectable.getstatus = GetStatus
+    ------------------------------------------
+
+    inst:ListenForEvent("attacked", OnAttacked)
+    inst:ListenForEvent("newcombattarget", OnNewTarget)
+
+    --MakeHauntablePanic(inst)
 
     inst:SetBrain(brain)
     inst:SetStateGraph("pkc_SGbunnyking")
@@ -464,10 +455,6 @@ local function fn()
     --体格
     local currentscale = inst.Transform:GetScale()
     inst.Transform:SetScale(currentscale*2.5,currentscale*2.5,currentscale*2.5)
-
-    --睡不睡觉
-    inst.components.sleeper:SetSleepTest(function(inst) return false  end)
-    inst.components.sleeper:SetWakeTest(function(inst) return true  end)
 
     --技能学了么
     inst:AddComponent("timer")
@@ -482,6 +469,9 @@ local function fn()
     else
         inst.AnimState:SetBuild("manrabbit_build")
     end
+
+    inst.OnSave = onsave
+    inst.OnLoad = onload
 
     return inst
 end

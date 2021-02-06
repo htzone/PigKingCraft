@@ -72,10 +72,10 @@ local function NormalKeepTargetFn(inst, target)
     if target:HasTag("pkc_hostile") then
         return false
     end
-    local home = inst.components.homeseeker and inst.components.homeseeker.home
-    if home then
-        return home:GetDistanceSqToInst(target) < 50*50
-                and home:GetDistanceSqToInst(inst) < 50*50
+    local homePos = inst.components.knownlocations and inst.components.knownlocations:GetLocation("home") or nil
+    if homePos then
+        return target:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
+                and inst:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
     end
     return not (target.sg ~= nil and target.sg:HasStateTag("hiding")) and inst.components.combat:CanTarget(target)
 end
@@ -178,14 +178,20 @@ local loot = {
 
 local function onsave(inst, data)
     data.colour = inst.colour_idx
+    data.isSetHome = inst.isSetHome
 end
 
 local function onload(inst, data)
-    if data ~= nil and data.colour ~= nil then
-        local colour = colours[data.colour]
-        if colour ~= nil then
-            inst.colour_idx = data.colour
-            inst.AnimState:SetMultColour(unpack(colour))
+    if data ~= nil then
+        if data.colour ~= nil then
+            local colour = colours[data.colour]
+            if colour ~= nil then
+                inst.colour_idx = data.colour
+                inst.AnimState:SetMultColour(unpack(colour))
+            end
+        end
+        if data.isSetHome ~= nil then
+            inst.isSetHome = data.isSetHome
         end
     end
 end
@@ -335,7 +341,7 @@ local function fn()
     inst:ListenForEvent("timerdone", onTimerDone)
 
     --家在哪儿
-    inst:DoTaskInTime(0, RememberKnownLocation)
+    inst:DoTaskInTime(.1, RememberKnownLocation)
 
     --体格
     local currentscale = inst.Transform:GetScale()

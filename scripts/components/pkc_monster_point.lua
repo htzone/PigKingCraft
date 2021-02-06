@@ -312,9 +312,9 @@ local function updateWorld(world)
         world.needPointPKCBoss = true
     end
 
-    --if showDay >=2 then
-    --    teleportPlayerTo(world)
-    --end
+    if showDay >=2 then
+        teleportPlayerTo(world)
+    end
 
     --安置怪物据点
     if world.needPointPigGuard then

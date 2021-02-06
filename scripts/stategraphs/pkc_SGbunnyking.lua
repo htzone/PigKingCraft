@@ -60,7 +60,6 @@ end
 
 --兔兔催眠
 local function Hypnosised(inst)
-	
 	local fx = SpawnPrefab("dr_warm_loop_1")
 	local x,y,z = inst.Transform:GetWorldPosition()
 	
@@ -95,7 +94,6 @@ end
 
 --兔兔电击
 local function LightingStroke(inst)
-
 	local fx = SpawnPrefab("shock_fx")
 	local x,y,z = inst.Transform:GetWorldPosition()
 	
@@ -106,10 +104,9 @@ local function LightingStroke(inst)
 	--周围的玩家受到电击
 	local ents = TheSim:FindEntities(x, y, z, BUNNYMAN_LIGHTING_RANGE, {"_combat"}, { "playerghost", "beefalo", "electricdamageimmune", "pkc_hostile", "FX"}, {"player", "character"})
 	for i, v in ipairs(ents) do
-		if v:HasTag("player") or v:HasTag("character") then
-			if v.components.health ~= nil and not (v.components.health:IsDead())
-			then
-				if not v.components.inventory:IsInsulated() then
+		if v and v:HasTag("player") or v:HasTag("character") then
+			if v.components.health ~= nil and not (v.components.health:IsDead()) then
+				if v.components.inventory and not v.components.inventory:IsInsulated() then
 					local damage = nil
 					if v.components.moisture then 
 						local mult = TUNING.ELECTRIC_WET_DAMAGE_MULT * v.components.moisture:GetMoisturePercent()
@@ -117,9 +114,10 @@ local function LightingStroke(inst)
 					else
 						damage = TUNING.LIGHTNING_DAMAGE + 40
 					end
-					
 					v.components.health:DoDelta(-damage, false, "lightning")
-					v.sg:GoToState("electrocute")
+					if v.sg then
+						v.sg:GoToState("electrocute")
+					end
 				else
 					v:PushEvent("lightningdamageavoided")
 				end

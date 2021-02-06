@@ -65,14 +65,13 @@ end
 local function GroundPound(inst)
 	local x,y,z = inst.Transform:GetWorldPosition()
 	local fx1 = SpawnPrefab("groundpoundring_fx")
-	fx1.Transform:SetScale(1.1,1.1,1.1)
+	fx1.Transform:SetScale(1,1,1)
 	fx1.Transform:SetPosition(x,y,z)
 	local fx2 = SpawnPrefab("ground_chunks_breaking") 
 	local currentscale = fx2.Transform:GetScale()
 	fx2.Transform:SetScale(currentscale*2,currentscale*2,currentscale*2)
 	fx2.Transform:SetPosition(x,y,z)
-	--local x1, y1, z1 = inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x, y, z, 12, nil, {"pkc_hostile", "INLIMBO",})
+	local ents = TheSim:FindEntities(x, y, z, 11, nil, {"pkc_hostile", "INLIMBO",})
 	for _,obj in pairs(ents) do
         if obj and obj:IsValid() and not obj:HasTag("pkc_hostile") and not obj:HasTag("NET_workable") and
                 obj.components.workable ~= nil and

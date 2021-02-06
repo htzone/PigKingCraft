@@ -37,7 +37,6 @@ local function GoHomeAction(inst)
         return
     end
     local homePos = inst.components.knownlocations:GetLocation("home")
-	print("GoHomeAction!")
     return homePos ~= nil
         and BufferedAction(inst, nil, ACTIONS.WALKTO, nil, homePos, nil, .2)
         or nil
