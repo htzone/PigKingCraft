@@ -36,12 +36,16 @@ local SHARE_TARGET_DIST = 30
 
 local function onsave(inst, data)
     data.isSecondState = inst.isSecondState
+    data.isSetHome = inst.isSetHome
 end
 
 local function onload(inst, data)
     if data ~= nil then
         if data.isSecondState ~= nil then
             inst.isSecondState = data.isSecondState
+        end
+        if data.isSetHome ~= nil then
+            inst.isSetHome = data.isSetHome
         end
     end
 end
@@ -272,8 +276,11 @@ local function onTimerDone(inst, data)
 end
 
 local function RememberKnownLocation(inst)
-    inst.homePos = inst:GetPosition()
-    inst.components.knownlocations:RememberLocation("home", inst.homePos)
+    if not inst.isSetHome then
+        inst.homePos = inst:GetPosition()
+        inst.components.knownlocations:RememberLocation("home", inst.homePos)
+        inst.isSetHome = true
+    end
 end
 
 local loot = {

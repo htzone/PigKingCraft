@@ -52,6 +52,18 @@ local merm_guard_brain = require "brains/pkc_mermkingbrain"
 local SLEEP_DIST_FROMTHREAT = 20
 local SLEEP_DIST_FROMHOME_SQ = 1 * 1
 
+local function onsave(inst, data)
+    data.isSetHome = inst.isSetHome
+end
+
+local function onload(inst, data)
+    if data ~= nil then
+        if data.isSetHome ~= nil then
+            inst.isSetHome = data.isSetHome
+        end
+    end
+end
+
 local function _BasicWakeCheck(inst)
     return (inst.components.combat ~= nil and inst.components.combat.target ~= nil)
             or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning())
@@ -151,10 +163,10 @@ local function KeepTargetFn(inst, target)
     if target:HasTag("pkc_hostile") then
         return false
     end
-    local home = inst.components.homeseeker and inst.components.homeseeker.home
-    if home then
-        return home:GetDistanceSqToInst(target) < 50*50
-                and home:GetDistanceSqToInst(inst) < 50*50
+    local homePos = inst.components.knownlocations and inst.components.knownlocations:GetLocation("home") or nil
+    if homePos then
+        return target:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
+                and inst:GetDistanceSqToPoint(homePos:Get()) < PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST * PKC_HOSTILE_BOSS_DEFENCE_MAX_DIST
     end
     return inst.components.combat:CanTarget(target)
 end
@@ -376,7 +388,7 @@ local function MakeMerm(name, assets, prefabs, common_postinit, master_postinit)
 
         inst:AddComponent("health")
         inst.components.health:SetMaxHealth(MERM_HEALTH)
-        inst.components.health:StartRegen(200, 100)
+        inst.components.health:StartRegen(400, 200)
 
         inst:AddComponent("combat")
         inst.components.combat.GetBattleCryString = battlecry
@@ -402,12 +414,12 @@ local function MakeMerm(name, assets, prefabs, common_postinit, master_postinit)
 
         inst:AddComponent("timer")
 
-        inst:AddComponent("trader")
-        inst.components.trader:SetAcceptTest(ShouldAcceptItem)
-        inst.components.trader:SetAbleToAcceptTest(IsAbleToAccept)
-        inst.components.trader.onaccept = OnGetItemFromPlayer
-        inst.components.trader.onrefuse = OnRefuseItem
-        inst.components.trader.deleteitemonaccept = false
+        --inst:AddComponent("trader")
+        --inst.components.trader:SetAcceptTest(ShouldAcceptItem)
+        --inst.components.trader:SetAbleToAcceptTest(IsAbleToAccept)
+        --inst.components.trader.onaccept = OnGetItemFromPlayer
+        --inst.components.trader.onrefuse = OnRefuseItem
+        --inst.components.trader.deleteitemonaccept = false
 
         --叫什么
         inst:AddComponent("named")
@@ -435,11 +447,14 @@ local function MakeMerm(name, assets, prefabs, common_postinit, master_postinit)
         inst:ListenForEvent("timerdone", onTimerDone)
 
         MakeWeapon(inst)
-        inst:DoTaskInTime(0, RememberKnownLocation)
+        inst:DoTaskInTime(.1, RememberKnownLocation)
 
         if master_postinit ~= nil then
             master_postinit(inst)
         end
+
+        inst.OnSave = onsave
+        inst.OnLoad = onload
 
         return inst
     end

@@ -112,9 +112,10 @@ AddComponentPostInit("combat", function(self, inst)
 	if GLOBAL.TheWorld.ismastersim then
 		function self:ShareTarget(target, ...)
 			if self.inst and self.inst.prefab
-					and self.inst.prefab == "pigman"
-					and not self.inst:HasTag("werepig")
-					and not self.inst:HasTag("guard") then
+					and (self.inst.prefab == "pigman"
+					or self.inst.prefab == "pigguard"
+					or self.inst.prefab == "moonpig")
+					and not self.inst:HasTag("werepig") then
 				--Do not Share...
 				return
 			end
