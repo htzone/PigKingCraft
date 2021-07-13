@@ -506,3 +506,44 @@ AddPrefabPostInit("tentacle", function(inst)
 	end
 end)
 
+local needAddAssistsCompPrefabs = {
+	"pkc_mermking", "pkc_bunnymanking", "pkc_leifking", "pkc_rockyking",
+	"pkc_bigpig", "pkc_cuipig", "pkc_redpig", "pkc_longpig",
+	"deerclops",
+	"bearger",
+	"dragonfly",
+	"moose",
+	"beequeen",
+	"antlion",
+	"stalker_forest",
+	"stalker",
+	"stalker_atrium",
+	"malbatross",
+	"minotaur",
+}
+
+--被攻击时统计
+local function onAttacked(inst, data)
+	if inst and data and data.attacker then
+		if data.attacker:HasTag("player") and data.attacker.components.pkc_group
+				and inst.components.pkc_assists then
+			inst.components.pkc_assists:addAssistsPlayer(data.attacker.userid,
+					data.attacker.components.pkc_group:getChooseGroup())
+		end
+	end
+end
+
+--添加助攻统计组件
+for _, v in ipairs(needAddAssistsCompPrefabs) do
+	AddPrefabPostInit(v, function(inst)
+		if not GLOBAL.TheWorld.ismastersim then
+			return
+		end
+		if inst then
+			inst:AddComponent("pkc_assists")
+			inst:ListenForEvent("attacked", onAttacked)
+		end
+	end)
+end
+
+

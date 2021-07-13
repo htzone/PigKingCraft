@@ -149,9 +149,54 @@ local function setGravestoneForKing(inst, killerId)
 	end
 end
 
+local function getBeKilledInstName(inst)
+	local beKilledName = nil
+	if inst then
+		if inst:HasTag("player") then
+			if inst.userid and GLOBAL.PKC_PLAYER_INFOS[inst.userid] then
+				beKilledName = GLOBAL.PKC_PLAYER_INFOS[inst.userid].PLAYER_NAME
+			end
+		else
+			if inst.prefab and GLOBAL.BOSS_NAME[inst.prefab] then
+				beKilledName = GLOBAL.BOSS_NAME[inst.prefab].NAME
+			end
+		end
+	end
+	return beKilledName
+end
+
+--助攻击杀公告
+local function assistKill(world, beKilledInst, assistsPlayers)
+	if beKilledInst and assistsPlayers then
+		print("test1 size:"..tostring(tablelength(assistsPlayers)))
+		print("beKilledPlayer.prefab:"..tostring(beKilledInst.prefab))
+		for uid, _ in pairs(assistsPlayers) do
+			print("uid:"..tostring(uid))
+			local beKilledName = getBeKilledInstName(beKilledInst)
+			print("test2...beKilledName:"..tostring(beKilledName))
+			if beKilledName and GLOBAL.PKC_PLAYER_INFOS[uid] then
+				print("test3...")
+				if beKilledInst:HasTag("player") then
+					world.components.pkc_playerinfos:addPlayerScoreByUserId(uid, GLOBAL.GAME_SCORE.KILL.PLAYER / 2)
+				else
+					world.components.pkc_playerinfos:addPlayerScoreByUserId(uid, GLOBAL.GAME_SCORE.KILL[beKilledInst.prefab] / 2)
+				end
+				world.components.pkc_playerinfos:addPlayerAssistsNum(uid)
+				local assistsPlayerName = GLOBAL.PKC_PLAYER_INFOS[uid].PLAYER_NAME or "Unknown"
+				GLOBAL.pkc_announce(assistsPlayerName.." 助攻击杀 "..beKilledName)
+			end
+		end
+	end
+end
+
 --boss击杀公告
-local function bossKilledAnnounce(boss, killer)
+local function bossKilledAnnounce(world, boss, killer)
 	if GLOBAL.BOSS_NAME[boss.prefab] then
+		if boss.components.pkc_assists then
+			print("test0....")
+			local assistsPlayers = boss.components.pkc_assists:getAssistsPlayers(killer)
+			assistKill(world, boss, assistsPlayers)
+		end
 		GLOBAL.pkc_announce(GLOBAL.MODAL_WORDS[math.random(#(GLOBAL.MODAL_WORDS))]..GLOBAL.PKC_SPEECH.COMMA..GLOBAL.BOSS_NAME[boss.prefab].NAME..GLOBAL.PKC_SPEECH.KILLED_ANNOUNCE.SPEECH1..killer.name..GLOBAL.PKC_SPEECH.KILLED_ANNOUNCE.SPEECH2)
 	end
 end
@@ -167,6 +212,10 @@ local function onEntityDied(data, inst)
 				if data.inst.components.pkc_group then --被击杀者有队伍
 					if data.inst.components.pkc_group:getChooseGroup() ~= data.afflicter.components.pkc_group:getChooseGroup() then --击杀的是其他队伍的成员
 						if data.inst:HasTag("player") then --击杀的是玩家
+							if data.inst.components.pkc_assists then
+								local assistsPlayers = data.inst.components.pkc_assists:getAssistsPlayers(data.afflicter)
+								assistKill(inst, data.inst, assistsPlayers)
+							end
 							inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL.PLAYER)
 							inst.components.pkc_playerinfos:addPlayerKillNum(data.afflicter)
 							inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL.PLAYER)
@@ -182,7 +231,7 @@ local function onEntityDied(data, inst)
 						end
 					end
 				else --被击杀者没有队伍
-					bossKilledAnnounce(data.inst, data.afflicter) --boss击杀公告
+					bossKilledAnnounce(inst, data.inst, data.afflicter) --boss击杀公告
 					if data.inst.prefab ~= nil and GLOBAL.GAME_SCORE.KILL[data.inst.prefab] ~= nil then
 						inst.components.pkc_groupscore:addGroupScore(killer_group_id, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])
 						inst.components.pkc_playerinfos:addPlayerScore(data.afflicter, GLOBAL.GAME_SCORE.KILL[data.inst.prefab])

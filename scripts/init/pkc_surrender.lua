@@ -88,7 +88,7 @@ GLOBAL.Networking_Say = function(guid, userid, name, prefab, message, colour, wh
             --检查是否投票成功
             local totalGroupPlayerNum = getGroupPlayerNumByGroupId(groupId) --获取队伍的总人数
             local needValidSurrenderNum = getNeedValidSurrenderNum(totalGroupPlayerNum) --获取需要的有效投票数
-            local hasSurrenderNum = #(pkc_surrender_list[groupId]) --队伍已经投降的人数
+            local hasSurrenderNum = tablelength(pkc_surrender_list[groupId]) --队伍已经投降的人数
             if hasSurrenderNum >= needValidSurrenderNum then
                 --投票成功
                 message = string.format(PKC_SPEECH.SURRENDER_SPEECH.SPEECH3, hasSurrenderNum, totalGroupPlayerNum)

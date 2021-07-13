@@ -178,9 +178,9 @@ end
 
 --系统公告
 --@param content 公告内容
-function pkc_announce(content, lifetime)
-    if lifetime ~= nil then
-        TheNet:Announce(content, nil, nil, lifetime)
+function pkc_announce(content, category)
+    if category ~= nil then
+        TheNet:Announce(content, nil, nil, category)
     else
         TheNet:Announce(content)
     end
@@ -803,6 +803,10 @@ function pkc_removeByValue(list, value, removeAll)
         i = i + 1
     end
     return deleteNum
+end
+
+function pkc_removeByKey(list, key)
+    list[key] = nil
 end
 
 function pkc_printArray(array)

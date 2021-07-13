@@ -74,12 +74,21 @@ local function onKillNumInfoDirty(inst)
     end
 end
 
+local function onAssistsNumInfoDirty(inst)
+    local self = inst.components.pkc_playerinfos
+    local info = json.decode(self._assistsnuminfo:value())
+    if PKC_PLAYER_INFOS[info.USERID] then
+        PKC_PLAYER_INFOS[info.USERID].PLAYER_ASSISTS_NUM = info.PLAYER_ASSISTS_NUM
+    end
+end
+
 local PKC_PLAYERINFOS = Class(function(self, inst)
     self.inst = inst
     self._playerinfos = net_string(self.inst.GUID, "pkc_playerinfo._playerinfos", "_playerinfosDirty")
     self._playerinfo = net_string(self.inst.GUID, "pkc_playerinfo._playerinfo", "_playerinfoDirty")
     self._scoreinfo = net_string(self.inst.GUID, "pkc_playerinfo._scoreinfo", "_scoreinfoDirty")
     self._killnuminfo = net_string(self.inst.GUID, "pkc_playerinfo._killnuminfo", "_killnuminfoDirty")
+    self._assistsnuminfo = net_string(self.inst.GUID, "pkc_playerinfo._assistsnuminfo", "_assistsnuminfoDirty")
 
     if TheNet:GetIsServer() then
         --监听队伍选择完成
@@ -92,6 +101,7 @@ local PKC_PLAYERINFOS = Class(function(self, inst)
     self.inst:ListenForEvent("_playerinfoDirty", onPlayerInfoDirty)
     self.inst:ListenForEvent("_scoreinfoDirty", onScoreInfoDirty)
     self.inst:ListenForEvent("_killnuminfoDirty", onKillNumInfoDirty)
+    self.inst:ListenForEvent("_assistsnuminfoDirty", onAssistsNumInfoDirty)
 end, nil, {})
 
 -- 设置玩家信息
@@ -126,6 +136,17 @@ function PKC_PLAYERINFOS:addPlayerScore(player, score)
     end
 end
 
+-- 增加玩家分数
+function PKC_PLAYERINFOS:addPlayerScoreByUserId(userid, score)
+    if player and PKC_PLAYER_INFOS[userid] then
+        local newScore = (PKC_PLAYER_INFOS[userid].PLAYER_SCORE or 0) + (score or 1)
+        local scoreinfo = {}
+        scoreinfo.USERID = userid
+        scoreinfo.PLAYER_SCORE = newScore
+        self._scoreinfo:set(json.encode(scoreinfo))
+    end
+end
+
 -- 增加玩家击杀个数
 function PKC_PLAYERINFOS:addPlayerKillNum(player, num)
     if player and PKC_PLAYER_INFOS[player.userid] then
@@ -134,6 +155,17 @@ function PKC_PLAYERINFOS:addPlayerKillNum(player, num)
         info.USERID = player.userid
         info.PLAYER_KILLNUM = newKillNum
         self._killnuminfo:set(json.encode(info))
+    end
+end
+
+--增加玩家助攻击杀个数
+function PKC_PLAYERINFOS:addPlayerAssistsNum(userid, num)
+    if userid then
+        local newAssistNum = (PKC_PLAYER_INFOS[userid].PLAYER_ASSISTS_NUM or 0) + (num or 1)
+        local info = {}
+        info.USERID = userid
+        info.PLAYER_ASSISTS_NUM = newAssistNum
+        self._assistsnuminfo:set(json.encode(info))
     end
 end
 

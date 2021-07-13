@@ -18,6 +18,11 @@ if GetModConfigData("language") == "chinese" then
 		pkc_bunnymanking = {NAME = "兔人国王"},
 		pkc_mermking = {NAME = "鱼人国王"},
 		pkc_rockyking = {NAME = "石虾国王"},
+		antlion = {NAME = "蚁狮"},
+		stalker_forest = {NAME = "潜行者"},
+		stalker = {NAME = "潜行者"},
+		stalker_atrium = {NAME = "远古潜行者"},
+		krampus = {NAME = "坎普斯"},
 	}
 	
 	--语气词
@@ -264,6 +269,11 @@ else
 		pkc_bunnymanking = {NAME = "Bunny Man King"},
 		pkc_mermking = {NAME = "Merm King"},
 		pkc_rockyking = {NAME = "Rocky King"},
+		antlion = {NAME = "蚁狮"},
+		stalker_forest = {NAME = "潜行者"},
+		stalker = {NAME = "潜行者"},
+		stalker_atrium = {NAME = "远古潜行者"},
+		krampus = {NAME = "坎普斯"},
 	}
 
 	GLOBAL.MODAL_WORDS = {

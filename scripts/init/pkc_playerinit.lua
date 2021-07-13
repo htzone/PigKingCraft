@@ -10,6 +10,11 @@ local IsServer = TheNet:GetIsServer()
 --当玩家被攻击时有一定几率虚弱
 local function onAttacked(inst, data)
 	if inst and data and data.attacker then
+		if data.attacker:HasTag("player") and data.attacker.components.pkc_group
+				and inst.components.pkc_assists then
+			inst.components.pkc_assists:addAssistsPlayer(data.attacker.userid,
+					data.attacker.components.pkc_group:getChooseGroup())
+		end
 		if inst:HasTag("pkc_gohome") then
 			inst:RemoveTag("pkc_gohome")
 		end
@@ -61,6 +66,8 @@ AddPlayerPostInit(function(player)
 			end
 		end)
 		if IsServer then
+			--助攻统计
+			player:AddComponent("pkc_assists")
 			--计时器
 			if not player.components.timer then
 				player:AddComponent("timer")
